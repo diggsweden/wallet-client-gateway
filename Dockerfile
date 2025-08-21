@@ -1,13 +1,11 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
-# Multi-stage Dockerfile for EUDIW Client Gateway
-
 # Stage 1: Build stage
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
 LABEL maintainer="Digg - Agency for Digital Government"
-LABEL description="Build stage for EUDIW Client Gateway"
+LABEL description="Build stage for Wallet Client Gateway"
 
 # Install dependencies needed for building
 RUN apk add --no-cache curl
@@ -36,7 +34,7 @@ RUN ./mvnw clean package -DskipTests -B && \
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
 LABEL maintainer="Digg - Agency for Digital Government"
-LABEL description="EUDIW Client Gateway - European Digital Identity Wallet Client Gateway"
+LABEL description="Wallet Client Gateway - European Digital Identity Wallet Client Gateway"
 LABEL version="0.1.0-SNAPSHOT"
 
 # Install runtime dependencies

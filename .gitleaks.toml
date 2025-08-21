@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
-# Gitleaks configuration file for EUDIW Client Gateway
+# Gitleaks configuration file for Wallet Client Gateway
 
-title = "EUDIW Client Gateway - Gitleaks Configuration"
+title = "Wallet Client Gateway - Gitleaks Configuration"
 
 [extend]
 # Base rules can be extended here if needed

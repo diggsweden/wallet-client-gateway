@@ -1,126 +1,124 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!--
   SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
   SPDX-License-Identifier: EUPL-1.2
 -->
-<ruleset name="Custom Rules"
-    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+<ruleset
+  name="Custom Rules"
+  xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd"
+>
+  <description>PMD configuration for Wallet Client Gateway project</description>
 
-    <description>
-        PMD configuration for EUDIW Client Gateway project
-    </description>
+  <!-- Best Practices -->
+  <rule ref="category/java/bestpractices.xml">
+    <!-- Exclude rules that conflict with modern Spring Boot patterns -->
+    <exclude name="JUnitTestsShouldIncludeAssert" />
+    <exclude name="JUnitAssertionsShouldIncludeMessage" />
+    <exclude name="GuardLogStatement" />
+    <exclude name="UseVarargs" />
+  </rule>
 
-    <!-- Best Practices -->
-    <rule ref="category/java/bestpractices.xml">
-        <!-- Exclude rules that conflict with modern Spring Boot patterns -->
-        <exclude name="JUnitTestsShouldIncludeAssert"/>
-        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
-        <exclude name="GuardLogStatement"/>
-        <exclude name="UseVarargs"/>
-    </rule>
+  <!-- Code Style -->
+  <rule ref="category/java/codestyle.xml">
+    <!-- Exclude overly strict naming and formatting rules -->
+    <exclude name="ShortVariable" />
+    <exclude name="LongVariable" />
+    <exclude name="TooManyStaticImports" />
+    <exclude name="OnlyOneReturn" />
+    <exclude name="AtLeastOneConstructor" />
+    <exclude name="CallSuperInConstructor" />
+    <exclude name="CommentDefaultAccessModifier" />
+    <exclude name="DefaultPackage" />
+    <exclude name="UnnecessaryConstructor" />
+    <exclude name="UnnecessaryLocalBeforeReturn" />
+    <exclude name="UselessParentheses" />
+    <exclude name="ConfusingTernary" />
+  </rule>
 
-    <!-- Code Style -->
-    <rule ref="category/java/codestyle.xml">
-        <!-- Exclude overly strict naming and formatting rules -->
-        <exclude name="ShortVariable"/>
-        <exclude name="LongVariable"/>
-        <exclude name="TooManyStaticImports"/>
-        <exclude name="OnlyOneReturn"/>
-        <exclude name="AtLeastOneConstructor"/>
-        <exclude name="CallSuperInConstructor"/>
-        <exclude name="CommentDefaultAccessModifier"/>
-        <exclude name="DefaultPackage"/>
-        <exclude name="UnnecessaryConstructor"/>
-        <exclude name="UnnecessaryLocalBeforeReturn"/>
-        <exclude name="UselessParentheses"/>
-        <exclude name="ConfusingTernary"/>
-    </rule>
+  <!-- Design -->
+  <rule ref="category/java/design.xml">
+    <!-- Exclude rules that don't fit Spring Boot architecture -->
+    <exclude name="UseUtilityClass" />
+    <exclude name="LawOfDemeter" />
+    <exclude name="LoosePackageCoupling" />
+    <exclude name="DataClass" />
+    <exclude name="TooManyMethods" />
+    <exclude name="ExcessiveImports" />
+    <exclude name="CouplingBetweenObjects" />
+    <exclude name="ExcessiveParameterList" />
+  </rule>
 
-    <!-- Design -->
-    <rule ref="category/java/design.xml">
-        <!-- Exclude rules that don't fit Spring Boot architecture -->
-        <exclude name="UseUtilityClass"/>
-        <exclude name="LawOfDemeter"/>
-        <exclude name="LoosePackageCoupling"/>
-        <exclude name="DataClass"/>
-        <exclude name="TooManyMethods"/>
-        <exclude name="ExcessiveImports"/>
-        <exclude name="CouplingBetweenObjects"/>
-        <exclude name="ExcessiveParameterList"/>
-    </rule>
+  <!-- Error Prone -->
+  <rule ref="category/java/errorprone.xml">
+    <!-- Exclude rules that don't apply to modern Java -->
+    <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="DataflowAnomalyAnalysis" />
+    <exclude name="AvoidLiteralsInIfCondition" />
+    <exclude name="NullAssignment" />
+    <exclude name="UseProperClassLoader" />
+    <exclude name="TestClassWithoutTestCases" />
+  </rule>
 
-    <!-- Error Prone -->
-    <rule ref="category/java/errorprone.xml">
-        <!-- Exclude rules that don't apply to modern Java -->
-        <exclude name="BeanMembersShouldSerialize"/>
-        <exclude name="DataflowAnomalyAnalysis"/>
-        <exclude name="AvoidLiteralsInIfCondition"/>
-        <exclude name="NullAssignment"/>
-        <exclude name="UseProperClassLoader"/>
-        <exclude name="TestClassWithoutTestCases"/>
-    </rule>
+  <!-- Multithreading -->
+  <rule ref="category/java/multithreading.xml">
+    <!-- Exclude rules that don't apply to Spring Boot applications -->
+    <exclude name="DoNotUseThreads" />
+    <exclude name="AvoidSynchronizedAtMethodLevel" />
+    <exclude name="UseConcurrentHashMap" />
+  </rule>
 
-    <!-- Multithreading -->
-    <rule ref="category/java/multithreading.xml">
-        <!-- Exclude rules that don't apply to Spring Boot applications -->
-        <exclude name="DoNotUseThreads"/>
-        <exclude name="AvoidSynchronizedAtMethodLevel"/>
-        <exclude name="UseConcurrentHashMap"/>
-    </rule>
+  <!-- Performance -->
+  <rule ref="category/java/performance.xml">
+    <!-- Most performance rules are good to keep -->
+    <exclude name="AvoidInstantiatingObjectsInLoops" />
+    <exclude name="TooFewBranchesForASwitchStatement" />
+  </rule>
 
-    <!-- Performance -->
-    <rule ref="category/java/performance.xml">
-        <!-- Most performance rules are good to keep -->
-        <exclude name="AvoidInstantiatingObjectsInLoops"/>
-        <exclude name="TooFewBranchesForASwitchStatement"/>
-    </rule>
+  <!-- Security -->
+  <rule ref="category/java/security.xml" />
 
-    <!-- Security -->
-    <rule ref="category/java/security.xml"/>
+  <!-- Customize some rules with specific settings -->
+  <rule ref="category/java/design.xml/ExcessiveClassLength">
+    <properties>
+      <property name="minimum" value="500" />
+    </properties>
+  </rule>
 
-    <!-- Customize some rules with specific settings -->
-    <rule ref="category/java/design.xml/ExcessiveClassLength">
-        <properties>
-            <property name="minimum" value="500"/>
-        </properties>
-    </rule>
+  <rule ref="category/java/design.xml/ExcessiveMethodLength">
+    <properties>
+      <property name="minimum" value="50" />
+    </properties>
+  </rule>
 
-    <rule ref="category/java/design.xml/ExcessiveMethodLength">
-        <properties>
-            <property name="minimum" value="50"/>
-        </properties>
-    </rule>
+  <rule ref="category/java/design.xml/CyclomaticComplexity">
+    <properties>
+      <property name="methodReportLevel" value="10" />
+    </properties>
+  </rule>
 
-    <rule ref="category/java/design.xml/CyclomaticComplexity">
-        <properties>
-            <property name="methodReportLevel" value="10"/>
-        </properties>
-    </rule>
+  <rule ref="category/java/design.xml/NPathComplexity">
+    <properties>
+      <property name="reportLevel" value="200" />
+    </properties>
+  </rule>
 
-    <rule ref="category/java/design.xml/NPathComplexity">
-        <properties>
-            <property name="reportLevel" value="200"/>
-        </properties>
-    </rule>
+  <rule ref="category/java/codestyle.xml/ShortClassName">
+    <properties>
+      <property name="minimum" value="3" />
+    </properties>
+  </rule>
 
-    <rule ref="category/java/codestyle.xml/ShortClassName">
-        <properties>
-            <property name="minimum" value="3"/>
-        </properties>
-    </rule>
+  <rule ref="category/java/codestyle.xml/LongVariable">
+    <properties>
+      <property name="minimum" value="30" />
+    </properties>
+  </rule>
 
-    <rule ref="category/java/codestyle.xml/LongVariable">
-        <properties>
-            <property name="minimum" value="30"/>
-        </properties>
-    </rule>
-
-    <rule ref="category/java/codestyle.xml/ShortVariable">
-        <properties>
-            <property name="minimum" value="2"/>
-        </properties>
-    </rule>
-
+  <rule ref="category/java/codestyle.xml/ShortVariable">
+    <properties>
+      <property name="minimum" value="2" />
+    </properties>
+  </rule>
 </ruleset>

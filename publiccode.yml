@@ -15,7 +15,7 @@ description:
     features:
       - Digital Identity Wallet Gateway
       - Secure API Endpoints
-      - EUDIW Architecture Compliance
+      - Wallet Architecture Compliance
       - Credential Management
     longDescription: |
       A secure client gateway implementation for the European Digital Identity 
@@ -42,7 +42,7 @@ maintenance:
   contacts:
     - name: ospo@digg.se
   type: internal
-name: EUDIW Client Gateway
+name: Wallet Client Gateway
 platforms:
   - web
   - linux
@@ -51,4 +51,4 @@ platforms:
 releaseDate: "2025-08-22"
 softwareType: standalone/backend
 softwareVersion: "0.1.0"
-url: "https://github.com/diggsweden/eudiw-client-gateway.git"
+url: "https://github.com/diggsweden/wallet-client-gateway.git"

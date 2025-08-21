@@ -4,7 +4,7 @@
 
 spring:
   application:
-    name: eudiw-client-gateway
+    name: wallet-client-gateway
   jpa:
     database: POSTGRESQL
     hibernate:
