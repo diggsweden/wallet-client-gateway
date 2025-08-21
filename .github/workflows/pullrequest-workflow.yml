@@ -19,8 +19,9 @@ permissions:
 jobs:
   commitlint:
     uses: diggsweden/.github/.github/workflows/commit-lint.yml@main
-  dependencyreviewlint:
-    uses: diggsweden/.github/.github/workflows/dependency-review.yml@main
+  # dependencyreviewlint:
+  #   uses: diggsweden/.github/.github/workflows/dependency-review.yml@main
+  #   # Disabled: requires GitHub Advanced Security ($19/month for private repos)
   licenselint:
     uses: diggsweden/.github/.github/workflows/license-lint.yml@main
   misclint:
@@ -32,5 +33,5 @@ jobs:
     permissions:
       contents: read
     if: always()
-    needs: [licenselint, commitlint, dependencyreviewlint, misclint]
+    needs: [licenselint, commitlint, misclint]
     uses: ./.github/workflows/test.yml
