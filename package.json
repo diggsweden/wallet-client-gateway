@@ -1,0 +1,7 @@
+{
+  "name": "wallet-backend-reference",
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.2",
+    "prettier": "^3.6.2"
+  }
+}
