@@ -3,7 +3,7 @@
 
 # Docker Compose configuration for EUDIW Client Gateway development
 
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
