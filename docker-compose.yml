@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+
+# Docker Compose configuration for EUDIW Client Gateway development
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: eudiw-postgres
+    environment:
+      POSTGRES_DB: eudiw_gateway
+      POSTGRES_USER: eudiw_gateway
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    restart: unless-stopped
+    networks:
+      - eudiw-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  eudiw-network:
+    driver: bridge

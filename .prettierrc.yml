@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+---
+plugins:
+  - "@prettier/plugin-xml"
+#
+# This enables automated whitespace formatting of XML files.
+# However, there is a slight risk that this can introduce semantic changes.
+# In those, expectedly rare, cases we can disable formatting selectively using
+# either the .prettierignore file or by using ignore ranges:
+# <foo>
+#  <!-- prettier-ignore-start -->
+#    <this-content-will-not-be-formatted     />
+#  <!-- prettier-ignore-end -->
+# </foo>
+#
+xmlWhitespaceSensitivity: "ignore"

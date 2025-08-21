@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+{"RuleID":"digg-email-address","StartLine":1,"EndLine":1,"StartColumn":13,"EndColumn":32,"Match":"super-secret@digg.se","Secret":"super-secret"}
+{"RuleID":"digg-email-address","StartLine":8,"EndLine":8,"StartColumn":2,"EndColumn":25,"Match":"super.secret@foo.digg.se","Secret":"super.secret"}
+{"RuleID":"digg-email-address","StartLine":9,"EndLine":9,"StartColumn":2,"EndColumn":21,"Match":"super.secret@digg.se","Secret":"super.secret"}
+{"RuleID":"digg-email-address","StartLine":10,"EndLine":10,"StartColumn":2,"EndColumn":19,"Match":"secret@foo-digg.se","Secret":"secret"}
+{"RuleID":"digg-email-address","StartLine":11,"EndLine":11,"StartColumn":2,"EndColumn":19,"Match":"secret@digg-foo.se","Secret":"secret"}
+{"RuleID":"digg-internal-hosts","StartLine":1,"EndLine":1,"StartColumn":34,"EndColumn":47,"Match":"secret.digg.se","Secret":"secret."}
+{"RuleID":"digg-internal-hosts","StartLine":2,"EndLine":2,"StartColumn":6,"EndColumn":19,"Match":"secret.digg.se","Secret":"secret."}
+{"RuleID":"digg-internal-hosts","StartLine":3,"EndLine":3,"StartColumn":2,"EndColumn":21,"Match":"super-secret.digg.se","Secret":"super-secret."}
+{"RuleID":"digg-internal-hosts","StartLine":4,"EndLine":4,"StartColumn":2,"EndColumn":27,"Match":"super_duper-secret.digg.se","Secret":"super_duper-secret."}
+{"RuleID":"digg-internal-hosts","StartLine":5,"EndLine":5,"StartColumn":2,"EndColumn":22,"Match":"secret.typo...digg.se","Secret":"secret.typo..."}
+{"RuleID":"digg-internal-hosts","StartLine":6,"EndLine":6,"StartColumn":2,"EndColumn":15,"Match":"secret-digg.se","Secret":"secret-"}
+{"RuleID":"digg-internal-hosts","StartLine":7,"EndLine":7,"StartColumn":2,"EndColumn":15,"Match":"digg-secret.se","Secret":"-secret"}
+{"RuleID":"digg-internal-hosts","StartLine":8,"EndLine":8,"StartColumn":15,"EndColumn":25,"Match":"foo.digg.se","Secret":"foo."}
+{"RuleID":"digg-internal-hosts","StartLine":10,"EndLine":10,"StartColumn":9,"EndColumn":19,"Match":"foo-digg.se","Secret":"foo-"}
+{"RuleID":"digg-internal-hosts","StartLine":11,"EndLine":11,"StartColumn":9,"EndColumn":19,"Match":"digg-foo.se","Secret":"-foo"}

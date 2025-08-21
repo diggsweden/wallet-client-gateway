@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+foo digg.se super-secret@digg.se secret.digg.se bar
+foo secret.digg.se digg.se bar
+super-secret.digg.se
+super_duper-secret.digg.se
+secret.typo...digg.se
+secret-digg.se
+digg-secret.se
+super.secret@foo.digg.se
+super.secret@digg.se
+secret@foo-digg.se
+secret@digg-foo.se
