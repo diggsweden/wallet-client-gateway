@@ -25,7 +25,7 @@ SPDX-License-Identifier: EUPL-1.2
   <logger name="liquibase" level="WARN" />
 
   <!-- Application-specific loggers -->
-  <logger name="se.digg.eudiw.gateway" level="INFO" additivity="false">
+  <logger name="se.digg.wallet.gateway" level="INFO" additivity="false">
     <appender-ref ref="CONSOLE" />
   </logger>
 

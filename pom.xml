@@ -15,14 +15,14 @@
     <relativePath />
   </parent>
 
-  <groupId>se.digg.eudiw</groupId>
-  <artifactId>eudiw-client-gateway</artifactId>
+  <groupId>se.digg.wallet</groupId>
+  <artifactId>wallet-client-gateway</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>EUDIW Client Gateway</name>
+  <name>Wallet Client Gateway</name>
   <description>European Digital Identity Wallet Client Gateway</description>
-  <url>https://github.com/diggsweden/eudiw-client-gateway</url>
+  <url>https://github.com/diggsweden/wallet-client-gateway</url>
   <organization>
     <name>Digg - Agency for Digital Government</name>
     <url>https://www.digg.se</url>

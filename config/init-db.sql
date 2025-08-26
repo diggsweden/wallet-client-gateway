@@ -1,20 +1,18 @@
 -- SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 -- SPDX-License-Identifier: EUPL-1.2
 
--- Database initialization script for EUDIW Client Gateway
-
 -- Create database user if not exists
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = 'eudiw_gateway') THEN
-        CREATE USER eudiw_gateway WITH ENCRYPTED PASSWORD 'postgres';
+    IF NOT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = 'wallet_gateway') THEN
+        CREATE USER wallet_gateway WITH ENCRYPTED PASSWORD 'postgres';
     END IF;
 END
 $$;
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE eudiw_gateway TO eudiw_gateway;
-GRANT ALL PRIVILEGES ON SCHEMA public TO eudiw_gateway;
+GRANT ALL PRIVILEGES ON DATABASE wallet_gateway TO wallet_gateway;
+GRANT ALL PRIVILEGES ON SCHEMA public TO wallet_gateway;
 
 -- Create extensions if needed
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

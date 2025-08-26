@@ -2,15 +2,15 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.eudiw.gateway;
+package se.digg.wallet.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EudiwClientGatewayApplication {
+public class WalletClientGatewayApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(EudiwClientGatewayApplication.class, args);
+    SpringApplication.run(WalletClientGatewayApplication.class, args);
   }
 }

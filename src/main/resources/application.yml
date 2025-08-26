@@ -1,17 +1,17 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
-# EUDIW Client Gateway Configuration
+# Wallet Client Gateway Configuration
 
 server:
   port: 8080
 spring:
   application:
-    name: eudiw-client-gateway
+    name: wallet-client-gateway
   profiles:
     active: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/eudiw_gateway
+    url: jdbc:postgresql://localhost:5432/wallet_gateway
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver

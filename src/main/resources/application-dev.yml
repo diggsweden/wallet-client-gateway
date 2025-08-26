@@ -6,5 +6,5 @@ spring:
     compose:
       enabled: true
   datasource:
-    username: eudiw_gateway
+    username: wallet_gateway
     password: postgres
