@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: "0.4"
+categories:
+  - identity-management
+  - security
+description:
+  en:
+    features:
+      - Digital Identity Wallet Gateway
+      - Secure API Endpoints
+      - Wallet Architecture Compliance
+      - Credential Management
+    longDescription: |
+      A secure client gateway implementation for the European Digital Identity 
+      Wallet (EUDIW) ecosystem, providing standardized API endpoints and secure 
+      communication channels for digital identity verification and credential 
+      management.
+
+      This gateway serves as a bridge between client applications and the EUDIW 
+      infrastructure, ensuring secure and compliant handling of digital identity 
+      credentials according to European standards and regulations.
+
+      Key features include secure authentication, credential verification, 
+      API gateway functionality, and compliance with EUDIW architecture 
+      requirements.
+    shortDescription: "Secure client gateway for European Digital Identity Wallet ecosystem"
+developmentStatus: development
+legal:
+  license: EUPL-1.2
+localisation:
+  availableLanguages:
+    - en
+  localisationReady: false
+maintenance:
+  contacts:
+    - name: ospo@digg.se
+  type: internal
+name: Wallet Client Gateway
+platforms:
+  - web
+  - linux
+  - windows
+  - mac
+releaseDate: "2025-08-22"
+softwareType: standalone/backend
+softwareVersion: "0.1.0"
+url: "https://github.com/diggsweden/wallet-client-gateway.git"

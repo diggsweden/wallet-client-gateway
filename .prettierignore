@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+**/*.md
+megalinter-reports
+target
+development/format/eclipse-java-google-style.xml
+development/lint/google_checks.xml
+development/sast/pmd_default_java.xml

@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+
+# Gitleaks configuration file for Wallet Client Gateway
+
+title = "Wallet Client Gateway - Gitleaks Configuration"
+
+[extend]
+# Base rules can be extended here if needed
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)((key|api|token|secret|password)[_-]?[=:\s]*['"]?[0-9a-zA-Z\-_]{20,})'''
+keywords = ["key", "api", "token", "secret", "password"]
+
+[[rules]]
+id = "slack-token"
+description = "Slack Token"
+regex = '''xox[baprs]-([0-9a-zA-Z]{10,48})'''
+keywords = ["slack"]
+
+[[rules]]
+id = "aws-access-token"
+description = "AWS"
+regex = '''AKIA[0-9A-Z]{16}'''
+keywords = ["AKIA"]
+
+[[rules]]
+id = "github-pat"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+keywords = ["ghp_"]
+
+[[rules]]
+id = "github-oauth"
+description = "GitHub OAuth Access Token"
+regex = '''gho_[0-9a-zA-Z]{36}'''
+keywords = ["gho_"]
+
+[[rules]]
+id = "ssh-rsa-private-key"
+description = "SSH RSA private key"
+regex = '''-----BEGIN RSA PRIVATE KEY-----'''
+keywords = ["-----BEGIN RSA PRIVATE KEY-----"]
+
+[[rules]]
+id = "ssh-dsa-private-key"
+description = "SSH DSA private key"
+regex = '''-----BEGIN DSA PRIVATE KEY-----'''
+keywords = ["-----BEGIN DSA PRIVATE KEY-----"]
+
+[[rules]]
+id = "ssh-ec-private-key"
+description = "SSH EC private key"
+regex = '''-----BEGIN EC PRIVATE KEY-----'''
+keywords = ["-----BEGIN EC PRIVATE KEY-----"]
+
+[[rules]]
+id = "pgp-private-block"
+description = "PGP private key block"
+regex = '''-----BEGIN PGP PRIVATE KEY BLOCK-----'''
+keywords = ["-----BEGIN PGP PRIVATE KEY BLOCK-----"]
+
+[allowlist]
+description = "Allowlisted files and patterns"
+files = [
+    '''(.*?)(\.test\.toml)$''',
+    '''(.*?)(\.example)$''',
+    '''(.*?)(README\.md)$''',
+    '''(.*?)(\.md)$''',
+    '''(.*?)(test)(.*)$''',
+    '''(.*?)(Test)(.*)$''',
+    '''(.*?)(spec)(.*)$''',
+    '''(.*?)(Spec)(.*)$'''
+]
+paths = [
+    '''src/test/''',
+    '''src/main/resources/application-test\.yml''',
+    '''src/main/resources/application-development\.yml''',
+    '''.github/''',
+    '''docs/''',
+    '''development/'''
+]
+regexes = [
+    '''placeholder''',
+    '''example''',
+    '''sample''',
+    '''demo''',
+    '''test''',
+    '''changeme''',
+    '''YOUR_''',
+    '''INSERT_''',
+    '''REPLACE_''',
+    '''<.*>''',
+    '''\$\{.*\}'''
+]
