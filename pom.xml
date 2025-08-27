@@ -44,16 +44,16 @@
 
   <scm>
     <connection>
-      scm:git:https://github.com/diggsweden/eudiw-client-gateway.git
+      scm:git:https://github.com/diggsweden/wallet-client-gateway.git
     </connection>
     <developerConnection>
-      scm:git:https://github.com/diggsweden/eudiw-client-gateway.git
+      scm:git:https://github.com/diggsweden/wallet-client-gateway.git
     </developerConnection>
-    <url>https://github.com/diggsweden/eudiw-client-gateway</url>
+    <url>https://github.com/diggsweden/wallet-client-gateway</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/diggsweden/eudiw-client-gateway/issues</url>
+    <url>https://github.com/diggsweden/wallet-client-gateway/issues</url>
   </issueManagement>
 
   <properties>
