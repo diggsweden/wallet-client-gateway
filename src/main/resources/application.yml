@@ -1,8 +1,12 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
-# Wallet Client Gateway Configuration
+# Application Properties
+properties:
+  apiSecret: ${API_SECRET}
+  downstreamServiceUrl: ${DOWNSTREAM_SERVICE_URL}
 
+# Wallet Client Gateway Configuration
 server:
   port: 8080
 spring:
