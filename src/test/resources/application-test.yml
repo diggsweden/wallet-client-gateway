@@ -1,0 +1,12 @@
+# This file is loaded only when the "test" profile is active.
+properties:
+  apiSecret: ${API_SECRET}
+  downstreamServiceUrl: ${DOWNSTREAM_SERVICE_URL}
+
+# We can also disable database and liquibase here instead of in the annotation
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration
