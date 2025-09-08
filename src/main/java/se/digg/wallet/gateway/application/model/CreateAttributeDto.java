@@ -4,8 +4,10 @@
 
 package se.digg.wallet.gateway.application.model;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class CreateAttributeDto {
-  private String value;
+  @NotBlank private String value;
 
   public String getValue() {
     return value;

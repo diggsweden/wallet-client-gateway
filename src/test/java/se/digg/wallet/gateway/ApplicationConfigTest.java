@@ -19,7 +19,8 @@ public class ApplicationConfigTest {
   public static final String SECRET_TEST_VALUE = "my-super-secret-test-value";
   public static final String TEST_SERVICE_URL = "http://test-service:8888";
   private final ApplicationContextRunner contextRunner = new ApplicationContextRunner();
-  @Autowired private ApplicationConfig applicationConfig;
+  @Autowired
+  private ApplicationConfig applicationConfig;
 
   /**
    * This static method is called before the application context is created. It adds properties that
