@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -20,8 +19,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -79,10 +78,6 @@ class AttributeControllerTest {
     when(attributeService.getAttribute(TEST_ATTRIBUTE_ID))
         .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-    mockMvc
-        .perform(get("/attributes/" + TEST_ATTRIBUTE_ID))
-        .andExpect(
-            result -> assertInstanceOf(HttpClientErrorException.class,
-                result.getResolvedException()));
+    mockMvc.perform(get("/attributes/" + TEST_ATTRIBUTE_ID)).andExpect(status().isNotFound());
   }
 }
