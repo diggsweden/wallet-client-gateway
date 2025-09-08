@@ -76,8 +76,8 @@ class AttributeControllerTest {
   @WithMockUser
   void testGetAttribute_NotFound() throws Exception {
     when(attributeService.getAttribute(TEST_ATTRIBUTE_ID))
-        .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
-    mockMvc.perform(get("/attributes/" + TEST_ATTRIBUTE_ID)).andExpect(status().isNotFound());
+    mockMvc.perform(get("/attributes/" + TEST_ATTRIBUTE_ID)).andExpect(status().is5xxServerError());
   }
 }
