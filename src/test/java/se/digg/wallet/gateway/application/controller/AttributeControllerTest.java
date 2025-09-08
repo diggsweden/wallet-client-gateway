@@ -32,11 +32,14 @@ class AttributeControllerTest {
   public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
   public static final String TEST_ATTRIBUTE_ID = "12345";
 
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-  @Autowired private ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
-  @MockitoBean private AttributeService attributeService;
+  @MockitoBean
+  private AttributeService attributeService;
 
   @Test
   @WithMockUser
@@ -65,7 +68,7 @@ class AttributeControllerTest {
     mockMvc
         .perform(get("/attributes/" + TEST_ATTRIBUTE_ID))
         .andExpect(
-            result ->
-                assertInstanceOf(HttpClientErrorException.class, result.getResolvedException()));
+            result -> assertInstanceOf(HttpClientErrorException.class,
+                result.getResolvedException()));
   }
 }

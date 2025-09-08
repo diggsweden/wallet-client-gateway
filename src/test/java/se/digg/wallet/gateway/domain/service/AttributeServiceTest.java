@@ -21,11 +21,14 @@ class AttributeServiceTest {
   public static final String TEST_DOWNSTREAM_SERVICE_URL = "http://localhost:8080/attributes";
   public static final String TEST_ATTRIBUTE_ID = "12345";
 
-  @Mock private RestTemplate restTemplate;
+  @Mock
+  private RestTemplate restTemplate;
 
-  @Mock private ApplicationConfig applicationConfig;
+  @Mock
+  private ApplicationConfig applicationConfig;
 
-  @InjectMocks private AttributeService attributeService;
+  @InjectMocks
+  private AttributeService attributeService;
 
   @BeforeEach
   void setUp() {
@@ -41,7 +44,7 @@ class AttributeServiceTest {
 
     when(applicationConfig.downstreamServiceUrl()).thenReturn(TEST_DOWNSTREAM_SERVICE_URL);
     when(restTemplate.postForObject(
-            TEST_DOWNSTREAM_SERVICE_URL, createAttributeDto, AttributeDto.class))
+        TEST_DOWNSTREAM_SERVICE_URL, createAttributeDto, AttributeDto.class))
         .thenReturn(expectedAttributeDto);
 
     // When
@@ -58,7 +61,7 @@ class AttributeServiceTest {
 
     when(applicationConfig.downstreamServiceUrl()).thenReturn(TEST_DOWNSTREAM_SERVICE_URL);
     when(restTemplate.getForObject(
-            TEST_DOWNSTREAM_SERVICE_URL + "/" + TEST_ATTRIBUTE_ID, AttributeDto.class))
+        TEST_DOWNSTREAM_SERVICE_URL + "/" + TEST_ATTRIBUTE_ID, AttributeDto.class))
         .thenReturn(expectedAttributeDto);
 
     // When
@@ -72,7 +75,7 @@ class AttributeServiceTest {
   void getAttribute_NotFound() {
     when(applicationConfig.downstreamServiceUrl()).thenReturn(TEST_DOWNSTREAM_SERVICE_URL);
     when(restTemplate.getForObject(
-            TEST_DOWNSTREAM_SERVICE_URL + "/" + TEST_ATTRIBUTE_ID, AttributeDto.class))
+        TEST_DOWNSTREAM_SERVICE_URL + "/" + TEST_ATTRIBUTE_ID, AttributeDto.class))
         .thenThrow(HttpClientErrorException.NotFound.class);
 
     // When & Then

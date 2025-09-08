@@ -17,7 +17,8 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Autowired private ApiKeyAuthenticationManager apiKeyAuthenticationManager;
+  @Autowired
+  private ApiKeyAuthenticationManager apiKeyAuthenticationManager;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
