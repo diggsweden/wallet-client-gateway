@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 
 # Stage 1: Build stage
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM docker.io/library/eclipse-temurin:21-jdk-alpine AS builder
 
 LABEL maintainer="Digg - Agency for Digital Government"
 LABEL description="Build stage for Wallet Client Gateway"
@@ -26,54 +26,25 @@ RUN ./mvnw dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests -B && \
+# Build the application (skip checkstyle in Docker build)
+RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip=true -B && \
     java -Djarmode=layertools -jar target/*.jar extract
 
 # Stage 2: Runtime stage
-FROM eclipse-temurin:21-jre-alpine AS runtime
+FROM gcr.io/distroless/java21-debian12:nonroot AS runtime
 
 LABEL maintainer="Digg - Agency for Digital Government"
-LABEL description="Wallet Client Gateway - European Digital Identity Wallet Client Gateway"
-LABEL version="0.1.0-SNAPSHOT"
+LABEL description="Wallet Client Gateway"
 
-# Install runtime dependencies
-RUN apk add --no-cache \
-    curl \
-    ca-certificates \
-    tzdata && \
-    rm -rf /var/cache/apk/*
-
-# Create non-root user
-RUN addgroup -g 1000 appuser && \
-    adduser -D -u 1000 -G appuser appuser
-
-# Create app directory
 WORKDIR /app
 
-# Copy Spring Boot layers from builder stage
-COPY --from=builder --chown=appuser:appuser /app/dependencies/ ./
-COPY --from=builder --chown=appuser:appuser /app/spring-boot-loader/ ./
-COPY --from=builder --chown=appuser:appuser /app/snapshot-dependencies/ ./
-COPY --from=builder --chown=appuser:appuser /app/application/ ./
+# Copy Spring Boot layers from builder stage (nonroot user: 65532)
+COPY --from=builder --chown=65532:65532 /app/dependencies/ ./
+COPY --from=builder --chown=65532:65532 /app/spring-boot-loader/ ./
+COPY --from=builder --chown=65532:65532 /app/snapshot-dependencies/ ./
+COPY --from=builder --chown=65532:65532 /app/application/ ./
 
-# Switch to non-root user
-USER appuser
-
-# Expose port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-# Set JVM options for container environment
-ENV JAVA_OPTS="-XX:+UseContainerSupport \
-    -XX:MaxRAMPercentage=75.0 \
-    -XX:+UseG1GC \
-    -XX:+UseStringDeduplication \
-    -Djava.security.egd=file:/dev/./urandom \
-    -Dfile.encoding=UTF-8"
-
-# Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
+# JVM options are set directly in ENTRYPOINT since distroless has no shell
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-Djava.security.egd=file:/dev/./urandom", "-Dfile.encoding=UTF-8", "org.springframework.boot.loader.launch.JarLauncher"]

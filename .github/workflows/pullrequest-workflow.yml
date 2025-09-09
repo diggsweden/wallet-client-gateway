@@ -39,3 +39,10 @@ jobs:
     if: always()
     needs: [licenselint, commitlint, misclint]
     uses: ./.github/workflows/test.yml
+  build-image:
+    permissions:
+      contents: read
+      packages: write
+    if: always()
+    needs: [licenselint, commitlint, misclint]
+    uses: ./.github/workflows/build-image.yml
