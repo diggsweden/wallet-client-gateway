@@ -5,7 +5,7 @@
 package se.digg.wallet.gateway.domain.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.AttributeDto;
 import se.digg.wallet.gateway.application.model.CreateAttributeDto;
@@ -13,21 +13,30 @@ import se.digg.wallet.gateway.application.model.CreateAttributeDto;
 @Service
 public class AttributeService {
 
-  private final RestTemplate restTemplate;
+  private final WebClient webClient;
   private final ApplicationConfig applicationConfig;
 
-  public AttributeService(RestTemplate restTemplate, ApplicationConfig applicationConfig) {
-    this.restTemplate = restTemplate;
+  public AttributeService(WebClient webClient, ApplicationConfig applicationConfig) {
+    this.webClient = webClient;
     this.applicationConfig = applicationConfig;
   }
 
   public AttributeDto createAttribute(CreateAttributeDto createAttributeDto) {
-    return restTemplate.postForObject(
-        applicationConfig.downstreamServiceUrl(), createAttributeDto, AttributeDto.class);
+    return webClient
+        .post()
+        .uri(applicationConfig.downstreamServiceUrl())
+        .bodyValue(createAttributeDto)
+        .retrieve()
+        .bodyToMono(AttributeDto.class)
+        .block();
   }
 
   public AttributeDto getAttribute(String id) {
-    return restTemplate.getForObject(
-        applicationConfig.downstreamServiceUrl() + "/" + id, AttributeDto.class);
+    return webClient
+        .get()
+        .uri(applicationConfig.downstreamServiceUrl() + "/" + id)
+        .retrieve()
+        .bodyToMono(AttributeDto.class)
+        .block();
   }
 }
