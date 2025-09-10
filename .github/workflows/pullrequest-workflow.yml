@@ -43,6 +43,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write # Required for SLSA provenance
+      actions: read # Required for SLSA provenance v2
     if: always()
-    needs: [licenselint, commitlint, misclint]
-    uses: ./.github/workflows/build-image.yml
+    needs: [licenselint, commitlint, misclint, test]
+    uses: ./.github/workflows/release-publish.yml
