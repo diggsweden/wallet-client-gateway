@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2024 Digg - The Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Release Workflow
+
+on:
+  push:
+    tags:
+      - "v[0-9]*.[0-9]*" # Forces at least vX.Y and then allows anything after
+
+permissions:
+  contents: read
+
+jobs:
+  version-bump:
+    secrets: inherit
+    permissions:
+      contents: write
+      packages: read
+    uses: diggsweden/.github/.github/workflows/version-bump-changelog.yml@main
+    with:
+      updatePom: true
+      file_pattern: pom.xml CHANGELOG.md
+
+  publish:
+    needs: [version-bump]
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # Required for SLSA provenance
+      actions: read # Required for SLSA provenance v2
+    uses: ./.github/workflows/release-publish.yml
