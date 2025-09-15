@@ -31,3 +31,12 @@ jobs:
       id-token: write # Required for SLSA provenance
       actions: read # Required for SLSA provenance v2
     uses: ./.github/workflows/release-publish.yml
+
+  release:
+    needs: [publish]
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    secrets: inherit
+    uses: ./.github/workflows/release.yml
