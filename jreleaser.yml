@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Basic project metadata
+project:
+  name: wallet-client-gateway
+  description: EUDIW client gateway - Backend for Frontend serving mobile and web apps
+  license: EUPL-1.2
+  copyright: 2025 Digg - The Agency for Digital Government
+  inceptionYear: 2025
+  authors:
+    - Digg - Agency for Digital Government
+  snapshot:
+    pattern: .*-SNAPSHOT
+    label: early-access
+    fullChangelog: true
+
+# GitHub release configuration
+release:
+  github:
+    owner: diggsweden
+    overwrite: true # Allows updating existing releases
+    draft: false # Creates as final release, not draft
+    sign: true # Signs release assets
+    branch: main
+    changelog:
+      external: ReleasenotesTmp
+
+checksum:
+  algorithms:
+    - SHA-256
+    - SHA-512
+
+# GPG signing configuration
+signing:
+  active: ALWAYS
+  armored: true
+
+# SBOM generation
+catalog:
+  sbom:
+    syft:
+      active: ALWAYS
+      formats:
+        - CYCLONEDX_JSON
+        - SPDX_JSON
+      pack:
+        enabled: true
+
+# Syft need to know what to sign
+distributions:
+  library:
+    artifacts:
+      - path: target/{{projectName}}-{{projectVersion}}.jar

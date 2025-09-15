@@ -64,6 +64,8 @@
     <formatter-maven-plugin.version>2.26.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <checkstyle.version>10.25.0</checkstyle.version>
+
+    <jreleaser-maven-plugin.version>1.20.0</jreleaser-maven-plugin.version>
   </properties>
 
   <dependencies>
@@ -238,6 +240,16 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Release -->
+      <plugin>
+        <groupId>org.jreleaser</groupId>
+        <artifactId>jreleaser-maven-plugin</artifactId>
+        <version>${jreleaser-maven-plugin.version}</version>
+        <configuration>
+          <configFile>${project.basedir}/jreleaser.yml</configFile>
+        </configuration>
       </plugin>
     </plugins>
   </build>
