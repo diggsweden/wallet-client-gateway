@@ -40,7 +40,6 @@ jobs:
         run: |
           # shellcheck disable=SC2086
           mvn $MAVEN_CLI_OPTS package -DskipTests         
-          cache: "maven" # Enables Maven caching
 
       - name: Import GPG key # Added this step
         uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
