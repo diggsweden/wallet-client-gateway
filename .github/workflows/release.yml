@@ -60,7 +60,7 @@ jobs:
           PACKAGE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           # shellcheck disable=SC2086 
-          mvn $MAVEN_CLI_OPTS deploy jreleaser:full-release -DskipTests
+          mvn $MAVEN_CLI_OPTS jreleaser:full-release -DskipTests
 
       - name: JReleaser output
         if: always()
