@@ -6,18 +6,18 @@ package se.digg.wallet.gateway.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 @Configuration
-public class WebClientConfig {
+public class RestClientConfig {
 
   /**
-   * Creates a WebClient.Builder bean to be used for making HTTP requests.
+   * Creates a RestClient bean to be used for making HTTP requests.
    *
-   * @return a WebClient.Builder instance.
+   * @return a RestClient instance.
    */
   @Bean
-  public WebClient webClient(WebClient.Builder builder) {
+  public RestClient webClient(RestClient.Builder builder) {
     return builder.build();
   }
 }

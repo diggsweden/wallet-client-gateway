@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.model;
+package se.digg.wallet.gateway.infrastructure.downstream.model;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CreateAttributeDto(@NotBlank String value) {
+public record DownstreamCreateAttributeDto(@NotBlank String value) {
 }

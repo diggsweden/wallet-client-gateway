@@ -14,34 +14,11 @@ spring:
     name: wallet-client-gateway
   profiles:
     active: dev
-  datasource:
-    url: jdbc:postgresql://localhost:5432/wallet_gateway
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      idle-timeout: 300000
-      connection-test-query: SELECT 1
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: false
   security:
     oauth2:
       client:
         registration: {}
         provider: {}
-  liquibase:
-    change-log: classpath:/db/changelog/db.changelog-master.xml
-  docker:
-    compose:
-      enabled: false
 
 # Management and Monitoring
 management:

@@ -11,35 +11,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import se.digg.wallet.gateway.application.model.AttributeDto;
 import se.digg.wallet.gateway.application.model.CreateAttributeDto;
 import se.digg.wallet.gateway.domain.service.AttributeService;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
-@EnableAutoConfiguration(
-    exclude = {
-        DataSourceAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class,
-        LiquibaseAutoConfiguration.class
-    })
+// @SpringBootTest
+// @ActiveProfiles("test")
+// @AutoConfigureMockMvc
+@WebMvcTest(AttributeController.class)
+// @EnableAutoConfiguration
+@ExtendWith(MockitoExtension.class)
 class AttributeControllerTest {
 
   public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
@@ -51,14 +49,21 @@ class AttributeControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockitoBean
+  @Mock
   private AttributeService attributeService;
+
+  @InjectMocks
+  private AttributeController attributeController;
+
+  @BeforeEach
+  public void setUp() {
+    MockitoAnnotations.openMocks(this);
+  }
 
   @Test
   @WithMockUser
   void testCreateAttribute_HappyPath() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto();
-    createAttributeDto.setValue(TEST_ATTRIBUTE_VALUE);
+    CreateAttributeDto createAttributeDto = new CreateAttributeDto(TEST_ATTRIBUTE_VALUE);
 
     when(attributeService.createAttribute(any(CreateAttributeDto.class)))
         .thenReturn(new AttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));

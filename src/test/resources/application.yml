@@ -11,12 +11,3 @@ properties:
 spring:
   application:
     name: wallet-client-gateway
-  jpa:
-    database: POSTGRESQL
-    hibernate:
-      ddl-auto: validate
-  datasource:
-    platform: postgres
-    driverClassName: org.postgresql.Driver
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml

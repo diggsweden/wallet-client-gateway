@@ -7,13 +7,8 @@ package se.digg.wallet.gateway.application.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,20 +17,16 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
-import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.CreateAttributeDto;
 import se.digg.wallet.gateway.domain.service.AttributeService;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@EnableAutoConfiguration(
-    exclude = {
-        DataSourceAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class,
-        LiquibaseAutoConfiguration.class
-    })
 class ApiKeyAuthFilterTest {
 
   public static final String SECRET_TEST_VALUE = "my-super-secret-test-value";
@@ -50,9 +41,6 @@ class ApiKeyAuthFilterTest {
   @MockitoBean
   private AttributeService attributeService;
 
-  @Autowired
-  private ApplicationConfig applicationConfig;
-
   /**
    * This static method is called before the application context is created. It adds properties that
    * will be used to resolve the placeholders in the YAML file. This acts like setting an
@@ -66,8 +54,7 @@ class ApiKeyAuthFilterTest {
 
   @Test
   void testValidApiKey() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto();
-    createAttributeDto.setValue("test");
+    CreateAttributeDto createAttributeDto = new CreateAttributeDto("test");
 
     mockMvc
         .perform(
@@ -80,8 +67,7 @@ class ApiKeyAuthFilterTest {
 
   @Test
   void testInvalidApiKey() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto();
-    createAttributeDto.setValue("test");
+    CreateAttributeDto createAttributeDto = new CreateAttributeDto("test");
 
     mockMvc
         .perform(
@@ -94,8 +80,7 @@ class ApiKeyAuthFilterTest {
 
   @Test
   void testNoApiKey() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto();
-    createAttributeDto.setValue("test");
+    CreateAttributeDto createAttributeDto = new CreateAttributeDto("test");
 
     mockMvc
         .perform(
