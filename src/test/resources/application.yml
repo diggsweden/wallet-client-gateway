@@ -2,15 +2,12 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
+# Application Properties
+properties:
+  apiSecret: my_secret_key
+  downstreamServiceUrl: http://localhost:8099
+
+# Wallet Client Gateway Configuration
 spring:
   application:
     name: wallet-client-gateway
-  jpa:
-    database: POSTGRESQL
-    hibernate:
-      ddl-auto: validate
-  datasource:
-    platform: postgres
-    driverClassName: org.postgresql.Driver
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml
