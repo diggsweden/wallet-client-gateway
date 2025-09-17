@@ -53,6 +53,7 @@ JAVA_CHECKSTYLE_CLI_EXECUTABLE:
 JAVA_CHECKSTYLE_FILTER_REGEX_INCLUDE: src/main
 JAVA_CHECKSTYLE_CONFIG_FILE: development/lint/google_checks.xml
 JAVA_PMD_CONFIG_FILE: development/sast/pmd_default_java.xml
+MARKDOWN_MARKDOWNLINT_ARGUMENTS: ["--disable", "MD024"]
 REPOSITORY_GITLEAKS_ARGUMENTS: detect --log-opts="main..HEAD"
 # LOG_LEVEL: DEBUG # will show you the exact command run
 PRE_COMMANDS:
