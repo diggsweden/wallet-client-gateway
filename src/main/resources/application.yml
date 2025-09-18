@@ -12,8 +12,6 @@ server:
 spring:
   application:
     name: wallet-client-gateway
-  profiles:
-    active: dev
   security:
     oauth2:
       client:
