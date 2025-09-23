@@ -18,13 +18,12 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
-
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.model.CreateAttributeDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 8099))
-class AttributeControllerIT {
+class AttributeControllerIntegrationTest {
 
   public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
   public static final String TEST_ATTRIBUTE_ID = "12345";
@@ -42,7 +41,7 @@ class AttributeControllerIT {
   private int port;
 
   @Test
-  void testCreateAttribute_HappyPath() throws Exception {
+  void testCreateAttributeHappyPath() throws Exception {
     var createAttributeDto = new CreateAttributeDto(TEST_ATTRIBUTE_VALUE);
 
     stubFor(post("/")
@@ -79,7 +78,7 @@ class AttributeControllerIT {
   }
 
   @Test
-  void testGetAttribute_NotFound() throws Exception {
+  void testGetAttributeNotFound() throws Exception {
     stubFor(get("/%s".formatted(TEST_ATTRIBUTE_ID))
         .willReturn(aResponse()
             .withStatus(404)));
@@ -93,11 +92,4 @@ class AttributeControllerIT {
         .isEqualTo(500);
   }
 
-  // TODO do we need to test this config?
-  // @Test
-  // void testSwaggerEndpointsArePublic() throws Exception {
-  // mockMvc.perform(get("/swagger-ui.html")).andExpect(status().is3xxRedirection());
-  // mockMvc.perform(get("/swagger-ui/index.html")).andExpect(status().isOk());
-  // mockMvc.perform(get("/v3/api-docs")).andExpect(status().isOk());
-  // }
 }

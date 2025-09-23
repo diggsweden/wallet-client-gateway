@@ -11,7 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ActuatorIT {
+class ActuatorIntegrationTest {
 
   @Autowired
   private WebTestClient restClient;

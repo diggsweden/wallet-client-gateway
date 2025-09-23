@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
+
 package se.digg.wallet.gateway.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +38,7 @@ class AttributeServiceTest {
   }
 
   @Test
-  void createAttribute_Success() {
+  void createAttributeSuccess() {
     // Given
     CreateAttributeDto createAttributeDto = new CreateAttributeDto(TEST_ATTRIBUTE_VALUE);
     AttributeDto expectedAttributeDto = new AttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
@@ -52,7 +53,7 @@ class AttributeServiceTest {
   }
 
   @Test
-  void getAttribute_Success() {
+  void getAttributeSuccess() {
     // Given
     AttributeDto expectedAttributeDto = new AttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
 
@@ -66,7 +67,7 @@ class AttributeServiceTest {
   }
 
   @Test
-  void getAttribute_NotFound() {
+  void getAttributeNotFound() {
     when(client.getAttribute(anyString()))
         .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404)));
 

@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,8 +21,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import se.digg.wallet.gateway.application.model.AttributeDto;
 import se.digg.wallet.gateway.application.model.CreateAttributeDto;
 import se.digg.wallet.gateway.domain.service.AttributeService;
@@ -43,7 +42,7 @@ class AttributeControllerTest {
 
   @Test
   @WithMockUser
-  void testCreateAttribute_HappyPath() throws Exception {
+  void testCreateAttributeHappyPath() throws Exception {
     CreateAttributeDto createAttributeDto = new CreateAttributeDto(TEST_ATTRIBUTE_VALUE);
 
     when(attributeService.createAttribute(any(CreateAttributeDto.class)))
@@ -60,7 +59,7 @@ class AttributeControllerTest {
 
   @Test
   @WithMockUser
-  void testGetAttribute_NotFound() throws Exception {
+  void testGetAttributeNotFound() throws Exception {
     when(attributeService.getAttribute(TEST_ATTRIBUTE_ID))
         .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
