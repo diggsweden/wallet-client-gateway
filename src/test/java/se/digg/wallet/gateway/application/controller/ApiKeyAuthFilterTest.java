@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -18,10 +17,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
-import se.digg.wallet.gateway.application.model.CreateAttributeDto;
-import se.digg.wallet.gateway.domain.service.AttributeService;
+import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.model.CreateWuaDto;
+import se.digg.wallet.gateway.domain.service.WuaService;
 
-@SpringBootTest
+@SpringBootTest()
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 class ApiKeyAuthFilterTest {
@@ -33,46 +33,46 @@ class ApiKeyAuthFilterTest {
   private ObjectMapper objectMapper;
 
   @MockitoBean
-  private AttributeService attributeService;
+  private WuaService wuaService;
 
-  @Value("${properties.apiSecret}")
-  private String apiKey;
+  @Autowired
+  ApplicationConfig applicationConfig;
 
   @Test
   void testValidApiKey() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto("test");
+    CreateWuaDto createWuaDto = new CreateWuaDto("test");
 
     mockMvc
         .perform(
-            post("/attributes")
-                .header(ApiKeyAuthFilter.API_KEY_HEADER, apiKey)
+            post("/wua")
+                .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apiSecret())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createAttributeDto)))
+                .content(objectMapper.writeValueAsString(createWuaDto)))
         .andExpect(status().isCreated());
   }
 
   @Test
   void testInvalidApiKey() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto("test");
+    CreateWuaDto createWuaDto = new CreateWuaDto("test");
 
     mockMvc
         .perform(
-            post("/attributes")
+            post("/wua")
                 .header(ApiKeyAuthFilter.API_KEY_HEADER, "invalid-api-key")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createAttributeDto)))
+                .content(objectMapper.writeValueAsString(createWuaDto)))
         .andExpect(status().isUnauthorized());
   }
 
   @Test
   void testNoApiKey() throws Exception {
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto("test");
+    CreateWuaDto createWuaDto = new CreateWuaDto("test");
 
     mockMvc
         .perform(
-            post("/attributes")
+            post("/wua")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createAttributeDto)))
+                .content(objectMapper.writeValueAsString(createWuaDto)))
         .andExpect(status().isUnauthorized());
   }
 }

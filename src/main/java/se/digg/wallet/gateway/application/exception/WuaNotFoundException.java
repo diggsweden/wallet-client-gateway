@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.application.exception;
 
-public class AttributeNotFoundException extends RuntimeException {
+public class WuaNotFoundException extends RuntimeException {
 }

@@ -4,7 +4,7 @@
 # Application Properties
 properties:
   apiSecret:
-  downstreamServiceUrl:
+  walletProviderUrl:
 
 # Wallet Client Gateway Configuration
 server:

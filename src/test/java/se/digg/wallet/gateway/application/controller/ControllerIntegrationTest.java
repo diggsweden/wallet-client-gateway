@@ -19,11 +19,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
-import se.digg.wallet.gateway.application.model.CreateAttributeDto;
+import se.digg.wallet.gateway.application.model.CreateWuaDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 8099))
-class AttributeControllerIntegrationTest {
+class ControllerIntegrationTest {
 
   public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
   public static final String TEST_ATTRIBUTE_ID = "12345";
@@ -42,7 +42,7 @@ class AttributeControllerIntegrationTest {
 
   @Test
   void testCreateAttributeHappyPath() throws Exception {
-    var createAttributeDto = new CreateAttributeDto(TEST_ATTRIBUTE_VALUE);
+    var createAttributeDto = new CreateWuaDto(TEST_ATTRIBUTE_VALUE);
 
     stubFor(post("/")
         .withRequestBody(equalToJson("""
@@ -61,7 +61,7 @@ class AttributeControllerIntegrationTest {
                 """.formatted(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE))));
 
     var response = restClient.post()
-        .uri("/attributes")
+        .uri("/wua")
         .bodyValue(createAttributeDto)
         .header(ApiKeyAuthFilter.API_KEY_HEADER, apiKey)
         .exchange();

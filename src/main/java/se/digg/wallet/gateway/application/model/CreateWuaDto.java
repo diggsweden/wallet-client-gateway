@@ -4,5 +4,7 @@
 
 package se.digg.wallet.gateway.application.model;
 
-public record AttributeDto(String id, String value) {
+import jakarta.validation.constraints.NotBlank;
+
+public record CreateWuaDto(@NotBlank String value) {
 }

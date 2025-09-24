@@ -11,5 +11,5 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "properties")
 @Validated
 public record ApplicationConfig(
-    @NotBlank String apiSecret, @NotBlank String downstreamServiceUrl) {
+    @NotBlank String apiSecret, @NotBlank String walletProviderUrl) {
 }

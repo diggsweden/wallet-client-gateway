@@ -4,7 +4,5 @@
 
 package se.digg.wallet.gateway.infrastructure.downstream.model;
 
-import jakarta.validation.constraints.NotBlank;
-
-public record DownstreamCreateAttributeDto(@NotBlank String value) {
+public record WalletProviderWuaDto(String id, String value) {
 }

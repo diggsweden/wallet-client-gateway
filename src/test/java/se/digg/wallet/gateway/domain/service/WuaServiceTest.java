@@ -16,37 +16,37 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.HttpClientErrorException;
-import se.digg.wallet.gateway.application.model.AttributeDto;
-import se.digg.wallet.gateway.application.model.CreateAttributeDto;
-import se.digg.wallet.gateway.infrastructure.downstream.client.DownstreamServiceClient;
-import se.digg.wallet.gateway.infrastructure.downstream.model.DownstreamAttributeDto;
+import se.digg.wallet.gateway.application.model.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.WuaDto;
+import se.digg.wallet.gateway.infrastructure.downstream.client.WalletProviderClient;
+import se.digg.wallet.gateway.infrastructure.downstream.model.WalletProviderWuaDto;
 
-class AttributeServiceTest {
+class WuaServiceTest {
 
   public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
   public static final String TEST_ATTRIBUTE_ID = "12345";
 
   @Mock
-  private DownstreamServiceClient client;
+  private WalletProviderClient client;
 
-  private AttributeService attributeService;
+  private WuaService wuaService;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    attributeService = new AttributeService(client);
+    wuaService = new WuaService(client);
   }
 
   @Test
   void createAttributeSuccess() {
     // Given
-    CreateAttributeDto createAttributeDto = new CreateAttributeDto(TEST_ATTRIBUTE_VALUE);
-    AttributeDto expectedAttributeDto = new AttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
+    CreateWuaDto createAttributeDto = new CreateWuaDto(TEST_ATTRIBUTE_VALUE);
+    WuaDto expectedAttributeDto = new WuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
     when(client.createAttribute(any()))
-        .thenReturn(new DownstreamAttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
+        .thenReturn(new WalletProviderWuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
 
     // When
-    AttributeDto actualAttributeDto = attributeService.createAttribute(createAttributeDto);
+    WuaDto actualAttributeDto = wuaService.createWua(createAttributeDto);
 
     // Then
     assertEquals(expectedAttributeDto, actualAttributeDto);
@@ -55,12 +55,12 @@ class AttributeServiceTest {
   @Test
   void getAttributeSuccess() {
     // Given
-    AttributeDto expectedAttributeDto = new AttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
+    WuaDto expectedAttributeDto = new WuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
 
-    when(client.getAttribute(TEST_ATTRIBUTE_ID))
-        .thenReturn(new DownstreamAttributeDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
+    when(client.getWua(TEST_ATTRIBUTE_ID))
+        .thenReturn(new WalletProviderWuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
     // When
-    AttributeDto actualAttributeDto = attributeService.getAttribute(TEST_ATTRIBUTE_ID);
+    WuaDto actualAttributeDto = wuaService.getWua(TEST_ATTRIBUTE_ID);
 
     // Then
     assertEquals(expectedAttributeDto, actualAttributeDto);
@@ -68,11 +68,11 @@ class AttributeServiceTest {
 
   @Test
   void getAttributeNotFound() {
-    when(client.getAttribute(anyString()))
+    when(client.getWua(anyString()))
         .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404)));
 
     // When & Then
     assertThrows(
-        HttpClientErrorException.class, () -> attributeService.getAttribute(TEST_ATTRIBUTE_ID));
+        HttpClientErrorException.class, () -> wuaService.getWua(TEST_ATTRIBUTE_ID));
   }
 }
