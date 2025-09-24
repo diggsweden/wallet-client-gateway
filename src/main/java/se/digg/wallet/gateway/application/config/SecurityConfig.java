@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,11 +16,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Autowired
-  private ApiKeyAuthenticationManager apiKeyAuthenticationManager;
+  private final ApiKeyAuthenticationManager apiKeyAuthenticationManager;
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-  @Autowired
-  private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  SecurityConfig(ApiKeyAuthenticationManager apiKeyAuthenticationManager,
+      CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+    this.apiKeyAuthenticationManager = apiKeyAuthenticationManager;
+    this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {

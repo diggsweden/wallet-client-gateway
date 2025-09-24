@@ -21,8 +21,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
-import se.digg.wallet.gateway.application.model.WuaDto;
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.WuaDto;
 import se.digg.wallet.gateway.domain.service.WuaService;
 
 @WebMvcTest(Controller.class)

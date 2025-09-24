@@ -45,7 +45,7 @@ class ApiKeyAuthFilterTest {
     mockMvc
         .perform(
             post("/wua")
-                .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apiSecret())
+                .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createWuaDto)))
         .andExpect(status().isCreated());

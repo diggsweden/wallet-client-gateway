@@ -4,8 +4,9 @@
 
 # Application Properties
 properties:
-  apiSecret: my_secret_key
-  walletProviderUrl: http://localhost:8099
+  apisecret: my_secret_key
+  walletprovider:
+    baseurl: http://localhost:8099
 
 # Wallet Client Gateway Configuration
 spring:

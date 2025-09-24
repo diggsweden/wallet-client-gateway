@@ -21,7 +21,7 @@ public class DefaultExceptionHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
-  
+
   private final HttpServletRequest httpServletRequest;
 
   DefaultExceptionHandler(HttpServletRequest httpServletRequest) {

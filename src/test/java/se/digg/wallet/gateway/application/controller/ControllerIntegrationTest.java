@@ -19,6 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
+import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -34,8 +35,8 @@ class ControllerIntegrationTest {
   @Value("${wiremock.server.baseUrl}")
   private String wireMockUrl;
 
-  @Value("${properties.apiSecret}")
-  private String apiKey;
+  @Autowired
+  private ApplicationConfig applicationConfig;
 
   @LocalServerPort
   private int port;
@@ -63,7 +64,7 @@ class ControllerIntegrationTest {
     var response = restClient.post()
         .uri("/wua")
         .bodyValue(createAttributeDto)
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, apiKey)
+        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
     response.expectStatus()
@@ -85,7 +86,7 @@ class ControllerIntegrationTest {
 
     var response = restClient.get()
         .uri("/%s".formatted(TEST_ATTRIBUTE_ID))
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, apiKey)
+        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
     response.expectStatus()

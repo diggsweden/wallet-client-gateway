@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.infrastructure.downstream.client;
 
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
@@ -19,7 +18,7 @@ public class WalletProviderClient {
 
   public WalletProviderClient(RestClient restClient, ApplicationConfig applicationConfig) {
     this.restClient = restClient;
-    this.serviceUrl = applicationConfig.walletProviderUrl();
+    this.serviceUrl = applicationConfig.walletprovider().baseurl();
   }
 
   public WalletProviderWuaDto createAttribute(WalletProviderCreateWuaDto createWuaDto) {

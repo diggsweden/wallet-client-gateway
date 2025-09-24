@@ -22,7 +22,7 @@ public class ApiKeyAuthenticationManager implements AuthenticationManager {
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
     String principal = (String) authentication.getPrincipal();
-    if (!applicationConfig.apiSecret().equals(principal)) {
+    if (!applicationConfig.apisecret().equals(principal)) {
       throw new BadCredentialsException("The API key was not found or not the expected value.");
     }
     authentication.setAuthenticated(true);

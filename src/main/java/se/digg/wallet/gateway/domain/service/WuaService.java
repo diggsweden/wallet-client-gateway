@@ -5,7 +5,6 @@
 package se.digg.wallet.gateway.domain.service;
 
 import org.springframework.stereotype.Service;
-
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
 import se.digg.wallet.gateway.application.model.WuaDto;
 import se.digg.wallet.gateway.infrastructure.downstream.client.WalletProviderClient;
