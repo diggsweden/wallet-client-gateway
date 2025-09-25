@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.WuaDto;
 import se.digg.wallet.gateway.domain.service.WuaService;
 
@@ -41,7 +42,7 @@ class ControllerTest {
   @Test
   @WithMockUser
   void testCreateAttributeHappyPath() throws Exception {
-    CreateWuaDto createWuaDto = ApiKeyAuthFilterTest.generateCreateWuaDto(TEST_ATTRIBUTE_ID);
+    CreateWuaDto createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
 
     when(wuaService.createWua(any(CreateWuaDto.class)))
         .thenReturn(new WuaDto(TEST_ATTRIBUTE_VALUE));

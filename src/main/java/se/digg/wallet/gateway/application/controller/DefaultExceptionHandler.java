@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import se.digg.wallet.gateway.application.exception.InputValidationException;
-import se.digg.wallet.gateway.application.exception.WuaNotFoundException;
 import se.digg.wallet.gateway.application.model.BadRequestDto;
 
 @ControllerAdvice
@@ -33,10 +32,6 @@ public class DefaultExceptionHandler {
   public void handleAnyException(Throwable e) {
     LOGGER.warn("Uncaught exception, responding with 500", e);
   }
-
-  @ResponseStatus(HttpStatus.NOT_FOUND) // 404 for missing resources
-  @ExceptionHandler(WuaNotFoundException.class)
-  public void handleWuaNotFoundException() {}
 
   @ExceptionHandler(InputValidationException.class)
   public ResponseEntity<BadRequestDto> handleInputValidationException(InputValidationException e) {

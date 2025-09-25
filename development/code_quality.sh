@@ -105,7 +105,7 @@ commit() {
 
 verify() {
   print_header 'VERIFY'
-  mvn verify "${MAVEN_CLI_OPTS[@]}"
+  mvn clean verify "${MAVEN_CLI_OPTS[@]}"
   store_exit_code "$?" "Verify" "${MISSING} ${RED}Verify check failed, see logs (std out) and fix problems.${NC}\n" "${GREEN}${CHECKMARK}${CHECKMARK} Verify check passed${NC}\n"
   printf '\n\n'
 }
