@@ -6,20 +6,20 @@ package se.digg.wallet.gateway.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.digg.wallet.gateway.application.controller.ApiKeyAuthFilterTest;
-import se.digg.wallet.gateway.application.model.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.WuaDto;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 
 @ExtendWith(MockitoExtension.class)
 class WuaServiceTest {
@@ -29,24 +29,30 @@ class WuaServiceTest {
   @Mock
   private WalletProviderClient client;
 
+  @Mock
+  private WuaMapper wuaMapper;
+
   @InjectMocks
   private WuaService wuaService;
 
-  @Spy
-  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
   void createAttributeSuccess() {
     // Given
-    CreateWuaDto createAttributeDto = ApiKeyAuthFilterTest.generateCreateWuaDto(TEST_ATTRIBUTE_ID);
-    WuaDto expectedAttributeDto = new WuaDto("my dummy jwt");
-    when(client.createWua(any()))
-        .thenReturn("my dummy jwt");
+    var createWoaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
+    var expectedWua = new WuaDto("my dummy jwt");
+    var mappedDto = new WalletProviderCreateWuaDto("data", "doesnt matter");
+    when(wuaMapper.toWalletProviderCreateWuaDto(createWoaDto))
+        .thenReturn(mappedDto);
+    when(client.createWua(mappedDto))
+        .thenReturn(expectedWua.jwt());
 
     // When
-    WuaDto actualAttributeDto = wuaService.createWua(createAttributeDto);
+    var actualWuaDto = wuaService.createWua(createWoaDto);
 
     // Then
-    assertEquals(expectedAttributeDto, actualAttributeDto);
+    assertEquals(expectedWua, actualWuaDto);
+    verify(client).createWua(any());
+    verifyNoMoreInteractions(client);
   }
 }

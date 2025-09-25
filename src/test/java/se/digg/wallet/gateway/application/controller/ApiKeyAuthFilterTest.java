@@ -8,25 +8,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
-import se.digg.wallet.gateway.application.model.JwkDto;
+import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.domain.service.WuaService;
 
 @SpringBootTest()
-@ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class ApiKeyAuthFilterTest {
+class ApiKeyAuthFilterTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -42,7 +39,7 @@ public class ApiKeyAuthFilterTest {
 
   @Test
   void testValidApiKey() throws Exception {
-    CreateWuaDto createWuaDto = generateCreateWuaDto(UUID.randomUUID());
+    CreateWuaDto createWuaDto = CreateWuaDtoTestBuilder.withDefaultValues();
 
     mockMvc
         .perform(
@@ -55,7 +52,7 @@ public class ApiKeyAuthFilterTest {
 
   @Test
   void testInvalidApiKey() throws Exception {
-    CreateWuaDto createWuaDto = generateCreateWuaDto(UUID.randomUUID());
+    CreateWuaDto createWuaDto = CreateWuaDtoTestBuilder.withDefaultValues();
 
     mockMvc
         .perform(
@@ -68,7 +65,7 @@ public class ApiKeyAuthFilterTest {
 
   @Test
   void testNoApiKey() throws Exception {
-    CreateWuaDto createWuaDto = generateCreateWuaDto(UUID.randomUUID());
+    CreateWuaDto createWuaDto = CreateWuaDtoTestBuilder.withDefaultValues();
 
     mockMvc
         .perform(
@@ -78,7 +75,4 @@ public class ApiKeyAuthFilterTest {
         .andExpect(status().isUnauthorized());
   }
 
-  public static CreateWuaDto generateCreateWuaDto(UUID walletId) {
-    return new CreateWuaDto(walletId, new JwkDto("kty", "kid", "alg", "use"));
-  }
 }

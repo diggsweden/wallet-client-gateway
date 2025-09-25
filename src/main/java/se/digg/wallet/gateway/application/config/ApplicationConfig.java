@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public record ApplicationConfig(
     @NotBlank String apisecret, Walletprovider walletprovider) {
-  public record Walletprovider(@NotBlank String baseurl) {
+  public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
   }
 }
 

@@ -15,17 +15,18 @@ public class WalletProviderClient {
 
   private final RestClient restClient;
   private final String walletProviderUrl;
-  private static String path = "/wallet-unit-attestation";
+  private final String wuaPath;
 
   public WalletProviderClient(RestClient restClient, ApplicationConfig applicationConfig) {
     this.restClient = restClient;
     this.walletProviderUrl = applicationConfig.walletprovider().baseurl();
+    this.wuaPath = applicationConfig.walletprovider().wuaPath();
   }
 
   public String createWua(WalletProviderCreateWuaDto createWuaDto) {
     return restClient
         .post()
-        .uri(walletProviderUrl + path)
+        .uri(walletProviderUrl + wuaPath)
         .body(createWuaDto)
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()

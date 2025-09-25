@@ -4,9 +4,14 @@
 
 package se.digg.wallet.gateway.application.model;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record JwkDto(
-    String kty,
-    String kid,
-    String alg,
-    String use) {
+    @NotBlank String kty,
+    @NotBlank String kid,
+    @NotBlank String alg,
+    @NotBlank String use,
+    @NotBlank String crv,
+    @NotBlank String x,
+    @NotBlank String y) {
 }
