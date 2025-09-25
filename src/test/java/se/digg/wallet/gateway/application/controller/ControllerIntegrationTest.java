@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +21,19 @@ import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.application.model.CreateWuaDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 8099))
 class ControllerIntegrationTest {
+  public static final String TEST_JWK_STRING = """
+      {\\"kty\\":\\"kty\\",\\"kid\\":\\"kid\\",\\"alg\\":\\"alg\\",\\"use\\":\\"use\\"}""";
+  public static final UUID TEST_WALLET_ID = UUID.randomUUID();
+  private static final String SIGNED_JWT = """
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5\
+      jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
+      """;
 
-  public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
-  public static final String TEST_ATTRIBUTE_ID = "12345";
+
 
   @Autowired
   private WebTestClient restClient;
@@ -41,29 +47,26 @@ class ControllerIntegrationTest {
   @LocalServerPort
   private int port;
 
+
   @Test
   void testCreateAttributeHappyPath() throws Exception {
-    var createAttributeDto = new CreateWuaDto(TEST_ATTRIBUTE_VALUE);
 
-    stubFor(post("/")
+    stubFor(post("/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
             {
-              "value": "%s"
+              "walletId": "%s",
+              "jwk": "%s"
             }
-            """.formatted(TEST_ATTRIBUTE_VALUE)))
+            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
         .willReturn(aResponse()
             .withStatus(201)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                {
-                  "id": "%s",
-                  "value": "%s"
-                }
-                """.formatted(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE))));
+            .withHeader("content-type", "text/plain")
+            .withBody(SIGNED_JWT)));
 
+    var requestBody = ApiKeyAuthFilterTest.generateCreateWuaDto(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(createAttributeDto)
+        .bodyValue(requestBody)
         .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
@@ -72,20 +75,20 @@ class ControllerIntegrationTest {
         .expectBody()
         .json("""
             {
-              "id": "%s",
-              "value": "%s"
+
+              "jwt": "%s"
             }
-            """.formatted(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
+            """.formatted(SIGNED_JWT));
   }
 
   @Test
   void testGetAttributeNotFound() throws Exception {
-    stubFor(get("/%s".formatted(TEST_ATTRIBUTE_ID))
+    stubFor(get("/%s".formatted(TEST_WALLET_ID))
         .willReturn(aResponse()
             .withStatus(404)));
 
     var response = restClient.get()
-        .uri("/%s".formatted(TEST_ATTRIBUTE_ID))
+        .uri("/%s".formatted(TEST_WALLET_ID))
         .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 

@@ -5,74 +5,48 @@
 package se.digg.wallet.gateway.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.web.client.HttpClientErrorException;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import se.digg.wallet.gateway.application.controller.ApiKeyAuthFilterTest;
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
 import se.digg.wallet.gateway.application.model.WuaDto;
-import se.digg.wallet.gateway.infrastructure.downstream.client.WalletProviderClient;
-import se.digg.wallet.gateway.infrastructure.downstream.model.WalletProviderWuaDto;
+import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
 
+@ExtendWith(MockitoExtension.class)
 class WuaServiceTest {
 
-  public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
-  public static final String TEST_ATTRIBUTE_ID = "12345";
+  public static final UUID TEST_ATTRIBUTE_ID = UUID.randomUUID();
 
   @Mock
   private WalletProviderClient client;
 
+  @InjectMocks
   private WuaService wuaService;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-    wuaService = new WuaService(client);
-  }
+  @Spy
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
   void createAttributeSuccess() {
     // Given
-    CreateWuaDto createAttributeDto = new CreateWuaDto(TEST_ATTRIBUTE_VALUE);
-    WuaDto expectedAttributeDto = new WuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
-    when(client.createAttribute(any()))
-        .thenReturn(new WalletProviderWuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
+    CreateWuaDto createAttributeDto = ApiKeyAuthFilterTest.generateCreateWuaDto(TEST_ATTRIBUTE_ID);
+    WuaDto expectedAttributeDto = new WuaDto("my dummy jwt");
+    when(client.createWua(any()))
+        .thenReturn("my dummy jwt");
 
     // When
     WuaDto actualAttributeDto = wuaService.createWua(createAttributeDto);
 
     // Then
     assertEquals(expectedAttributeDto, actualAttributeDto);
-  }
-
-  @Test
-  void getAttributeSuccess() {
-    // Given
-    WuaDto expectedAttributeDto = new WuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE);
-
-    when(client.getWua(TEST_ATTRIBUTE_ID))
-        .thenReturn(new WalletProviderWuaDto(TEST_ATTRIBUTE_ID, TEST_ATTRIBUTE_VALUE));
-    // When
-    WuaDto actualAttributeDto = wuaService.getWua(TEST_ATTRIBUTE_ID);
-
-    // Then
-    assertEquals(expectedAttributeDto, actualAttributeDto);
-  }
-
-  @Test
-  void getAttributeNotFound() {
-    when(client.getWua(anyString()))
-        .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404)));
-
-    // When & Then
-    assertThrows(
-        HttpClientErrorException.class, () -> wuaService.getWua(TEST_ATTRIBUTE_ID));
   }
 }

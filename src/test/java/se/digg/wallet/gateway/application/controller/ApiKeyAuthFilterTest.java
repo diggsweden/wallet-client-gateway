@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,12 +20,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.JwkDto;
 import se.digg.wallet.gateway.domain.service.WuaService;
 
 @SpringBootTest()
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class ApiKeyAuthFilterTest {
+public class ApiKeyAuthFilterTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -40,7 +42,7 @@ class ApiKeyAuthFilterTest {
 
   @Test
   void testValidApiKey() throws Exception {
-    CreateWuaDto createWuaDto = new CreateWuaDto("test");
+    CreateWuaDto createWuaDto = generateCreateWuaDto(UUID.randomUUID());
 
     mockMvc
         .perform(
@@ -53,7 +55,7 @@ class ApiKeyAuthFilterTest {
 
   @Test
   void testInvalidApiKey() throws Exception {
-    CreateWuaDto createWuaDto = new CreateWuaDto("test");
+    CreateWuaDto createWuaDto = generateCreateWuaDto(UUID.randomUUID());
 
     mockMvc
         .perform(
@@ -66,7 +68,7 @@ class ApiKeyAuthFilterTest {
 
   @Test
   void testNoApiKey() throws Exception {
-    CreateWuaDto createWuaDto = new CreateWuaDto("test");
+    CreateWuaDto createWuaDto = generateCreateWuaDto(UUID.randomUUID());
 
     mockMvc
         .perform(
@@ -74,5 +76,9 @@ class ApiKeyAuthFilterTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createWuaDto)))
         .andExpect(status().isUnauthorized());
+  }
+
+  public static CreateWuaDto generateCreateWuaDto(UUID walletId) {
+    return new CreateWuaDto(walletId, new JwkDto("kty", "kid", "alg", "use"));
   }
 }

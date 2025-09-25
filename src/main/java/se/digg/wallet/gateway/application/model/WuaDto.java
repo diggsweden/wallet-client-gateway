@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.application.model;
 
-public record WuaDto(String id, String value) {
+public record WuaDto(String jwt) {
 }
