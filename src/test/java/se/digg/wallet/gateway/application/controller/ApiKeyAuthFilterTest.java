@@ -23,7 +23,7 @@ import se.digg.wallet.gateway.domain.service.WuaService;
 
 @SpringBootTest()
 @AutoConfigureMockMvc
-public class ApiKeyAuthFilterTest {
+class ApiKeyAuthFilterTest {
 
   @Autowired
   private MockMvc mockMvc;

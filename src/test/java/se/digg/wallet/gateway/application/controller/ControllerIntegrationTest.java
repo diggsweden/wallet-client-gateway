@@ -47,7 +47,7 @@ class ControllerIntegrationTest {
 
 
   @Test
-  void testRequestingWuaSuccessfullyReturnsCreated() throws Exception {
+  void testRequestingWuaSuccessfullyReturnsCreated() {
     stubFor(post("/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
             {
@@ -79,7 +79,7 @@ class ControllerIntegrationTest {
   }
 
   @Test
-  void testRequestingWuaFailsReturnsInternalServerError() throws Exception {
+  void testRequestingWuaFailsReturnsInternalServerError() {
     stubFor(post("/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
             {
