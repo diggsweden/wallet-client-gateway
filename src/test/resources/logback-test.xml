@@ -24,12 +24,12 @@ SPDX-License-Identifier: EUPL-1.2
   <logger name="com.zaxxer.hikari" level="WARN" />
   <logger name="liquibase" level="WARN" />
 
-
   <!-- Application-specific loggers -->
   <logger name="se.digg.wallet.gateway" level="INFO" additivity="false">
     <appender-ref ref="CONSOLE" />
   </logger>
-
+ <!-- To hide logging api-key at debug level for appliaction-->
+  <logger name="se.digg.wallet.gateway.config.apikeyauthfilter" level="info"/> 
   <root level="WARN">
     <appender-ref ref="CONSOLE" />
   </root>

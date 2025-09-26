@@ -13,6 +13,6 @@ public class CreateWuaDtoTestBuilder {
   }
 
   public static CreateWuaDto withWalletId(UUID walletId) {
-    return new CreateWuaDto(walletId, new JwkDto("kty", "kid", "alg", "use"));
+    return new CreateWuaDto(walletId, new JwkDto("kty", "kid", "alg", "use", "crv", "x", "y"));
   }
 }

@@ -26,13 +26,13 @@ import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 @EnableWireMock(@ConfigureWireMock(port = 8099))
 class ControllerIntegrationTest {
   public static final String TEST_JWK_STRING = """
-      {\\"kty\\":\\"kty\\",\\"kid\\":\\"kid\\",\\"alg\\":\\"alg\\",\\"use\\":\\"use\\"}""";
+      {\\"kty\\":\\"kty\\",\\"kid\\":\\"kid\\",\\"alg\\":\\"alg\\",\\"use\\":\\"use\\",\\"crv\\":\\"crv\\",\\"x\\":\\"x\\",\\"y\\":\\"y\\"}""";
+  
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
   private static final String SIGNED_JWT = """
       eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5\
       jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
       """;
-
   @Autowired
   private WebTestClient restClient;
 

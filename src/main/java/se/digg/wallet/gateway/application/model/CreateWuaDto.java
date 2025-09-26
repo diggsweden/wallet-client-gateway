@@ -5,7 +5,8 @@
 package se.digg.wallet.gateway.application.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.UUID;
 
-public record CreateWuaDto(@NotBlank UUID walletId, @NotBlank JwkDto jwk) {
+public record CreateWuaDto(@NotEmpty UUID walletId, @NotBlank JwkDto jwk) {
 }
