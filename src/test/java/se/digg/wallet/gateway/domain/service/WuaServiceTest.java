@@ -37,21 +37,21 @@ class WuaServiceTest {
 
 
   @Test
-  void createAttributeSuccess() throws Exception {
+  void createAttributeSuccess() {
     // Given
     var createWoaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
-    var expected = new WuaDto("my dummy jwt");
+    var expectedWua = new WuaDto("my dummy jwt");
     var mappedDto = new WalletProviderCreateWuaDto("data", "doesnt matter");
     when(wuaMapper.toWalletProviderCreateWuaDto(createWoaDto))
         .thenReturn(mappedDto);
     when(client.createWua(mappedDto))
-        .thenReturn("my dummy jwt");
+        .thenReturn(expectedWua.jwt());
 
     // When
-    var actualAttributeDto = wuaService.createWua(createWoaDto);
+    var actualWuaDto = wuaService.createWua(createWoaDto);
 
     // Then
-    assertEquals(expected, actualAttributeDto);
+    assertEquals(expectedWua, actualWuaDto);
     verify(client).createWua(any());
     verifyNoMoreInteractions(client);
   }

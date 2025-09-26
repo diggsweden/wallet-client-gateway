@@ -31,15 +31,15 @@ class WuaMapperTest {
   @Test
   void map() throws Exception {
     // Given
-    var createAttributeDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
-    var expectedAttributeDto =
-        new WalletProviderCreateWuaDto(createAttributeDto.walletId().toString(),
-            objectMapper.writeValueAsString(createAttributeDto.jwk()));
+    var createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
+    var expectedWuaDto =
+        new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(),
+            objectMapper.writeValueAsString(createWuaDto.jwk()));
 
     // When
-    var actualAttributeDto = wuaMapper.toWalletProviderCreateWuaDto(createAttributeDto);
+    var actualWuaDto = wuaMapper.toWalletProviderCreateWuaDto(createWuaDto);
 
     // Then
-    assertEquals(expectedAttributeDto, actualAttributeDto);
+    assertEquals(expectedWuaDto, actualWuaDto);
   }
 }

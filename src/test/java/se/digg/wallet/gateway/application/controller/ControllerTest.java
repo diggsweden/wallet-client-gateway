@@ -27,8 +27,8 @@ import se.digg.wallet.gateway.domain.service.WuaService;
 @WebMvcTest(Controller.class)
 class ControllerTest {
 
-  public static final String TEST_ATTRIBUTE_VALUE = "test attribute value";
-  public static final UUID TEST_ATTRIBUTE_ID = UUID.randomUUID();
+  public static final String TEST_WUA_VALUE = "test wua value";
+  public static final UUID TEST_WUA_ID = UUID.randomUUID();
 
   @Autowired
   private MockMvc mockMvc;
@@ -41,11 +41,11 @@ class ControllerTest {
 
   @Test
   @WithMockUser
-  void testCreateAttributeHappyPath() throws Exception {
-    CreateWuaDto createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
+  void testCreateWuaHappyPath() throws Exception {
+    CreateWuaDto createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_WUA_ID);
 
     when(wuaService.createWua(any(CreateWuaDto.class)))
-        .thenReturn(new WuaDto(TEST_ATTRIBUTE_VALUE));
+        .thenReturn(new WuaDto(TEST_WUA_VALUE));
 
     mockMvc
         .perform(
