@@ -7,7 +7,7 @@ properties:
   apisecret: my_secret_key
   walletprovider:
     baseurl: http://localhost:8099
-    wua-path: /wallet-unit-attestation
+    wua-path: /wallet-provider/wallet-unit-attestation
 
 # Wallet Client Gateway Configuration
 spring:
