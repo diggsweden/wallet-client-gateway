@@ -7,11 +7,11 @@ package se.digg.wallet.gateway.application.model;
 import jakarta.validation.constraints.NotBlank;
 
 public record JwkDto(
-    @NotBlank String kty,
-    @NotBlank String kid,
-    @NotBlank String alg,
-    @NotBlank String use,
-    @NotBlank String crv,
-    @NotBlank String x,
-    @NotBlank String y) {
+    @NotBlank(message = "kty cannot be blank") String kty,
+    String kid,
+    String alg,
+    String use,
+    @NotBlank(message = "crv cannot be blank") String crv,
+    @NotBlank(message = "x cannot be blank") String x,
+    @NotBlank(message = "y cannot be blank") String y) {
 }

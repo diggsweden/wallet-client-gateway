@@ -4,9 +4,10 @@
 
 package se.digg.wallet.gateway.application.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
-public record CreateWuaDto(@NotEmpty UUID walletId, @NotBlank JwkDto jwk) {
+public record CreateWuaDto(@NotNull(message = "Wallet id cannot be empty") UUID walletId,
+    @Valid @NotNull(message = "A valid JWK is required") JwkDto jwk) {
 }

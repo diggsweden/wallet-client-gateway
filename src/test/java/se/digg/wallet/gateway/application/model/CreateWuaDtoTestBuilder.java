@@ -15,4 +15,8 @@ public class CreateWuaDtoTestBuilder {
   public static CreateWuaDto withWalletId(UUID walletId) {
     return new CreateWuaDto(walletId, new JwkDto("kty", "kid", "alg", "use", "crv", "x", "y"));
   }
+
+  public static CreateWuaDto invaliDto() {
+    return new CreateWuaDto(UUID.randomUUID(), new JwkDto("", "kid", "alg", "use", "", "x", "y"));
+  }
 }

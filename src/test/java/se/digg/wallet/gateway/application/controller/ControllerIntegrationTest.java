@@ -103,4 +103,17 @@ class ControllerIntegrationTest {
         .isEqualTo(500);
   }
 
+  @Test
+  void testValidation() {
+    var requestBody = CreateWuaDtoTestBuilder.invaliDto();
+    var response = restClient.post()
+        .uri("/wua")
+        .bodyValue(requestBody)
+        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
+        .exchange();
+
+    response.expectStatus()
+        .isEqualTo(400);
+  }
+
 }

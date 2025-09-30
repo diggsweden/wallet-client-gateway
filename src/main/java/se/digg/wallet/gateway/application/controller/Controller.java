@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.application.controller;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,10 +27,9 @@ public class Controller {
     this.wuaService = wuaService;
   }
 
-  // TODO: Add validation
   @PostMapping
   public ResponseEntity<WuaDto> createWua(
-      @RequestBody CreateWuaDto createWuaDto) {
+      @RequestBody @Valid CreateWuaDto createWuaDto) {
     logger.debug("Recieved request for wallet {}", createWuaDto.walletId());
     WuaDto wuaDto = wuaService.createWua(createWuaDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
