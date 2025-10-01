@@ -5,11 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-10-01
+
+### Added
+
+- Add annotation with example post data
+- Add basic validation of WUA request
+- Add swagger auth button and use relative url
+- Add support for front- and backend agreed formats
+- Add spring app with generic downstream service
+
+### Changed
+
+- Merge branch 'feat/swagger-fix'
+- Improve tests and code structure
+- Remap config and clean up autowired
+- Re-label the attribute service client
+- Apply checkstyle to test source
+
+### Fixed
+
+- Fix wallet-provider urls
+- Fix pipeline
+- Open actuator path
+- Markdown linting conflicting with changelog
+
 ## [0.1.4] - 2025-09-16
 
 ### Removed
 
 - Remove cache from jar build
+
 
 ## [0.1.3] - 2025-09-16
 
@@ -49,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.1.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.4..v0.1.5
 [0.1.4]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.3..v0.1.4
 [0.1.3]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.2..v0.1.3
 [0.1.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.1..v0.1.2
