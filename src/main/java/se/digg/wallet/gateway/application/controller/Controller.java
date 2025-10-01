@@ -28,6 +28,7 @@ public class Controller {
   }
 
   @PostMapping
+  @CreateWuaOpenApiDocumentation
   public ResponseEntity<WuaDto> createWua(
       @RequestBody @Valid CreateWuaDto createWuaDto) {
     logger.debug("Recieved request for wallet {}", createWuaDto.walletId());
