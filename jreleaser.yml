@@ -52,4 +52,4 @@ catalog:
 distributions:
   library:
     artifacts:
-      - path: target/{{projectName}}-{{projectVersion}}.jar
+      - path: target/{{projectName}}.jar
