@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Release Workflow Dev
+#
+# This workflow triggers the dev release orchestrator for development and feature branches.
+# It creates dev-tagged artifacts and container images for testing.
+#
+# Triggers:
+# - Manual workflow dispatch
+#
+# Created artifacts:
+# - Container images with dev tags
+# - See release summary for full details
+
+name: Release Workflow Dev
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dev-release:
+    permissions:
+      contents: read # Read code for building
+      packages: write # Push dev images to ghcr.io
+    uses: diggsweden/reusable-ci/.github/workflows/release-dev-orchestrator.yml@v1
+    with:
+      projectType: maven
+      containerfile: "Containerfile"
+    secrets: inherit
