@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Artifacts Configuration for wallet-client-gateway
+# Defines what to build and where to publish
+
+artifacts:
+  - name: wallet-client-gateway
+    project-type: maven
+    working-directory: .
+    build-type: application
+    config:
+      java-version: 21
+
+containers:
+  - name: wallet-client-gateway
+    from: [wallet-client-gateway]
+    container-file: Containerfile
+    context: .
+    platforms: linux/amd64,linux/arm64
+    registry: ghcr.io
+
+publishers:
+  - type: github-packages
+    artifacts: [wallet-client-gateway]

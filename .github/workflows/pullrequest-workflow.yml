@@ -22,14 +22,14 @@ concurrency:
 
 jobs:
   pr-checks:
-    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@v1
+    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@v2
     secrets: inherit # Pass org-level secrets (for private Maven dependencies)
     permissions:
       contents: read # Clone repository and read source code
       packages: read # Access GitHub Packages for Maven dependencies
       security-events: write # Upload SpotBugs/dependency check results to Security tab
     with:
-      projectType: maven
+      project-type: maven
       linters.dependencyreview: false # Disabled: requires GitHub Advanced Security
 
   test:

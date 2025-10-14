@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   release:
-    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@v1
+    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@v2
     permissions:
       contents: write # Create GitHub releases and tags
       packages: write # Publish JARs to GitHub Packages and images to ghcr.io
@@ -34,19 +34,6 @@ jobs:
       attestations: write # Attach SBOM attestation to container images
     secrets: inherit # Use org-level GPG keys, Maven credentials if configured
     with:
-      # Project configuration
-      projectType: maven # Build system type (determines version file location)
-
-      # Artifact publisher configuration
-      artifactPublisher: maven-app-github # Publishes JAR to GitHub Packages
-
-      # Container builder configuration
-      containerBuilder: containerimage-ghcr # Build and push Docker image to ghcr.io
-      container.platforms: "linux/amd64,linux/arm64" # Multi-arch support for Intel and ARM
-      container.containerfile: "Containerfile" # Container build file
-
-      # Changelog configuration
-      changelogCreator: git-cliff # Generate changelog from conventional commits
-
-      # Release publisher configuration
-      releasePublisher: jreleaser # Uses JReleaser config from jreleaser.yml
+      artifacts-config: .github/artifacts.yml
+      changelog-creator: git-cliff
+      release-publisher: github-cli
