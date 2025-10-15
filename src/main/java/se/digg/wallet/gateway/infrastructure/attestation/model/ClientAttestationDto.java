@@ -4,8 +4,12 @@
 
 package se.digg.wallet.gateway.infrastructure.attestation.model;
 
-import java.util.List;
 import java.util.UUID;
 
-public record AttestationListDto(List<AttestationDto> attestations, UUID hsmId) {
+public record ClientAttestationDto(
+    UUID id,
+    UUID hsmId,
+    UUID wuaId,
+    String attestationData) {
 }
+

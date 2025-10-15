@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.application.controller.openapi.wua.CreateWuaOpenApiDocumentation;
-import se.digg.wallet.gateway.application.model.CreateWuaDto;
-import se.digg.wallet.gateway.application.model.WuaDto;
-import se.digg.wallet.gateway.domain.service.WuaService;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.wua.WuaDto;
+import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @RestController
 @RequestMapping("/wua")

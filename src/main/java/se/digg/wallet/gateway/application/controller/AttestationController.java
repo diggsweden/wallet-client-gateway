@@ -14,26 +14,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.application.controller.openapi.attestation.GetListOpenApiDocumentation;
 import se.digg.wallet.gateway.application.controller.openapi.attestation.GetOpenApiDocumentation;
 import se.digg.wallet.gateway.application.controller.openapi.attestation.PostOpenApiDocumentation;
-import se.digg.wallet.gateway.application.model.CreateAttestationDto;
-import se.digg.wallet.gateway.domain.service.AttestationService;
-import se.digg.wallet.gateway.infrastructure.attestation.client.AttestationsClient;
-import se.digg.wallet.gateway.infrastructure.attestation.model.AttestationDto;
-import se.digg.wallet.gateway.infrastructure.attestation.model.AttestationListDto;
+import se.digg.wallet.gateway.application.model.attestation.AttestationDto;
+import se.digg.wallet.gateway.application.model.attestation.AttestationListDto;
+import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto;
+import se.digg.wallet.gateway.domain.service.attestation.AttestationService;
 
 @RestController
-@RequestMapping("/attestation")
+@RequestMapping("/attribute-attestations")
 public class AttestationController {
   private final AttestationService attetstationService;
-  private final AttestationsClient attestationsClient;
 
-  public AttestationController(AttestationService attetstationService,
-      AttestationsClient attestationsClient) {
+  public AttestationController(AttestationService attetstationService) {
     this.attetstationService = attetstationService;
-    this.attestationsClient = attestationsClient;
   }
 
   @PostMapping
@@ -54,15 +51,15 @@ public class AttestationController {
   @GetMapping("/{id}")
   @GetOpenApiDocumentation
   public ResponseEntity<AttestationDto> getAttestationById(@PathVariable final UUID id) {
-    return attestationsClient.getAttestation(id).map(ResponseEntity::ok)
+    return attetstationService.getAttestation(id).map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
   }
 
-  @GetMapping("/users/{hsmId}")
+  @GetMapping
   @GetListOpenApiDocumentation
-  public ResponseEntity<AttestationListDto> getAttestationsById(@PathVariable UUID hsmId) {
+  public ResponseEntity<AttestationListDto> getAttestationsById(@RequestParam UUID key) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(attestationsClient.getAttestationByHsmId(hsmId));
+        .body(attetstationService.getAttestationByHsmId(key));
   }
 }

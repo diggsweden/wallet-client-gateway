@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -26,15 +27,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.gateway.application.model.CreateAttestationDto;
-import se.digg.wallet.gateway.domain.service.AttestationService;
+import org.springframework.util.MultiValueMap;
+import se.digg.wallet.gateway.application.model.attestation.AttestationDto;
+import se.digg.wallet.gateway.application.model.attestation.AttestationListDto;
+import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto;
+import se.digg.wallet.gateway.domain.service.attestation.AttestationService;
 import se.digg.wallet.gateway.infrastructure.attestation.client.AttestationsClient;
-import se.digg.wallet.gateway.infrastructure.attestation.model.AttestationDto;
-import se.digg.wallet.gateway.infrastructure.attestation.model.AttestationListDto;
 
 @WebMvcTest(AttestationController.class)
 class AttestationControllerTest {
-
 
   @Autowired
   private MockMvc mockMvc;
@@ -59,7 +60,7 @@ class AttestationControllerTest {
         .thenReturn(Optional.of(attestationDto));
     mockMvc
         .perform(
-            post("/attestation")
+            post("/attribute-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper
                     .writeValueAsString(
@@ -71,15 +72,14 @@ class AttestationControllerTest {
             .string(containsString(defaultUuid.toString())));
   }
 
-
   @Test
   @WithMockUser
   void testGetAttestation() throws Exception {
-    when(attestationsClient.getAttestation(defaultUuid))
+    when(attestationService.getAttestation(defaultUuid))
         .thenReturn(Optional.of(attestationDto));
     mockMvc
         .perform(
-            get("/attestation/" + defaultUuid))
+            get("/attribute-attestations/" + defaultUuid))
         .andExpect(status().isOk())
         .andExpect(content()
             .string(containsString(defaultUuid.toString())));
@@ -88,13 +88,15 @@ class AttestationControllerTest {
   @Test
   @WithMockUser
   void testGetListOfAttestation() throws Exception {
+
     AttestationListDto attestationListDto =
         new AttestationListDto(List.of(attestationDto), defaultUuid);
-    when(attestationsClient.getAttestationByHsmId(defaultUuid))
+    when(attestationService.getAttestationByHsmId(defaultUuid))
         .thenReturn(attestationListDto);
     mockMvc
         .perform(
-            get("/attestation/users/" + defaultUuid))
+            get("/attribute-attestations")
+                .queryParams(MultiValueMap.fromSingleValue(Map.of("key", defaultUuid.toString()))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.attestations").exists())
         .andExpect(content()

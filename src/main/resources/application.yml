@@ -12,7 +12,7 @@ properties:
     paths:
       post: /attestation
       get-by-id: /attestation
-      get-by-user: /attestation/user
+      get-by-key: attestation/user
 
 # Wallet Client Gateway Configuration
 server:

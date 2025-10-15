@@ -13,13 +13,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.http.MediaType;
 import se.digg.wallet.gateway.application.model.BadRequestDto;
-import se.digg.wallet.gateway.infrastructure.attestation.model.AttestationDto;
+import se.digg.wallet.gateway.infrastructure.attestation.model.ClientAttestationDto;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(description = "Attestation found", responseCode = "200",
     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-        schema = @Schema(implementation = AttestationDto.class)))
+        schema = @Schema(implementation = ClientAttestationDto.class)))
 @ApiResponse(description = "Attestion not found", responseCode = "404",
     content = @Content())
 @ApiResponse(description = "Unknown error", responseCode = "500",

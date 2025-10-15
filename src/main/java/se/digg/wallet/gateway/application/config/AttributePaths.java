@@ -7,5 +7,5 @@ package se.digg.wallet.gateway.application.config;
 import jakarta.validation.constraints.NotBlank;
 
 public record AttributePaths(@NotBlank String post, @NotBlank String getById,
-    @NotBlank String getByUser) {
+    @NotBlank String getByKey) {
 }

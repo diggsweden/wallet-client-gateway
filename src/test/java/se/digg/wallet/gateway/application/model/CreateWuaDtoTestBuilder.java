@@ -5,6 +5,8 @@
 package se.digg.wallet.gateway.application.model;
 
 import java.util.UUID;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.wua.JwkDto;
 
 public class CreateWuaDtoTestBuilder {
 

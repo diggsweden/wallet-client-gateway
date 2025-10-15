@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.attestation.model;
+package se.digg.wallet.gateway.application.model.attestation;
 
 import java.util.UUID;
 

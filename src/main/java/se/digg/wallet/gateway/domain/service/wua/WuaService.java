@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.service;
+package se.digg.wallet.gateway.domain.service.wua;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.application.model.CreateWuaDto;
-import se.digg.wallet.gateway.application.model.WuaDto;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
 
 @Service

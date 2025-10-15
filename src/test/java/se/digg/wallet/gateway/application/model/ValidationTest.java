@@ -12,6 +12,8 @@ import jakarta.validation.ValidatorFactory;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.wua.JwkDto;
 
 public class ValidationTest {
 
