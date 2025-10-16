@@ -5,14 +5,14 @@
 properties:
   apisecret: secret
   walletprovider:
-    baseurl: http://
+    baseurl:
     wua-path: /wallet-provider/wallet-unit-attestation
   attributeattestation:
-    baseurl: http://
+    baseurl: http://localhost:8088
     paths:
       post: /attestation
       get-by-id: /attestation
-      get-by-key: attestation/user
+      get-by-key: /attestation/user
 
 # Wallet Client Gateway Configuration
 server:

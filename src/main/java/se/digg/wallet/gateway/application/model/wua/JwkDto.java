@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.model;
+package se.digg.wallet.gateway.application.model.wua;
 
 import jakarta.validation.constraints.NotBlank;
 

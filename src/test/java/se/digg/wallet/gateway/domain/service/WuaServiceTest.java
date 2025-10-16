@@ -17,7 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.WuaDto;
+import se.digg.wallet.gateway.application.model.wua.WuaDto;
+import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
+import se.digg.wallet.gateway.domain.service.wua.WuaService;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 

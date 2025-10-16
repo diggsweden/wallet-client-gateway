@@ -19,13 +19,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.gateway.application.model.CreateWuaDto;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.WuaDto;
-import se.digg.wallet.gateway.domain.service.WuaService;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.wua.WuaDto;
+import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
-@WebMvcTest(Controller.class)
-class ControllerTest {
+@WebMvcTest(WuaController.class)
+class WuaControllerTest {
 
   public static final String TEST_WUA_VALUE = "test wua value";
   public static final UUID TEST_WUA_ID = UUID.randomUUID();

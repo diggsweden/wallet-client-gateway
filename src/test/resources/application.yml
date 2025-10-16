@@ -8,7 +8,12 @@ properties:
   walletprovider:
     baseurl: http://localhost:8099
     wua-path: /wallet-provider/wallet-unit-attestation
-
+  attributeattestation:
+    baseurl: http://localhost:8098
+    paths:
+      post: /attestation
+      get-by-id: /attestation
+      get-by-key: /attestation/user
 # Wallet Client Gateway Configuration
 spring:
   application:

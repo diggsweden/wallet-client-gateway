@@ -17,9 +17,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.application.model.CreateWuaDto;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
-import se.digg.wallet.gateway.domain.service.WuaService;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @SpringBootTest()
 @AutoConfigureMockMvc
