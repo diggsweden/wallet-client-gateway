@@ -18,7 +18,7 @@ mvn spring-boot:run
 
 ## Contributing
 
-Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting contributions.
+Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting any contributions.
 
 ## License
 
