@@ -5,11 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-10-16
+
+### Added
+
+- Add controller layer and improve test coverage
+- Add attestation api endpoints
+- Add more correct swagger doc
+
+### Changed
+
+- Merge branch 'feat/add_attestations_API'
+- Use reuseable-ci v2
+- Use reusable-ci v1
+- Document style change
+
 ## [0.1.6] - 2025-10-02
 
 ### Fixed
 
 - Adapt jreleaser artfiact name
+
 
 ## [0.1.5] - 2025-10-01
 
@@ -82,6 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.2.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.6..v0.2.0
 [0.1.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.5..v0.1.6
 [0.1.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.4..v0.1.5
 [0.1.4]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.3..v0.1.4
