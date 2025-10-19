@@ -1,0 +1,55 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>diggsweden/.github:renovate-base",
+    ":maintainLockFilesWeekly"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "npm",
+    "maven",
+    "dockerfile",
+    "docker-compose"
+  ],
+  "packageRules": [
+    {
+      "description": "Node.js dependencies - Major updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["dependencies", "major-update"]
+    },
+    {
+      "description": "Node.js dependencies - Non-major updates",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "addLabels": ["dependencies"],
+      "groupName": "npm non-major"
+    },
+    {
+      "description": "Development dependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "dev dependencies",
+      "addLabels": ["dev-deps"]
+    },
+    {
+      "description": "Maven dependencies - Major updates",
+      "matchManagers": ["maven"],
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["java", "dependencies", "major-update"],
+      "groupName": "java major"
+    },
+    {
+      "description": "Maven dependencies - Non-major updates",
+      "matchManagers": ["maven"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "addLabels": ["java", "dependencies"],
+      "groupName": "java non-major"
+    },
+    {
+      "description": "Docker images",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "addLabels": ["docker", "infrastructure"]
+    }
+  ]
+}
