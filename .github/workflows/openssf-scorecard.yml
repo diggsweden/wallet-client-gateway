@@ -3,18 +3,17 @@
 # SPDX-License-Identifier: CC0-1.0
 
 ---
-name: OpenSSF Scorecard analysis
-
+name: OpenSSF Scorecard Analysis
 on:
-  push:
-    branches:
-      - main
   schedule:
-    # Weekly on Tuesdays at 01:30 UTC
-    - cron: "30 1 * * 2"
+    # Saturdays at 02:35 UTC
+    - cron: "35 2 * * 6"
+    # Wednesdays at 02:35 UTC
+    - cron: "35 2 * * 3"
+  workflow_dispatch:
 
 permissions:
-  contents: read # Best Security practice. Jobs only get read as base, and then permissions are added as needed
+  contents: read
 
 jobs:
   scorecard-analysis:
@@ -23,3 +22,5 @@ jobs:
       security-events: write
       id-token: write
     uses: diggsweden/reusable-ci/.github/workflows/security-openssf-scorecard.yml@v2
+    with:
+      publish-results: true
