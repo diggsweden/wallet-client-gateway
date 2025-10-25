@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   postgres:
-    image: postgres:16-alpine@sha256:03379eed4ab21d32530f0a832017f06f79313f86276eab0b762c7c7e1eb998ff
+    image: postgres:16-alpine@sha256:029660641a0cfc575b14f336ba448fb8a75fd595d42e1fa316b9fb4378742297
     container_name: wallet-postgres
     environment:
       POSTGRES_DB: wallet_gateway
