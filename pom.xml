@@ -64,6 +64,7 @@
     <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <checkstyle.version>10.26.1</checkstyle.version>
+    <record-builder.version>47</record-builder.version>
   </properties>
 
   <dependencies>
@@ -91,6 +92,12 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-tracing-bridge-brave</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.soabase.record-builder</groupId>
+      <artifactId>record-builder-core</artifactId>
+      <version>${record-builder.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -159,6 +166,11 @@
             <path>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-configuration-processor</artifactId>
+            </path>
+            <path>
+              <groupId>io.soabase.record-builder</groupId>
+              <artifactId>record-builder-processor</artifactId>
+              <version>${record-builder.version}</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

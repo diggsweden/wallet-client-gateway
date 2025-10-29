@@ -13,11 +13,21 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public record ApplicationConfig(
     @NotBlank String apisecret, Walletprovider walletprovider,
-    Attributeattestation attributeattestation) {
+    Attributeattestation attributeattestation,
+    Walletaccount walletaccount) {
+
   public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
   }
 
-  public record Attributeattestation(@NotBlank String baseurl, @NotNull AttributePaths paths) {
+  public record Attributeattestation(@NotBlank String baseurl, @NotNull Paths paths) {
+    public record Paths(@NotBlank String post, @NotBlank String getById,
+        @NotBlank String getByKey) {
+    }
+  }
+
+  public record Walletaccount(@NotBlank String baseurl, @NotBlank Paths paths) {
+    public record Paths(@NotBlank String post) {
+    }
   }
 }
 

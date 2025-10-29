@@ -8,6 +8,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.EMAIL_ADDRESS;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PUBLIC_KEY_BASE64;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PUBLIC_KEY_IDENTIFIER;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -20,21 +25,12 @@ import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 8099))
-class ControllerIntegrationTest {
-  public static final String TEST_JWK_STRING =
-      """
-          {\\"kty\\":\\"kty\\",\\"kid\\":\\"kid\\",\\"alg\\":\\"alg\\",\\"use\\":\\"use\\",\
-          \\"crv\\":\\"crv\\",\\"x\\":\\"x\\",\\"y\\":\\"y\\"}""";
+class AccountControllerIntegrationTest {
 
-  public static final UUID TEST_WALLET_ID = UUID.randomUUID();
-  private static final String SIGNED_JWT = """
-      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5\
-      jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
-      """;
   @Autowired
   private WebTestClient restClient;
 
@@ -50,21 +46,41 @@ class ControllerIntegrationTest {
 
   @Test
   void testRequestingWuaSuccessfullyReturnsCreated() {
-    stubFor(post("/wallet-provider/wallet-unit-attestation")
+    var generatedAccountId = UUID.randomUUID();
+
+    stubFor(post("/account")
         .withRequestBody(equalToJson("""
             {
-              "walletId": "%s",
-              "jwk": "%s"
+              "personalIdentityNumber": "%s",
+              "emailAdress": "%s",
+              "telephoneNumber": "%s",
+              "publicKey": {
+                "publicKeyBase64": "%s",
+                "publicKeyIdentifier": "%s"
+              }
             }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
+            """.formatted(PERSONAL_IDENTITY_NUMBER, EMAIL_ADDRESS, TELEPHONE_NUMBER,
+            PUBLIC_KEY_BASE64, PUBLIC_KEY_IDENTIFIER)))
         .willReturn(aResponse()
             .withStatus(201)
-            .withHeader("content-type", "text/plain")
-            .withBody(SIGNED_JWT)));
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "id": "%s",
+                  "personalIdentityNumber": "%s",
+                  "emailAdress": "%s",
+                  "telephoneNumber": "%s",
+                  "publicKey": {
+                    "publicKeyBase64": "%s",
+                    "publicKeyIdentifier": "%s"
+                  }
+                }
+                """.formatted(generatedAccountId, PERSONAL_IDENTITY_NUMBER, EMAIL_ADDRESS,
+                TELEPHONE_NUMBER, PUBLIC_KEY_BASE64, PUBLIC_KEY_IDENTIFIER))));
 
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
+    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri("/wua")
+        .uri("/accounts")
         .bodyValue(requestBody)
         .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
@@ -74,27 +90,20 @@ class ControllerIntegrationTest {
         .expectBody()
         .json("""
             {
-
-              "jwt": "%s"
+              "accountId": "%s"
             }
-            """.formatted(SIGNED_JWT));
+            """.formatted(generatedAccountId));
   }
 
   @Test
   void testRequestingWuaFailsReturnsInternalServerError() {
-    stubFor(post("/wallet-provider/wallet-unit-attestation")
-        .withRequestBody(equalToJson("""
-            {
-              "walletId": "%s",
-              "jwk": "%s"
-            }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
+    stubFor(post("/account")
         .willReturn(aResponse()
             .withStatus(404)));
 
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
+    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri("/wua")
+        .uri("/accounts")
         .bodyValue(requestBody)
         .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
@@ -105,9 +114,11 @@ class ControllerIntegrationTest {
 
   @Test
   void testValidation() {
-    var requestBody = CreateWuaDtoTestBuilder.invaliDto();
+    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults()
+        .emailAdress(null)
+        .build();
     var response = restClient.post()
-        .uri("/wua")
+        .uri("/accounts")
         .bodyValue(requestBody)
         .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
