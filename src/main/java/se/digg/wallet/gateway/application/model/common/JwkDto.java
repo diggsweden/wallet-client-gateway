@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.model.wua;
+package se.digg.wallet.gateway.application.model.common;
 
+import io.soabase.recordbuilder.core.RecordBuilder;
 import jakarta.validation.constraints.NotBlank;
 
+@RecordBuilder
 public record JwkDto(
     @NotBlank(message = "kty cannot be blank") String kty,
     String kid,

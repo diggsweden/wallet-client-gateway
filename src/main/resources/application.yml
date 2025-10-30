@@ -13,6 +13,10 @@ properties:
       post: /attestation
       get-by-id: /attestation
       get-by-key: attestation/user
+  walletaccount:
+    baseurl: http://
+    paths:
+      post: /account
 
 # Wallet Client Gateway Configuration
 server:

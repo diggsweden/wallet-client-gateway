@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import se.digg.wallet.gateway.application.controller.exception.BadRequestException;
 import se.digg.wallet.gateway.application.model.BadRequestDto;
 
 @ControllerAdvice
@@ -53,6 +54,22 @@ public class DefaultExceptionHandler {
     LOGGER.debug("Validation error, not able to parse input {}", getErrorsMap(e));
     return ResponseEntity.badRequest().body(body);
   }
+
+  @ExceptionHandler(BadRequestException.class)
+  @ResponseStatus(BAD_REQUEST)
+  public ResponseEntity<BadRequestDto> handleBadRequestException(
+      BadRequestException e) {
+    var instance = httpServletRequest.getServletPath();
+    var body = new BadRequestDto(
+        null,
+        "Validation error",
+        HttpStatus.BAD_REQUEST.value(),
+        e.detail(),
+        instance);
+    LOGGER.debug("Validation error", e);
+    return ResponseEntity.badRequest().body(body);
+  }
+
 
   private Map<String, List<String>> getErrorsMap(MethodArgumentNotValidException e) {
 

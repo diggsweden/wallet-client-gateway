@@ -14,6 +14,10 @@ properties:
       post: /attestation
       get-by-id: /attestation
       get-by-key: /attestation/user
+  walletaccount:
+    baseurl: http://localhost:8099
+    paths:
+      post: /account
 # Wallet Client Gateway Configuration
 spring:
   application:

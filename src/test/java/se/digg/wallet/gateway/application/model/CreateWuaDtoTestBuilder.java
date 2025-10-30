@@ -6,7 +6,6 @@ package se.digg.wallet.gateway.application.model;
 
 import java.util.UUID;
 import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
-import se.digg.wallet.gateway.application.model.wua.JwkDto;
 
 public class CreateWuaDtoTestBuilder {
 
@@ -15,10 +14,12 @@ public class CreateWuaDtoTestBuilder {
   }
 
   public static CreateWuaDto withWalletId(UUID walletId) {
-    return new CreateWuaDto(walletId, new JwkDto("kty", "kid", "alg", "use", "crv", "x", "y"));
+    return new CreateWuaDto(walletId, JwkDtoTestBuilder.withDefaults().build());
   }
 
   public static CreateWuaDto invaliDto() {
-    return new CreateWuaDto(UUID.randomUUID(), new JwkDto("", "kid", "alg", "use", "", "x", "y"));
+    return new CreateWuaDto(UUID.randomUUID(), JwkDtoTestBuilder.withDefaults()
+        .kty("")
+        .build());
   }
 }
