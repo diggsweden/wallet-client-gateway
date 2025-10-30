@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import se.digg.wallet.gateway.application.controller.exception.BadRequestException;
 import se.digg.wallet.gateway.application.controller.openapi.account.PostOpenApiDocumentation;
 import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDto;
 import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
@@ -29,8 +30,10 @@ public class AccountController {
   @PostOpenApiDocumentation
   public ResponseEntity<CreateAccountResponseDto> createAccount(
       @RequestBody @Valid CreateAccountRequestDto requestDto) {
-    var responseDto =
-        accountService.createAccount(requestDto);
+    if (requestDto.publicKey().kid() == null || requestDto.publicKey().kid().isEmpty()) {
+      throw new BadRequestException("publicKey.kid is required when creating account");
+    }
+    var responseDto = accountService.createAccount(requestDto);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(responseDto);

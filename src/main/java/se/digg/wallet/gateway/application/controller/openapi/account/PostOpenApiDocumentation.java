@@ -34,8 +34,11 @@ import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto
               "emailAdress": "digg@example.com",
               "telephoneNumber": "070 007",
               "publicKey": {
-                "publicKeyBase64": "boguskey",
-                "publicKeyIdentifier": "kid"
+                "kty": "EC",
+                "crv": "P-256",
+                "x": "1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc",
+                "y": "5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40",
+                "kid": "myKey"
               }
             }
         """)))

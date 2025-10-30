@@ -10,10 +10,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.EMAIL_ADDRESS;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PUBLIC_KEY_BASE64;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PUBLIC_KEY_IDENTIFIER;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 8099))
@@ -40,13 +40,16 @@ class AccountControllerIntegrationTest {
   @Autowired
   private ApplicationConfig applicationConfig;
 
+  @Autowired
+  private ObjectMapper objectMapper;
+
   @LocalServerPort
   private int port;
 
-
   @Test
-  void testRequestingWuaSuccessfullyReturnsCreated() {
+  void testRequestingWuaSuccessfullyReturnsCreated() throws Exception {
     var generatedAccountId = UUID.randomUUID();
+    var jwkString = objectMapper.writeValueAsString(JwkDtoTestBuilder.withDefaults().build());
 
     stubFor(post("/account")
         .withRequestBody(equalToJson("""
@@ -54,13 +57,10 @@ class AccountControllerIntegrationTest {
               "personalIdentityNumber": "%s",
               "emailAdress": "%s",
               "telephoneNumber": "%s",
-              "publicKey": {
-                "publicKeyBase64": "%s",
-                "publicKeyIdentifier": "%s"
-              }
+              "publicKey": %s
             }
             """.formatted(PERSONAL_IDENTITY_NUMBER, EMAIL_ADDRESS, TELEPHONE_NUMBER,
-            PUBLIC_KEY_BASE64, PUBLIC_KEY_IDENTIFIER)))
+            jwkString)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "application/json")
@@ -70,13 +70,10 @@ class AccountControllerIntegrationTest {
                   "personalIdentityNumber": "%s",
                   "emailAdress": "%s",
                   "telephoneNumber": "%s",
-                  "publicKey": {
-                    "publicKeyBase64": "%s",
-                    "publicKeyIdentifier": "%s"
-                  }
+                  "publicKey": %s
                 }
                 """.formatted(generatedAccountId, PERSONAL_IDENTITY_NUMBER, EMAIL_ADDRESS,
-                TELEPHONE_NUMBER, PUBLIC_KEY_BASE64, PUBLIC_KEY_IDENTIFIER))));
+                TELEPHONE_NUMBER, jwkString))));
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()

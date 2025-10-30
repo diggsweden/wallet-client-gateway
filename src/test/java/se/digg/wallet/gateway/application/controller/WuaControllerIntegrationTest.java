@@ -9,7 +9,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,14 +23,12 @@ import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 8099))
 class WuaControllerIntegrationTest {
-  public static final String TEST_JWK_STRING =
-      """
-          {\\"kty\\":\\"kty\\",\\"kid\\":\\"kid\\",\\"alg\\":\\"alg\\",\\"use\\":\\"use\\",\
-          \\"crv\\":\\"crv\\",\\"x\\":\\"x\\",\\"y\\":\\"y\\"}""";
+  public static String TEST_JWK_STRING;
 
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
   private static final String SIGNED_JWT = """
@@ -47,6 +47,14 @@ class WuaControllerIntegrationTest {
   @LocalServerPort
   private int port;
 
+  @BeforeAll
+  public static void beforeAll() throws Exception {
+    TEST_JWK_STRING =
+        new ObjectMapper().writeValueAsString(
+            new ObjectMapper().writeValueAsString(JwkDtoTestBuilder.withDefaults().build()));
+    // remove wrapped outer quotes
+    TEST_JWK_STRING = TEST_JWK_STRING.substring(1, TEST_JWK_STRING.length() - 1);
+  }
 
   @Test
   void testRequestingWuaSuccessfullyReturnsCreated() {

@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
@@ -52,5 +53,24 @@ class AccountControllerTest {
                 .content(objectMapper.writeValueAsString(requestBody))
                 .with(csrf()))
         .andExpect(status().isCreated());
+  }
+
+  @Test
+  @WithMockUser
+  void testCreateAccountWithoutKid() throws Exception {
+    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults()
+        .publicKey(JwkDtoTestBuilder.withDefaults().kid("").build())
+        .build();
+
+    when(accountService.createAccount(any()))
+        .thenReturn(new CreateAccountResponseDto(TEST_ACCOUNT_ID));
+
+    mockMvc
+        .perform(
+            post("/accounts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody))
+                .with(csrf()))
+        .andExpect(status().isBadRequest());
   }
 }

@@ -4,7 +4,12 @@
 
 package se.digg.wallet.gateway.infrastructure.account.model;
 
-public record WalletAccountPublicKeyDto(
-    String publicKeyBase64,
-    String publicKeyIdentifier) {
+public record WalletAccountJwkDto(
+    String kty,
+    String kid,
+    String alg,
+    String use,
+    String crv,
+    String x,
+    String y) {
 }

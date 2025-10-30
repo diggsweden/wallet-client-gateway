@@ -8,12 +8,12 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
+import se.digg.wallet.gateway.application.model.common.JwkDto;
 
 @RecordBuilder
 public record CreateAccountRequestDto(
     @NotEmpty String personalIdentityNumber,
     @NotEmpty String emailAdress,
     Optional<String> telephoneNumber,
-    @NotNull AccountPublicKeyDto publicKey) {
-
+    @NotNull JwkDto publicKey) {
 }

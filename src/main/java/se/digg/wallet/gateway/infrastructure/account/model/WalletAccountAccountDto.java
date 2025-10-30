@@ -12,5 +12,5 @@ public record WalletAccountAccountDto(
     String personalIdentityNumber,
     String emailAdress,
     Optional<String> telephoneNumber,
-    WalletAccountPublicKeyDto publicKey) {
+    WalletAccountJwkDto publicKey) {
 }
