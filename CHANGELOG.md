@@ -5,11 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-10-30
+
+### Added
+
+- Add controller to create accounts
+
+### Changed
+
+- Replace public key model with jwk
+- Update actions/setup-java action to v5 (#33)
+- Update actions/checkout action to v5 (#32)
+- Update postgres:16-alpine docker digest to 0296606
+- Update cgr.dev/chainguard/jre:latest docker digest to 6cd7329 (#28)
+- Update java non-major (#31)
+- Update actions/checkout action to v4.3.0 (#30)
+- Pin dependencies
+- Pin dependencies (#26)
+- Pin sha and version
+- Use base renovate config
+- Adjust schedule
+
 ## [0.2.1] - 2025-10-16
 
 ### Fixed
 
 - Fix typo
+
 
 ## [0.2.0] - 2025-10-16
 
@@ -105,6 +127,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.2.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.1..v0.2.2
 [0.2.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.0..v0.2.1
 [0.2.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.6..v0.2.0
 [0.1.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.5..v0.1.6
