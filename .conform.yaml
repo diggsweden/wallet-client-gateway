@@ -10,7 +10,7 @@ policies:
       gpg:
         required: true
       header:
-        length: 90
+        length: 100
         imperative: true
         case: lower
         invalidLastCharacters: .
@@ -30,4 +30,4 @@ policies:
             "release",
           ]
         scopes: [".*"]
-        descriptionLength: 92
+        descriptionLength: 100
