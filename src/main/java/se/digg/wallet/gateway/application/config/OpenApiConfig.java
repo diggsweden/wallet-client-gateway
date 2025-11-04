@@ -28,7 +28,7 @@ public class OpenApiConfig {
                 new SecurityScheme()
                     .type(SecurityScheme.Type.APIKEY)
                     .in(SecurityScheme.In.HEADER)
-                    .name(ApiKeyAuthFilter.API_KEY_HEADER)))
+                    .name(SecurityConfig.API_KEY_HEADER)))
         .addSecurityItem(new SecurityRequirement().addList("ApiKeyScheme"));
   }
 

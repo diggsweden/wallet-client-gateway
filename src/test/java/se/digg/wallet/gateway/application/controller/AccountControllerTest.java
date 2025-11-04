@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import se.digg.wallet.gateway.application.auth.ApiKeyVerifier;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
@@ -38,6 +39,9 @@ class AccountControllerTest {
   @MockitoBean
   private AccountService accountService;
 
+  @MockitoBean
+  private ApiKeyVerifier apiKeyVerifier;
+
   @Test
   @WithMockUser
   void testCreateAccountHappyPath() throws Exception {
@@ -48,7 +52,7 @@ class AccountControllerTest {
 
     mockMvc
         .perform(
-            post("/accounts")
+            post("/accounts/v1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody))
                 .with(csrf()))
@@ -67,7 +71,7 @@ class AccountControllerTest {
 
     mockMvc
         .perform(
-            post("/accounts")
+            post("/accounts/v1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody))
                 .with(csrf()))

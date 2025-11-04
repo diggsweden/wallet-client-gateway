@@ -14,8 +14,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.http.MediaType;
-import se.digg.wallet.gateway.application.model.BadRequestDto;
 import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
+import se.digg.wallet.gateway.application.model.common.BadRequestDto;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

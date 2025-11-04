@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.http.MediaType;
-import se.digg.wallet.gateway.application.model.BadRequestDto;
+import se.digg.wallet.gateway.application.model.common.BadRequestDto;
 import se.digg.wallet.gateway.infrastructure.attestation.model.ClientAttestationDto;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})

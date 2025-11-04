@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,15 +20,16 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
-import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 8098))
+@EnableWireMock(@ConfigureWireMock(port = 0))
 class AttestationControllerIntegrationTest {
   @Autowired
   private WebTestClient restClient;
+
+  private boolean authenticated = false;
 
   @Value("${wiremock.server.baseUrl}")
   private String wireMockUrl;
@@ -41,6 +43,14 @@ class AttestationControllerIntegrationTest {
   UUID hsmId = UUID.randomUUID();
   UUID wuaId = UUID.randomUUID();
   UUID dbId = UUID.randomUUID();
+
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    if (!authenticated) {
+      restClient = AuthUtil.login(port, restClient);
+      authenticated = true;
+    }
+  }
 
   @Test
   void testCreateAttestation() {
@@ -71,7 +81,6 @@ class AttestationControllerIntegrationTest {
     var response = restClient.post()
         .uri("/attribute-attestations")
         .bodyValue(createAttestationDto)
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
     response.expectStatus()
         .isCreated()
@@ -88,8 +97,8 @@ class AttestationControllerIntegrationTest {
 
   @Test
   void testGetAttestation() {
-    stubFor(get(applicationConfig.attributeattestation().paths().getById() + "/" + dbId.toString())
-
+    stubFor(get(
+        applicationConfig.attributeattestation().paths().getById() + "/" + dbId.toString())
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "application/json")
@@ -105,7 +114,6 @@ class AttestationControllerIntegrationTest {
 
     var response = restClient.get()
         .uri("/attribute-attestations/" + dbId.toString())
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
     response.expectStatus()
         .isOk()
@@ -123,7 +131,8 @@ class AttestationControllerIntegrationTest {
   @Test
   void testGetAttestationByHsmId() {
 
-    stubFor(get(applicationConfig.attributeattestation().paths().getByKey() + "/" + dbId.toString())
+    stubFor(get(
+        applicationConfig.attributeattestation().paths().getByKey() + "/" + dbId.toString())
 
         .willReturn(aResponse()
             .withStatus(201)
@@ -144,8 +153,6 @@ class AttestationControllerIntegrationTest {
             .path("/attribute-attestations")
             .queryParam("key", dbId.toString())
             .build())
-
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
     response.expectStatus()
         .isOk()

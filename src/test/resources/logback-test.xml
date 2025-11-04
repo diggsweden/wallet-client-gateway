@@ -29,7 +29,7 @@ SPDX-License-Identifier: EUPL-1.2
     <appender-ref ref="CONSOLE" />
   </logger>
   <!-- To hide logging api-key at debug level for appliaction-->
-  <logger name="se.digg.wallet.gateway.config.apikeyauthfilter" level="info" />
+  <logger name="se.digg.wallet.gateway.config.SecurityConfig" level="info" />
   <root level="INFO">
     <appender-ref ref="CONSOLE" />
   </root>

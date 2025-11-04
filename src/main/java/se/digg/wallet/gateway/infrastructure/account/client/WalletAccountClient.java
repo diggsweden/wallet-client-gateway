@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.infrastructure.account.client;
 
+import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -17,11 +18,13 @@ public class WalletAccountClient {
   private final RestClient restClient;
   private final String baseUrl;
   private final String createAccountPath;
+  private final String getAccountPath;
 
   public WalletAccountClient(RestClient restClient, ApplicationConfig applicationConfig) {
     this.restClient = restClient;
     this.baseUrl = applicationConfig.walletaccount().baseurl();
     this.createAccountPath = applicationConfig.walletaccount().paths().post();
+    this.getAccountPath = applicationConfig.walletaccount().paths().get();
   }
 
   public WalletAccountAccountDto createAccount(WalletAccountCreateAccountRequestDto dto) {
@@ -32,6 +35,15 @@ public class WalletAccountClient {
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
         .body(WalletAccountAccountDto.class);
+  }
+
+  public Optional<WalletAccountAccountDto> getAccount(String accountId) {
+    return Optional.ofNullable(restClient
+        .get()
+        .uri(baseUrl + getAccountPath + "/" + accountId)
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .body(WalletAccountAccountDto.class));
   }
 
 }

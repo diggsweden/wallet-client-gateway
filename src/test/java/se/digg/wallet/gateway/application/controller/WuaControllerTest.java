@@ -49,7 +49,7 @@ class WuaControllerTest {
 
     mockMvc
         .perform(
-            post("/wua")
+            post("/wua/v2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createWuaDto))
                 .with(csrf()))

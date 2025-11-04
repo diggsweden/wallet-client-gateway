@@ -52,7 +52,7 @@ public class AttestationController {
   @GetOpenApiDocumentation
   public ResponseEntity<AttestationDto> getAttestationById(@PathVariable final UUID id) {
     return attetstationService.getAttestation(id).map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping

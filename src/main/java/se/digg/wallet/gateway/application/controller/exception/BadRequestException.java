@@ -11,6 +11,7 @@ public class BadRequestException extends RuntimeException {
   private String detail;
 
   public BadRequestException(String detail) {
+    super(detail);
     this.detail = Objects.requireNonNull(detail);
   }
 

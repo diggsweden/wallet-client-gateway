@@ -22,13 +22,13 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
-import se.digg.wallet.gateway.application.config.ApiKeyAuthFilter;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 8099))
+@EnableWireMock(@ConfigureWireMock(port = 0))
 class AccountControllerIntegrationTest {
 
   @Autowired
@@ -38,16 +38,16 @@ class AccountControllerIntegrationTest {
   private String wireMockUrl;
 
   @Autowired
-  private ApplicationConfig applicationConfig;
-
-  @Autowired
   private ObjectMapper objectMapper;
 
   @LocalServerPort
   private int port;
 
+  @Autowired
+  private ApplicationConfig applicationConfig;
+
   @Test
-  void testRequestingWuaSuccessfullyReturnsCreated() throws Exception {
+  void testCreateAccount() throws Exception {
     var generatedAccountId = UUID.randomUUID();
     var jwkString = objectMapper.writeValueAsString(JwkDtoTestBuilder.withDefaults().build());
 
@@ -77,9 +77,9 @@ class AccountControllerIntegrationTest {
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri("/accounts")
+        .uri("/accounts/v1")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .bodyValue(requestBody)
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
     response.expectStatus()
@@ -93,16 +93,16 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
-  void testRequestingWuaFailsReturnsInternalServerError() {
+  void testAccountReturns500IfAccountServiceRespondsWith404() {
     stubFor(post("/account")
         .willReturn(aResponse()
             .withStatus(404)));
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri("/accounts")
+        .uri("/accounts/v1")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .bodyValue(requestBody)
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
     response.expectStatus()
@@ -115,9 +115,9 @@ class AccountControllerIntegrationTest {
         .emailAdress(null)
         .build();
     var response = restClient.post()
-        .uri("/accounts")
+        .uri("/accounts/v1")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .bodyValue(requestBody)
-        .header(ApiKeyAuthFilter.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
     response.expectStatus()

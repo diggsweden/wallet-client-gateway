@@ -4,6 +4,9 @@
 
 package se.digg.wallet.gateway.infrastructure.account.model;
 
+import io.soabase.recordbuilder.core.RecordBuilder;
+
+@RecordBuilder
 public record WalletAccountJwkDto(
     String kty,
     String kid,

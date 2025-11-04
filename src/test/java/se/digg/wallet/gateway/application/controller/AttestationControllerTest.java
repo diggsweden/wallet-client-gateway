@@ -96,7 +96,8 @@ class AttestationControllerTest {
     mockMvc
         .perform(
             get("/attribute-attestations")
-                .queryParams(MultiValueMap.fromSingleValue(Map.of("key", defaultUuid.toString()))))
+                .queryParams(MultiValueMap
+                    .fromSingleValue(Map.of("key", defaultUuid.toString()))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.attestations").exists())
         .andExpect(content()

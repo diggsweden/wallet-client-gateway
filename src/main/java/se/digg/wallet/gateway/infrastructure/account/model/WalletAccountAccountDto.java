@@ -4,9 +4,11 @@
 
 package se.digg.wallet.gateway.infrastructure.account.model;
 
+import io.soabase.recordbuilder.core.RecordBuilder;
 import java.util.Optional;
 import java.util.UUID;
 
+@RecordBuilder
 public record WalletAccountAccountDto(
     UUID id,
     String personalIdentityNumber,

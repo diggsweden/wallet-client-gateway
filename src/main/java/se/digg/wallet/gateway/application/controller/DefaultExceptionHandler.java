@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -19,8 +20,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import se.digg.wallet.gateway.application.controller.exception.ApiKeyNeededException;
 import se.digg.wallet.gateway.application.controller.exception.BadRequestException;
-import se.digg.wallet.gateway.application.model.BadRequestDto;
+import se.digg.wallet.gateway.application.model.common.BadRequestDto;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
@@ -70,6 +72,12 @@ public class DefaultExceptionHandler {
     return ResponseEntity.badRequest().body(body);
   }
 
+  @ExceptionHandler(ApiKeyNeededException.class)
+  @ResponseStatus(UNAUTHORIZED)
+  public void handleApiKeyNeededException(
+      ApiKeyNeededException e) {
+    LOGGER.debug("Api key needed error", e);
+  }
 
   private Map<String, List<String>> getErrorsMap(MethodArgumentNotValidException e) {
 

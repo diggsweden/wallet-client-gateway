@@ -4,6 +4,15 @@
 # Application Properties
 properties:
   apisecret: secret
+  public-paths:
+    - "/actuator/**"
+    - "/v3/api-docs/**"
+    - "/swagger-ui.html"
+    - "/swagger-ui/**"
+    - "/public/**"
+    - "/wua"
+    - "/accounts/v1"
+  challenge-response-endpoint: "/public/auth/session/response"
   walletprovider:
     baseurl: http://
     wua-path: /wallet-provider/wallet-unit-attestation
@@ -17,18 +26,19 @@ properties:
     baseurl: http://
     paths:
       post: /account
+      get: /account
+  challenge-cache:
+    ttl-seconds: 30
 
 # Wallet Client Gateway Configuration
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: 10m
 spring:
   application:
     name: wallet-client-gateway
-  security:
-    oauth2:
-      client:
-        registration: {}
-        provider: {}
 
 # Management and Monitoring
 management:

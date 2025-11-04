@@ -5,20 +5,28 @@
 # Application Properties
 properties:
   apisecret: my_secret_key
+  public-paths:
+    - "/actuator/**"
+    - "/v3/api-docs/**"
+    - "/swagger-ui.html"
+    - "/swagger-ui/**"
+    - "/public/**"
+    - "/wua"
+    - "/accounts/v1"
+  challenge-response-endpoint: "/public/auth/session/response"
   walletprovider:
-    baseurl: http://localhost:8099
+    baseurl: http://localhost:${wiremock.server.port}
     wua-path: /wallet-provider/wallet-unit-attestation
   attributeattestation:
-    baseurl: http://localhost:8098
+    baseurl: http://localhost:${wiremock.server.port}
     paths:
       post: /attestation
       get-by-id: /attestation
       get-by-key: /attestation/user
   walletaccount:
-    baseurl: http://localhost:8099
+    baseurl: http://localhost:${wiremock.server.port}
     paths:
       post: /account
-# Wallet Client Gateway Configuration
-spring:
-  application:
-    name: wallet-client-gateway
+      get: /account
+  challenge-cache:
+    ttl-seconds: 1
