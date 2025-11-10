@@ -31,7 +31,7 @@ RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip=true -B && \
     java -Djarmode=layertools -jar target/*.jar extract
 
 # Stage 2: Runtime stage
-FROM cgr.dev/chainguard/jre:latest@sha256:14dc2fa681735e9d9b50c709f7cb0c0c8f704bb9e269449d596371ea9b8718d2 AS runtime
+FROM cgr.dev/chainguard/jre:latest@sha256:62ad89cd0af8e0c8750672586615e2c7ee990e5c83527dca99ae83891ad0bd2f AS runtime
 
 LABEL maintainer="Digg - Agency for Digital Government"
 LABEL description="Wallet Client Gateway"
