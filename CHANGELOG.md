@@ -5,7 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.2] - 2025-10-30
+## [0.2.3] - 2025-11-12
+
+### Added
+
+- Add challenge-response login sessions
+
+### Changed
+
+- Merge pull request #41 from diggsweden/renovate/docker.io-library-eclipse-temurin-25-jdk-alpine
+- Update docker.io/library/eclipse-temurin:25-jdk-alpine docker digest to 0c4c630
+- Merge pull request #39 from diggsweden/renovate/cgr.dev-chainguard-jre-latest
+- Update cgr.dev/chainguard/jre:latest docker digest to 62ad89c
+- Lock file maintenance (#43)
+- Update diggsweden/reusable-ci action to v2.1.1 (#40)
+- Merge pull request #36 from diggsweden/renovate/java-non-major
+- Update dependency org.springframework.boot:spring-boot-starter-parent to v3.5.7
+- Increase commit header length
+- Merge pull request #37 from diggsweden/renovate/major-java-major
+- Update java major
+- Merge pull request #38 from diggsweden/renovate/docker.io-library-eclipse-temurin-25.x
+- Update docker.io/library/eclipse-temurin docker tag to v25
+- Merge pull request #35 from diggsweden/renovate/cgr.dev-chainguard-jre-latest
+- Update cgr.dev/chainguard/jre:latest docker digest to 14dc2fa
+
+## [0.2.2] - 2025-11-03
 
 ### Added
 
@@ -25,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pin sha and version
 - Use base renovate config
 - Adjust schedule
+
 
 ## [0.2.1] - 2025-10-16
 
@@ -127,6 +152,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.2.3]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.2..v0.2.3
 [0.2.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.1..v0.2.2
 [0.2.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.0..v0.2.1
 [0.2.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.1.6..v0.2.0
