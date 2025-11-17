@@ -28,7 +28,8 @@ import se.digg.wallet.gateway.application.model.common.BadRequestDto;
         schema = @Schema(implementation = BadRequestDto.class)))
 @RequestBody(description = "Challenge response",
     content = @Content(
-        contentSchema = @Schema(implementation = AuthChallengeResponseDto.class),
+        mediaType = MediaType.APPLICATION_JSON_VALUE,
+        schema = @Schema(implementation = AuthChallengeResponseDto.class),
         examples = @ExampleObject("""
                 {
                   "signedJwt": "insert.signed.jwt"
