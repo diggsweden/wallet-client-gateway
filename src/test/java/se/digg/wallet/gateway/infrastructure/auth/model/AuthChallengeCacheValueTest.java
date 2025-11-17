@@ -14,7 +14,9 @@ import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class AuthChallengeCacheValueTest {
@@ -27,12 +29,11 @@ class AuthChallengeCacheValueTest {
     var accountId = "ads";
     var ecKey = "abcdef";
 
-    new AuthChallengeCacheValue(nonce, timestamp, randomString, accountId, ecKey);
+    new AuthChallengeCacheValue(nonce, accountId, ecKey);
   }
 
   @Test
   void testGenerate() throws JOSEException {
-    var now = Instant.now();
     var accountId = "123";
     var ecKey = new ECKeyGenerator(Curve.P_256)
         .keyID("CORRET")
@@ -41,9 +42,10 @@ class AuthChallengeCacheValueTest {
         .generate();
 
     var challenge = AuthChallengeCacheValue.generate(accountId, ecKey);
-    assertThat(challenge.timestamp())
-        .isAfterOrEqualTo(now)
-        .isBefore(now.plusSeconds(10));
+    assertThat(Stream.of(
+        challenge.nonce(),
+        challenge.accountId(),
+        challenge.publicKey())).allMatch(Objects::nonNull);
   }
 
   @Test
@@ -52,9 +54,8 @@ class AuthChallengeCacheValueTest {
     var randomString = UUID.randomUUID();
     var nonce = timestamp + " something other " + randomString;
     var accountId = "ads";
-    var ecKey = "abcdef";
 
-    assertThrows(IllegalArgumentException.class,
-        () -> new AuthChallengeCacheValue(nonce, timestamp, randomString, accountId, ecKey));
+    assertThrows(NullPointerException.class,
+        () -> new AuthChallengeCacheValue(nonce, accountId, null));
   }
 }

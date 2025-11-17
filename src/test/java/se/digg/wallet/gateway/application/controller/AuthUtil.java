@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
 
@@ -90,11 +91,11 @@ public class AuthUtil {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectCookie()
-        .value("JSESSIONID", sessionId::set);
+        .expectHeader()
+        .value(SessionConfig.SESSION_HEADER, sessionId::set);
 
     return restClient.mutate()
-        .defaultCookie("JSESSIONID", sessionId.get())
+        .defaultHeader(SessionConfig.SESSION_HEADER, sessionId.get())
         .build();
   }
 

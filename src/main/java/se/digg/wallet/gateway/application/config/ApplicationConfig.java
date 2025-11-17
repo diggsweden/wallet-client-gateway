@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 public record ApplicationConfig(
     @NotBlank String apisecret,
     @NotEmpty List<String> publicPaths,
-    @NotBlank String challengeResponseEndpoint,
     @NotNull Walletprovider walletprovider,
     @NotNull Attributeattestation attributeattestation,
     @NotNull Walletaccount walletaccount,

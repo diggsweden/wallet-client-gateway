@@ -21,22 +21,37 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.redis.testcontainers.RedisContainer;
 import java.util.Date;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
+import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 0))
+@Testcontainers
 class AuthControllerIntegrationTest {
+
+  @Container
+  static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
+
+  @DynamicPropertySource
+  static void configureRedisPort(DynamicPropertyRegistry registry) {
+    RedisTestConfiguration.configureRedisPort(registry, redisContainer);
+  }
 
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
   private static final String KEY_ID = "123";
@@ -96,8 +111,8 @@ class AuthControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectCookie()
-        .exists("JSESSIONID");
+        .expectHeader()
+        .exists(SessionConfig.SESSION_HEADER);
   }
 
   @Test
@@ -110,7 +125,7 @@ class AuthControllerIntegrationTest {
         .header("content-type", "application/json")
         .exchange()
         .expectStatus()
-        .isEqualTo(403);
+        .isEqualTo(401);
   }
 
   private void stubAccount(ECKey ecKey) {

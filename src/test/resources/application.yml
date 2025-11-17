@@ -13,7 +13,6 @@ properties:
     - "/public/**"
     - "/wua"
     - "/accounts/v1"
-  challenge-response-endpoint: "/public/auth/session/response"
   walletprovider:
     baseurl: http://localhost:${wiremock.server.port}
     wua-path: /wallet-provider/wallet-unit-attestation
@@ -29,4 +28,11 @@ properties:
       post: /account
       get: /account
   challenge-cache:
-    ttl-seconds: 1
+    ttl-seconds: 10
+
+spring:
+  application:
+    name: wallet-client-gateway
+  redis:
+    host: localhost
+    port: 6379

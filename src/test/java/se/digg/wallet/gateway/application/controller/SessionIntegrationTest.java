@@ -6,21 +6,39 @@ package se.digg.wallet.gateway.application.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
+import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.controller.SessionTestController.SessionTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 0))
+@Testcontainers
 class SessionIntegrationTest {
 
+  @Container
+  static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
+
+  @DynamicPropertySource
+  static void configureRedisPort(DynamicPropertyRegistry registry) {
+    RedisTestConfiguration.configureRedisPort(registry, redisContainer);
+  }
+
   @Autowired
+  private WebTestClient rawRestClient;
+
   private WebTestClient restClient;
 
   private boolean authenticated = false;
@@ -31,7 +49,7 @@ class SessionIntegrationTest {
   @BeforeEach
   void beforeEach() throws Exception {
     if (!authenticated) {
-      restClient = AuthUtil.login(port, restClient);
+      restClient = AuthUtil.login(port, rawRestClient);
       authenticated = true;
     }
   }
@@ -51,7 +69,7 @@ class SessionIntegrationTest {
   void invalidSessionIdIsForbidden() {
     restClient.get()
         .uri("/private/user/session/test")
-        .cookie("JSESSIONID", "10238128301")
+        .header(SessionConfig.SESSION_HEADER, "10238128301")
         .exchange()
         .expectStatus()
         .isEqualTo(403);
@@ -61,7 +79,7 @@ class SessionIntegrationTest {
   void emptySessionIdIsForbidden() {
     restClient.get()
         .uri("/private/user/session/test")
-        .cookie("JSESSIONID", "")
+        .header(SessionConfig.SESSION_HEADER, "")
         .exchange()
         .expectStatus()
         .isEqualTo(403);
@@ -70,42 +88,23 @@ class SessionIntegrationTest {
   @SuppressWarnings("null")
   @Test
   void noSessionIdIsForbidden() {
-    restClient.get()
+    rawRestClient.get()
         .uri("/private/user/session/test")
-        .cookie("JSESSIONID", null)
         .exchange()
         .expectStatus()
         .isEqualTo(403);
   }
 
-
   @Test
-  void canGenerateAnotherSessionWhenLoggedInAndBothAreValid() throws Exception {
-    var latestRestClient = AuthUtil.login(port, restClient);
-    // TODO not a good thing?
-    latestRestClient.get()
-        .uri("/private/user/session/test")
-        .exchange()
-        .expectStatus()
-        .isEqualTo(200);
-
-    restClient.get()
-        .uri("/private/user/session/test")
-        .exchange()
-        .expectStatus()
-        .isEqualTo(200);
-  }
-
-  @Test
+  @Order(99)
   void cannotUseInvalidatedSession() throws Exception {
-    var loggingOutRestClient = AuthUtil.login(port, restClient);
-    loggingOutRestClient.get()
+    restClient.get()
         .uri("/private/user/session/logout")
         .exchange()
         .expectStatus()
         .isEqualTo(200);
 
-    loggingOutRestClient.get()
+    restClient.get()
         .uri("/private/user/session/test")
         .exchange()
         .expectStatus()

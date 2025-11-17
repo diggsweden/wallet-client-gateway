@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
+import com.redis.testcontainers.RedisContainer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
@@ -25,7 +30,18 @@ import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock(@ConfigureWireMock(port = 0))
+@Testcontainers
 class AttestationControllerIntegrationTest {
+
+
+  @Container
+  static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
+
+  @DynamicPropertySource
+  static void configureRedisPort(DynamicPropertyRegistry registry) {
+    RedisTestConfiguration.configureRedisPort(registry, redisContainer);
+  }
+
   @Autowired
   private WebTestClient restClient;
 

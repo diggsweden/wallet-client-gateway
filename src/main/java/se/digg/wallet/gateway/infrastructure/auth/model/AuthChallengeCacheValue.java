@@ -11,37 +11,20 @@ import java.util.UUID;
 
 public record AuthChallengeCacheValue(
     String nonce,
-    Instant timestamp,
-    UUID randomString,
     String accountId,
     String publicKey) {
 
   public AuthChallengeCacheValue {
     Objects.requireNonNull(nonce);
-    Objects.requireNonNull(timestamp);
-    Objects.requireNonNull(randomString);
     Objects.requireNonNull(accountId);
     Objects.requireNonNull(publicKey);
-
-    if (!nonce.equals(timestamp + "+" + randomString)) {
-      throw new IllegalArgumentException(
-          """
-                  Nonce does not match timestamp and randomString.
-                  Nonce: %s
-                  Timestamp: %s
-                  RandomString: %s
-              """
-              .formatted(nonce, timestamp, randomString));
-    }
   }
 
   public static AuthChallengeCacheValue generate(String accountId, ECKey ecKey) {
-    var timestamp = Instant.now();
-    var randomString = UUID.randomUUID();
-    var nonce = generateNonce(timestamp, randomString);
+    var nonce = generateNonce(Instant.now(), UUID.randomUUID());
     var publicKey = ecKey.toPublicJWK().toJSONString();
 
-    return new AuthChallengeCacheValue(nonce, timestamp, randomString, accountId, publicKey);
+    return new AuthChallengeCacheValue(nonce, accountId, publicKey);
   }
 
   public static String generateNonce() {

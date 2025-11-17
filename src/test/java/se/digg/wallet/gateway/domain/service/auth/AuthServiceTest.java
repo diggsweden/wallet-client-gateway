@@ -23,7 +23,6 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -200,8 +199,6 @@ class AuthServiceTest {
   }
 
   static AuthChallengeCacheValue fromNonce(String nonce, ECKey ecJwk) {
-    Instant instant = Instant.parse(nonce.split("\\+")[0]);
-    UUID uuid = UUID.fromString(nonce.split("\\+")[1]);
-    return new AuthChallengeCacheValue(nonce, instant, uuid, accountId, ecJwk.toJSONString());
+    return new AuthChallengeCacheValue(nonce, accountId, ecJwk.toJSONString());
   }
 }

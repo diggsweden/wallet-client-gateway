@@ -14,7 +14,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.http.MediaType;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
 import se.digg.wallet.gateway.application.model.common.BadRequestDto;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})
@@ -28,8 +27,6 @@ import se.digg.wallet.gateway.application.model.common.BadRequestDto;
         schema = @Schema(implementation = BadRequestDto.class)))
 @RequestBody(description = "Challenge response",
     content = @Content(
-        mediaType = MediaType.APPLICATION_JSON_VALUE,
-        schema = @Schema(implementation = AuthChallengeResponseDto.class),
         examples = @ExampleObject("""
                 {
                   "signedJwt": "insert.signed.jwt"

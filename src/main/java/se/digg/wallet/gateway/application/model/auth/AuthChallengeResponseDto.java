@@ -5,7 +5,8 @@
 package se.digg.wallet.gateway.application.model.auth;
 
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
 
-public record AuthChallengeResponseDto(@NotBlank String signedJwt) {
+public record AuthChallengeResponseDto(@NotBlank String signedJwt) implements Serializable {
 
 }
