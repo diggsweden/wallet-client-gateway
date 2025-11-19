@@ -15,8 +15,25 @@ class AccountMapperTest {
   @Test
   void testMapping() {
     var requestDto = CreateAccountRequestDtoTestBuilder.withDefaults().build();
-    var mapped = new AccountMapper().toAccountCreateAccountDto(requestDto);
-    assertThat(mapped).usingRecursiveComparison().isEqualTo(requestDto);
+    var mapped = new AccountMapper().toAccountCreateAccountDto(requestDto, null);
+    assertThat(mapped)
+        .hasFieldOrPropertyWithValue("personalIdentityNumber",
+            requestDto.personalIdentityNumber().get())
+        .usingRecursiveComparison()
+        .ignoringFields("personalIdentityNumber")
+        .isEqualTo(requestDto);
+  }
+
+  @Test
+  void testMappingOverridingPersonalIdentityNumber() {
+    var personalIdentityNumber = "123123123";
+    var requestDto = CreateAccountRequestDtoTestBuilder.withDefaults().build();
+    var mapped = new AccountMapper().toAccountCreateAccountDto(requestDto, personalIdentityNumber);
+    assertThat(mapped)
+        .hasFieldOrPropertyWithValue("personalIdentityNumber", personalIdentityNumber)
+        .usingRecursiveComparison()
+        .ignoringFields("personalIdentityNumber")
+        .isEqualTo(requestDto);
   }
 
 }

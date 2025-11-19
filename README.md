@@ -11,10 +11,7 @@ A secure API gateway service for the European Digital Identity Wallet ecosystem.
 
 ## Development
 
-```bash
-docker-compose up -d
-mvn spring-boot:run
-```
+To run application locally, se docker-compose/README.md
 
 ## Contributing
 

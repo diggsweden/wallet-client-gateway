@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.old;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -37,7 +37,7 @@ public class AccountController {
     if (requestDto.publicKey().kid() == null || requestDto.publicKey().kid().isEmpty()) {
       throw new BadRequestException("publicKey.kid is required when creating account");
     }
-    var responseDto = accountService.createAccount(requestDto);
+    var responseDto = accountService.createAccount(requestDto, null);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(responseDto);

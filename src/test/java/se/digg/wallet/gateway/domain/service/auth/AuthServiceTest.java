@@ -191,10 +191,8 @@ class AuthServiceTest {
         new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(ecJwk.getKeyID()).build(),
         claimsSet);
 
-    // Compute the EC signature
     signedJwt.sign(signer);
 
-    // Serialize the JWS to compact form
     return signedJwt.serialize();
   }
 

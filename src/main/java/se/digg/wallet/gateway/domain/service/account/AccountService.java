@@ -20,8 +20,9 @@ public class AccountService {
     this.accountMapper = accountMapper;
   }
 
-  public CreateAccountResponseDto createAccount(CreateAccountRequestDto request) {
-    var mapped = accountMapper.toAccountCreateAccountDto(request);
+  public CreateAccountResponseDto createAccount(CreateAccountRequestDto request,
+      String personalIdentityNumber) {
+    var mapped = accountMapper.toAccountCreateAccountDto(request, personalIdentityNumber);
     var result = walletAccountClient.createAccount(mapped);
     return new CreateAccountResponseDto(result.id());
   }

@@ -9,13 +9,13 @@ import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDtoB
 
 public class CreateAccountRequestDtoTestBuilder {
 
-  public static final String PERSONAL_IDENTITY_NUMBER = "007";
+  public static final String PERSONAL_IDENTITY_NUMBER = "198001022386";
   public static final String EMAIL_ADDRESS = "dig@digg.se";
   public static final String TELEPHONE_NUMBER = "070 007";
 
   public static CreateAccountRequestDtoBuilder withDefaults() {
     return CreateAccountRequestDtoBuilder.builder()
-        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .personalIdentityNumber(Optional.of(PERSONAL_IDENTITY_NUMBER))
         .emailAdress(EMAIL_ADDRESS)
         .telephoneNumber(Optional.of(TELEPHONE_NUMBER))
         .publicKey(JwkDtoTestBuilder.withDefaults().build());
