@@ -28,8 +28,14 @@ public class OpenApiConfig {
                 new SecurityScheme()
                     .type(SecurityScheme.Type.APIKEY)
                     .in(SecurityScheme.In.HEADER)
-                    .name(SecurityConfig.API_KEY_HEADER)))
-        .addSecurityItem(new SecurityRequirement().addList("ApiKeyScheme"));
+                    .name(SecurityConfig.API_KEY_HEADER))
+            .addSecuritySchemes("SessionIdScheme",
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.APIKEY)
+                    .in(SecurityScheme.In.HEADER)
+                    .name(SessionConfig.SESSION_HEADER)))
+        .addSecurityItem(
+            new SecurityRequirement().addList("ApiKeyScheme").addList("SessionIdScheme"));
   }
 
 }
