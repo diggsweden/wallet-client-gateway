@@ -6,9 +6,9 @@ package se.digg.wallet.gateway.application.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -32,17 +32,17 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.wiremock.spring.ConfigureWireMock;
-import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.SessionConfig;
+import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 0))
 @Testcontainers
+@WalletAccountMock
 class AuthControllerIntegrationTest {
 
   @Container
@@ -60,6 +60,10 @@ class AuthControllerIntegrationTest {
 
   @LocalServerPort
   private int port;
+
+  @InjectWireMock(WalletAccountMock.NAME)
+  private WireMockServer server;
+
 
   @SuppressWarnings("null")
   @Test
@@ -125,7 +129,7 @@ class AuthControllerIntegrationTest {
   }
 
   private void stubAccount(ECKey ecKey) {
-    stubFor(get("/account/" + ACCOUNT_ID)
+    server.stubFor(get("/account/" + ACCOUNT_ID)
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "application/json")

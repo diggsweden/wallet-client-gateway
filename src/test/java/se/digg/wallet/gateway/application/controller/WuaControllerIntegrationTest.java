@@ -7,9 +7,9 @@ package se.digg.wallet.gateway.application.controller;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,13 +22,16 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.wiremock.spring.ConfigureWireMock;
-import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
+import se.digg.wallet.gateway.application.controller.util.AuthUtil;
+import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
+import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 0))
+@WalletAccountMock
+@WalletProviderMock
 @Testcontainers
 class WuaControllerIntegrationTest {
 
@@ -52,6 +55,12 @@ class WuaControllerIntegrationTest {
   @LocalServerPort
   private int port;
 
+  @InjectWireMock(WalletAccountMock.NAME)
+  private WireMockServer accountServer;
+
+  @InjectWireMock(WalletProviderMock.NAME)
+  private WireMockServer providerServer;
+
   @BeforeAll
   public static void beforeAll() throws Exception {
     TEST_JWK_STRING =
@@ -64,14 +73,14 @@ class WuaControllerIntegrationTest {
   @BeforeEach
   public void beforeEach() throws Exception {
     if (!authenticated) {
-      restClient = AuthUtil.login(port, restClient);
+      restClient = AuthUtil.login(accountServer, port, restClient);
       authenticated = true;
     }
   }
 
   @Test
   void testRequestingWuaSuccessfullyReturnsCreated() {
-    stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",
@@ -102,7 +111,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testRequestingWuaFailsReturnsInternalServerError() {
-    stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",

@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -48,12 +48,14 @@ public class AuthUtil {
   public static final String ACCOUNT_ID = UUID.randomUUID().toString();
   public static final String KEY_ID = "123";
 
+
   @SuppressWarnings("null")
-  public static WebTestClient login(int port, WebTestClient restClient)
+  public static WebTestClient login(WireMockServer wireMockServer, int port,
+      WebTestClient restClient)
       throws Exception {
     var generatedKeyPair = generateKey();
 
-    stubFor(get("/account/" + ACCOUNT_ID)
+    wireMockServer.stubFor(get("/account/" + ACCOUNT_ID)
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "application/json")
@@ -115,11 +117,11 @@ public class AuthUtil {
         .build();
   }
 
-  public static WebTestClient oauth2Login(int port, int wiremockPort,
+  public static WebTestClient oauth2Login(int port, WireMockServer authorizationServer,
       WebTestClient restClient)
       throws Exception {
     final var walletClientGatewayBaseUrl = "http://localhost:" + port;
-    final var authorizationServerBaseUrl = "http://localhost:" + wiremockPort;
+    final var authorizationServerBaseUrl = "http://localhost:" + authorizationServer.port();
     final var redirectUri = walletClientGatewayBaseUrl + "/login/oauth2/code/myprovider";
 
     var httpClient = HttpClient.newBuilder()
@@ -160,7 +162,7 @@ public class AuthUtil {
     var subject = "testuser";
     var rsaJwk = RSAKey.parse(Files.readString(
         new ClassPathResource("wiremock/authorization_server_key.jwk").getFile().toPath()));
-    stubAsyncAuthorizationServerCalls(code, subject, location2, wiremockPort, rsaJwk);
+    stubAsyncAuthorizationServerCalls(code, subject, location2, authorizationServer, rsaJwk);
 
     // go to /login/oauth2, get redirected back to original url that we tried to access
     var response3 = httpClient.send(
@@ -188,9 +190,9 @@ public class AuthUtil {
 
 
   private static void stubAsyncAuthorizationServerCalls(String code, String subject,
-      String location2, int wiremockPort, RSAKey rsaJwk)
+      String location2, WireMockServer authorizationServer, RSAKey rsaJwk)
       throws Exception {
-    stubFor(get(urlEqualTo("/jwks"))
+    authorizationServer.stubFor(get(urlEqualTo("/jwks"))
         .willReturn(
             okJson("""
                     {
@@ -201,7 +203,8 @@ public class AuthUtil {
 
     var nonce = getQueryParam("nonce", location2);
     String idToken =
-        createSignedJwt(subject, "http://localhost:" + wiremockPort, "localhost-test-client", 300,
+        createSignedJwt(subject, "http://localhost:" + authorizationServer.port(),
+            "localhost-test-client", 300,
             nonce, rsaJwk);
     String accessToken = "at-" + System.currentTimeMillis();
     String tokenResponseJson = String.format("""
@@ -213,11 +216,11 @@ public class AuthUtil {
         }
         """, accessToken, idToken);
 
-    stubFor(post(urlEqualTo("/token"))
+    authorizationServer.stubFor(post(urlEqualTo("/token"))
         .withRequestBody(containing("code=" + code))
         .willReturn(okJson(tokenResponseJson)));
 
-    stubFor(get(urlEqualTo("/userinfo"))
+    authorizationServer.stubFor(get(urlEqualTo("/userinfo"))
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("Content-Type", "application/json")

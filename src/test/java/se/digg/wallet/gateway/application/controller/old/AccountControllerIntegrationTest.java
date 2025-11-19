@@ -7,12 +7,12 @@ package se.digg.wallet.gateway.application.controller.old;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.EMAIL_ADDRESS;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +20,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.wiremock.spring.ConfigureWireMock;
-import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
+import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 0))
+@WalletAccountMock
 class AccountControllerIntegrationTest {
 
   @Autowired
@@ -46,12 +46,16 @@ class AccountControllerIntegrationTest {
   @Autowired
   private ApplicationConfig applicationConfig;
 
+  @InjectWireMock(WalletAccountMock.NAME)
+  private WireMockServer server;
+
+
   @Test
   void testCreateAccount() throws Exception {
     var generatedAccountId = UUID.randomUUID();
     var jwkString = objectMapper.writeValueAsString(JwkDtoTestBuilder.withDefaults().build());
 
-    stubFor(post("/account")
+    server.stubFor(post("/account")
         .withRequestBody(equalToJson("""
             {
               "personalIdentityNumber": "%s",
@@ -94,7 +98,7 @@ class AccountControllerIntegrationTest {
 
   @Test
   void testAccountReturns500IfAccountServiceRespondsWith404() {
-    stubFor(post("/account")
+    server.stubFor(post("/account")
         .willReturn(aResponse()
             .withStatus(404)));
 

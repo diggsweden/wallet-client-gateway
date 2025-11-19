@@ -7,24 +7,24 @@ package se.digg.wallet.gateway.application.controller.old;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.wiremock.spring.ConfigureWireMock;
-import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
+import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 0))
+@WalletProviderMock
 class ApiKeyIntegrationTest {
 
   @Autowired
@@ -33,6 +33,8 @@ class ApiKeyIntegrationTest {
   @Autowired
   ApplicationConfig applicationConfig;
 
+  @InjectWireMock(WalletProviderMock.NAME)
+  private WireMockServer providerServer;
 
   public static String TEST_JWK_STRING;
 
@@ -54,7 +56,7 @@ class ApiKeyIntegrationTest {
 
   @Test
   void testValidApiKey() throws Exception {
-    stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",

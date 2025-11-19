@@ -8,8 +8,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +22,16 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.wiremock.spring.ConfigureWireMock;
-import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.controller.util.AuthUtil;
+import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
+import se.digg.wallet.gateway.application.controller.util.WalletAttributeAttestationMock;
 import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 0))
+@WalletAccountMock
+@WalletAttributeAttestationMock
 @Testcontainers
 class AttestationControllerIntegrationTest {
 
@@ -51,6 +54,12 @@ class AttestationControllerIntegrationTest {
   @LocalServerPort
   private int port;
 
+  @InjectWireMock(WalletAccountMock.NAME)
+  private WireMockServer accountServer;
+
+  @InjectWireMock(WalletAttributeAttestationMock.NAME)
+  private WireMockServer attestationServer;
+
   UUID hsmId = UUID.randomUUID();
   UUID wuaId = UUID.randomUUID();
   UUID dbId = UUID.randomUUID();
@@ -58,14 +67,14 @@ class AttestationControllerIntegrationTest {
   @BeforeEach
   public void beforeEach() throws Exception {
     if (!authenticated) {
-      restClient = AuthUtil.login(port, restClient);
+      restClient = AuthUtil.login(accountServer, port, restClient);
       authenticated = true;
     }
   }
 
   @Test
   void testCreateAttestation() {
-    stubFor(post(applicationConfig.attributeattestation().paths().post())
+    attestationServer.stubFor(post(applicationConfig.attributeattestation().paths().post())
         .withRequestBody(equalToJson("""
              {
                 "id": null,
@@ -108,7 +117,7 @@ class AttestationControllerIntegrationTest {
 
   @Test
   void testGetAttestation() {
-    stubFor(get(
+    attestationServer.stubFor(get(
         applicationConfig.attributeattestation().paths().getById() + "/" + dbId.toString())
         .willReturn(aResponse()
             .withStatus(201)
@@ -141,8 +150,7 @@ class AttestationControllerIntegrationTest {
 
   @Test
   void testGetAttestationByHsmId() {
-
-    stubFor(get(
+    attestationServer.stubFor(get(
         applicationConfig.attributeattestation().paths().getByKey() + "/" + dbId.toString())
 
         .willReturn(aResponse()

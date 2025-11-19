@@ -6,6 +6,7 @@ package se.digg.wallet.gateway.application.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -17,13 +18,14 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.wiremock.spring.ConfigureWireMock;
-import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.controller.SessionTestController.SessionTest;
+import se.digg.wallet.gateway.application.controller.util.AuthUtil;
+import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableWireMock(@ConfigureWireMock(port = 0))
+@WalletAccountMock
 @Testcontainers
 class SessionIntegrationTest {
 
@@ -41,10 +43,13 @@ class SessionIntegrationTest {
   @LocalServerPort
   private int port;
 
+  @InjectWireMock(WalletAccountMock.NAME)
+  private WireMockServer accountServer;
+
   @BeforeEach
   void beforeEach() throws Exception {
     if (!authenticated) {
-      restClient = AuthUtil.login(port, rawRestClient);
+      restClient = AuthUtil.login(accountServer, port, rawRestClient);
       authenticated = true;
     }
   }
