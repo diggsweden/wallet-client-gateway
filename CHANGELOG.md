@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-11-19
+
+### Changed
+
+- Change in memory session and cache to redis
+
 ## [0.2.4] - 2025-11-17
 
 ### Added
@@ -17,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Lock file maintenance (#50)
 - Update java non-major (#48)
 - Update diggsweden/reusable-ci action to v2.2.3 (#47)
+
 
 ## [0.2.3] - 2025-11-12
 
@@ -166,6 +173,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.2.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.4..v0.2.5
 [0.2.4]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.3..v0.2.4
 [0.2.3]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.2..v0.2.3
 [0.2.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.1..v0.2.2
