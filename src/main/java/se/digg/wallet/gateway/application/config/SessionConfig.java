@@ -10,7 +10,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.session.web.http.CompositeHttpSessionIdResolver;
+import org.springframework.session.web.http.CookieHttpSessionIdResolver;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
+import org.springframework.session.web.http.HttpSessionIdResolver;
 
 @Configuration
 public class SessionConfig {
@@ -27,8 +30,11 @@ public class SessionConfig {
     return template;
   }
 
+  // Allowing both for now to enable browser testing
   @Bean
-  public HeaderHttpSessionIdResolver sessionIdResolver() {
-    return new HeaderHttpSessionIdResolver(SESSION_HEADER);
+  public HttpSessionIdResolver sessionIdResolver() {
+    return new CompositeHttpSessionIdResolver(
+        new HeaderHttpSessionIdResolver(SESSION_HEADER),
+        new CookieHttpSessionIdResolver());
   }
 }

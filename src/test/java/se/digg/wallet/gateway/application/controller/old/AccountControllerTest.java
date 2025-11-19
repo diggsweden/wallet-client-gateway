@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.old;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -47,7 +47,7 @@ class AccountControllerTest {
   void testCreateAccountHappyPath() throws Exception {
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
 
-    when(accountService.createAccount(any()))
+    when(accountService.createAccount(any(), any()))
         .thenReturn(new CreateAccountResponseDto(TEST_ACCOUNT_ID));
 
     mockMvc
@@ -66,7 +66,7 @@ class AccountControllerTest {
         .publicKey(JwkDtoTestBuilder.withDefaults().kid("").build())
         .build();
 
-    when(accountService.createAccount(any()))
+    when(accountService.createAccount(any(), any()))
         .thenReturn(new CreateAccountResponseDto(TEST_ACCOUNT_ID));
 
     mockMvc

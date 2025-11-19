@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+
+services:
+  valkey:
+    image: valkey/valkey:9.0.0
+    ports:
+      - "6379:6379"
+    networks:
+      - wallet-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.4-0
+    container_name: keycloak
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - wallet-network
+    ports:
+      - "8089:8080"
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./keystore-wallet-app-bff-local.p12:/opt/keycloak/conf/client-keystore.p12
+
+networks:
+  wallet-network:
+    driver: bridge

@@ -13,6 +13,8 @@ properties:
     - "/public/**"
     - "/wua"
     - "/accounts/v1"
+    - "/oauth2/authorization/**"
+    - "/login/oauth2/code/*"
   walletprovider:
     baseurl: http://localhost:${wiremock.server.port}
     wua-path: /wallet-provider/wallet-unit-attestation
@@ -33,7 +35,41 @@ properties:
 spring:
   application:
     name: wallet-client-gateway
-  data:
-    redis:
-      host: localhost
-      port: 6379
+  redis:
+    host: localhost
+    port: 6379
+  security:
+    oauth2:
+      client:
+        registration:
+          myprovider:
+            client-id: localhost-test-client
+            client-authentication-method: private_key_jwt
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - https://id.oidc.se/scope/naturalPersonNumber
+        provider:
+          myprovider:
+            # issuer-uri: http://localhost:${wiremock.server.port} commented out to not have to mock discovery
+            jwk-set-uri: http://localhost:${wiremock.server.port}/jwks
+            token-uri: http://localhost:${wiremock.server.port}/token
+            user-info-endpoint-uri: http://localhost:${wiremock.server.port}/userinfo
+            authorization-uri: http://localhost:${wiremock.server.port}/authorize
+
+credential:
+  bundles:
+    keystore:
+      private-jwt-keys:
+        location: classpath:keystore.p12
+        password: changeit
+        type: PKCS12
+
+    jks:
+      myprovider:
+        store-reference: private-jwt-keys
+        name: "Private JWT - KeyPair"
+        key:
+          alias: wallet-app-bff-local
+          key-password: changeit

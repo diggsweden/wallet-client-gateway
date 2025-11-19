@@ -1,0 +1,59 @@
+{
+  "realm": "wallet",
+  "enabled": true,
+  "users": [
+    {
+      "username": "test1",
+      "email": "anna.andersson@example.com",
+      "firstName": "Anna",
+      "lastName": "Andersson",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test1",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "test2",
+      "email": "johan.nilsson@example.com",
+      "firstName": "Johan",
+      "lastName": "Nilsson",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test2",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "http://localhost:8080/",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "clientAuthenticatorType": "client-jwt",
+      "attributes": {
+        "jwt.client.keystore": "client-keystore.p12",
+        "jwt.client.keystore-password": "changeit",
+        "jwt.client.key-alias": "jwtkey",
+        "jwt.client.key-password": "changeit",
+        "jwt.credential.certificate": "MIIEtzCCAp8CBgGawH9z3DANBgkqhkiG9w0BAQsFADAfMR0wGwYDVQQDDBR3YWxsZXQtYXBwLWJmZi1sb2NhbDAeFw0yNTExMjYxNDA3NDlaFw0zNTExMjYxNDA5MjhaMB8xHTAbBgNVBAMMFHdhbGxldC1hcHAtYmZmLWxvY2FsMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAkJoqNUCAywi8J2P3wgufUhoCSinrJq/kWGjYU5pjoWLdkgc6hI2hNZAxO2kS/VJbD+MablGVTx/6CAfSLAaAheGwURvDmhZprcP0yqzCXgK1Zd9I7XgvNqUBShSWM+JJ7IwM2EZ+SUdo3glDsJgTaPL9NOx/7lDsQzmFFonaCEv3cX1dyqLG3qmaHDZpm5zGzQSVvco6OPq0jMuBRCwcUuQ/FQVGksWRmmbuViYRjnqQNPOmzrDdGdOfCFxH24/vsQe0CvFFUfHzeko6HUOMJeRuS+2IYxBV3X+vNH40FOEOUpVsBpFKIXIgNhz/xtkOTbzgsKHjJBcGh2ARwlqUjFCK9ET8QemqlTzqCaDKUgnllBCQOMhGMf/sjL0q1oIFypKQ24T0UcSkEdQRHZeEAJ2NZWPwiv1m30YdP6hZtumOGzowF/I8xKRGYrGGMYBSL2utGK1vszZQbtX2llv4Ja3PUE+ZLnyWIyJ8ZKKmzyfkJRsWWcFfl2Y+qdcV0DHkoYcMr5b6Xfw+hmsFeqoMX69NrY+jJIP043JdT6d7tDfsC5OS/yrDXJKqyyzvymbX6vnQSlW2XLSxHLcY1LEYjZ6tQ/9FYMLxaK/mq8O4ccO8Ecd6Czj6cWbBdUjbxtu3OpKD4ZNnaZJeImJF93QH+cNNESqKj82gwfyHhkE8g1sCAwEAATANBgkqhkiG9w0BAQsFAAOCAgEAZNju7f3vKZE37ESH0hjVv8rtkkBcavDlNZeJzj+T7qDGrqSCkQPYuGuIfjQcg2OPmkmjGrFyMIhSKlH+0Iez+2XVExVVICqEl9bXaKRPshS6ycOxGmbkOkx/IhP7f7brYX5FjOyjnffbjsf4qUSGO6EYY6k0Dbc1SNDApW53fJwAXVi6wuMs4qU7CLr+eG7CsGMskTjXM6LYV2RIseUevXBnrsUXmE6WyDEFFH0KQiJaAx99T2mq45ff70LXxsm6kaM+bHEg1s4lrOCHrRiUldhL0j1NJ3zfJEfdOgQEbUi8oKHLPC+251VWN7GXZcyG/S0VTI97qMBeNLPh0nIUvU2QtE36SKXIc+N7YBEft6lHQfYSI6eyQoPSaclhXxFBAz+fZkp/nUjuXnzy5r2HCbnAW5Bzwk3dam90TQltHRgH7vV7leBhDUrC34wPhA60ckf+kie4xsm0CmnfmjTcuGBLZRj/Plze02NopGzuA+healvHILz9JPhNehofytg9Fs0mNj5bjUCt8XpLuGHR2/eoJeH6r+hZS3rVhvK/ZNJiNOispCqYZP+V7sC9o5Z+dHuu6uwzOos4PItPB01iJzfo8OMmlNNQ4jLRyc99Q9Rhe5O3QT+xy+nzzbXhAPZVBSjNJZOoBo+Pt65DL1T5odLef2QAQYOWt3WQQFdDJ/Y=+D2jADaLVcXuLDLGXhapU121d85pzF2/cS9GRiIlmK7LEdaOcSHLfno9NbyRm0Rj8ksQzcG6I0hMlIwy/f6AoCvTS/A1lZNumV81FmqsZhs06ut5D1tQTIsjgGDkmqFU64gguccPyuZNGce4SLVRPCudU1tPZVkzpbyVUNqI8iT/vmqd/z0LrCap9wuGulTVzawAzgkp0YXF4YZnU7yhVeEO4oxlYeofLJdV9MAvdCCI3FCEQHq4xjNAgMBAAEwDQYJKoZIhvcNAQELBQADggEBADy3vZvHr11s7MQQIX5Ky9W9Q74uBrPtrxT2FSg4svb2bmN8mt1x8QMFr9dTOPon5mf2cJnq5TjDlnyBQIVnGMKb0UA9Bx5u4x9/qEHSztmjmAi8dfQU9yq/4iSUWwoWaWkrdodVXCh5s7OqakEU+Q5X6Zh5Ls9g/3Psm0pkvNpTWKquUnrvOUcjHUwSn7PVo0Af52Me/AO9ltIY0qGMQ2N8SR3TdzwdfMGPdngpUIRFJ4DSKwguppfmhZjWG+ok89Ip6t6koghzMXqK3+AiKoO+iYhrq610k1Va/ZPLXoQHUTgWnbFZu7EreLnbdFyJx+FLspMvDpvTlWlfwEGT5S4="
+      },
+      "redirectUris": [
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080"
+      ]
+    }
+  ]
+}
