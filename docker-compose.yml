@@ -1,28 +1,13 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
-version: "3.8"
-
 services:
-  postgres:
-    image: postgres:16-alpine@sha256:029660641a0cfc575b14f336ba448fb8a75fd595d42e1fa316b9fb4378742297
-    container_name: wallet-postgres
-    environment:
-      POSTGRES_DB: wallet_gateway
-      POSTGRES_USER: wallet_gateway
-      POSTGRES_PASSWORD: postgres
+  valkey:
+    image: valkey/valkey:9.0.0
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
-    restart: unless-stopped
+      - "6379:6379"
     networks:
       - wallet-network
-
-volumes:
-  postgres_data:
-    driver: local
 
 networks:
   wallet-network:
