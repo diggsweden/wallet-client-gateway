@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   pr-checks:
-    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@10c4365f9e61bc72bdd618e7b11f8d427eb2d5fa # v2.1.1
+    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@dec913d711ef5fb2b1c01dbc06f5aa4ef6c77b6e # v2.2.4
     secrets: inherit # Pass org-level secrets (for private Maven dependencies)
     permissions:
       contents: read # Clone repository and read source code
