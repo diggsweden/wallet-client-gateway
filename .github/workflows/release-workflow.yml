@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   release:
-    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@10c4365f9e61bc72bdd618e7b11f8d427eb2d5fa # v2.1.1
+    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@dec913d711ef5fb2b1c01dbc06f5aa4ef6c77b6e # v2.2.4
     permissions:
       contents: write # Create GitHub releases and tags
       packages: write # Publish JARs to GitHub Packages and images to ghcr.io
