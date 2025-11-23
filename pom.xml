@@ -63,7 +63,7 @@
 
     <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>12.1.1</checkstyle.version>
+    <checkstyle.version>12.1.2</checkstyle.version>
     <record-builder.version>51</record-builder.version>
   </properties>
 
@@ -151,7 +151,7 @@
     <dependency>
       <groupId>org.wiremock.integrations</groupId>
       <artifactId>wiremock-spring-boot</artifactId>
-      <version>4.0.7</version>
+      <version>4.0.8</version>
       <scope>test</scope>
     </dependency>
     <dependency>
