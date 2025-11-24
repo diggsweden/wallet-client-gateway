@@ -5,11 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.8] - 2025-11-24
+
+### Added
+
+- Add header info to api doc
+
+### Changed
+
+- Update diggsweden/reusable-ci action to v2.3.1
+- Update java non-major (#58)
+- Update github actions (#57)
+
 ## [0.2.7] - 2025-11-20
 
 ### Fixed
 
 - Change redis properties to correct spring boot property
+
 
 ## [0.2.6] - 2025-11-20
 
@@ -193,6 +206,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.2.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.7..v0.2.8
 [0.2.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.6..v0.2.7
 [0.2.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.5..v0.2.6
 [0.2.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.4..v0.2.5
