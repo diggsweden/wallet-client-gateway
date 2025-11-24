@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.application.controller.openapi.auth;
 
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +20,14 @@ import se.digg.wallet.gateway.application.model.common.BadRequestDto;
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 
-@ApiResponse(description = "Session created", responseCode = "200", content = @Content())
+@ApiResponse(description = "Session created", responseCode = "200",
+    headers = {
+        @Header(
+            name = "session",
+            description = "Session ID",
+            schema = @Schema(type = "string"))
+    },
+    content = @Content())
 @ApiResponse(description = "Unknown error", responseCode = "500",
     content = @Content())
 @ApiResponse(description = "Bad input, session not created", responseCode = "400",
