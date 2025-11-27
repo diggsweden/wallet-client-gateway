@@ -35,6 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import se.digg.wallet.gateway.application.config.SessionConfig;
+import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
@@ -146,7 +147,7 @@ class AuthControllerIntegrationTest {
                 }
                 """.formatted(
                 ACCOUNT_ID,
-                "1990",
+                CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER,
                 "a@b.c",
                 "007 007",
                 ecKey.getKeyType().getValue(),
@@ -177,10 +178,8 @@ class AuthControllerIntegrationTest {
         new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(ecJwk.getKeyID()).build(),
         claimsSet);
 
-    // Compute the EC signature
     signedJwt.sign(signer);
 
-    // Serialize the JWS to compact form
     return signedJwt.serialize();
   }
 }

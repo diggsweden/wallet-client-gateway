@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.domain.service.account;
 
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDto;
 import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountCreateAccountRequestDto;
@@ -13,10 +14,12 @@ import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountJwkDto;
 
 public class AccountMapper {
   public WalletAccountCreateAccountRequestDto toAccountCreateAccountDto(
-      CreateAccountRequestDto dto) {
+      CreateAccountRequestDto dto, String personalIdentityNumber) {
 
     return new WalletAccountCreateAccountRequestDto(
-        dto.personalIdentityNumber(),
+        Optional.ofNullable(personalIdentityNumber)
+            .or(dto::personalIdentityNumber)
+            .orElseThrow(),
         dto.emailAdress(),
         dto.telephoneNumber(),
         new WalletAccountJwkDto(

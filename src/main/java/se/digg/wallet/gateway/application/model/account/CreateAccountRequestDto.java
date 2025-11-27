@@ -12,7 +12,7 @@ import se.digg.wallet.gateway.application.model.common.JwkDto;
 
 @RecordBuilder
 public record CreateAccountRequestDto(
-    @NotEmpty String personalIdentityNumber,
+    Optional<String> personalIdentityNumber,
     @NotEmpty String emailAdress,
     Optional<String> telephoneNumber,
     @NotNull JwkDto publicKey) {
