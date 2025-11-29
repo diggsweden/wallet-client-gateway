@@ -4,9 +4,9 @@
   "users": [
     {
       "username": "test1",
-      "email": "anna.andersson@example.com",
-      "firstName": "Anna",
-      "lastName": "Andersson",
+      "email": "test1@example.com",
+      "firstName": "Test",
+      "lastName": "198001022386",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -19,9 +19,9 @@
     },
     {
       "username": "test2",
-      "email": "johan.nilsson@example.com",
-      "firstName": "Johan",
-      "lastName": "Nilsson",
+      "email": "test2@example.com",
+      "firstName": "Test",
+      "lastName": "198401112399",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -53,7 +53,24 @@
       ],
       "webOrigins": [
         "http://localhost:8080"
-      ]
+      ],
+      "protocolMappers": [
+        {
+          "name": "personalIdentityNumber claim",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+
+            "claim.name": "https://id.oidc.se/claim/personalIdentityNumber",
+            "jsonType.label": "String",
+            "user.attribute": "lastName"
+          }
+        }
+    ]
     }
   ]
 }
