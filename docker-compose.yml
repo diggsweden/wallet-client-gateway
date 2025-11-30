@@ -3,7 +3,7 @@
 
 services:
   valkey:
-    image: valkey/valkey:9.0.0
+    image: valkey/valkey:9.0.0@sha256:4503e204c900a00ad393bec83c8c7c4c76b0529cd629e23b34b52011aefd1d27
     ports:
       - "6379:6379"
     networks:
