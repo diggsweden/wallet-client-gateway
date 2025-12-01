@@ -40,7 +40,7 @@ import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
         globalTemplating = true)
 })
 @Testcontainers
-class AccountControllerV2IntegrationTest {
+class AccountControllerV1IntegrationTest {
 
   @Container
   @ServiceConnection
@@ -51,7 +51,7 @@ class AccountControllerV2IntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
-
+  
   @LocalServerPort
   private int port;
 

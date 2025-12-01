@@ -23,10 +23,10 @@ import se.digg.wallet.gateway.domain.service.account.AccountService;
 
 @RestController
 @RequestMapping("/oidc/accounts/v1")
-public class AccountControllerV2 {
+public class AccountControllerV1 {
   private final AccountService accountService;
 
-  public AccountControllerV2(AccountService accountService) {
+  public AccountControllerV1(AccountService accountService) {
     this.accountService = accountService;
   }
 
