@@ -31,6 +31,9 @@ properties:
       get: /account
   challenge-cache:
     ttl-seconds: 10
+  authorization-server:
+    baseurl: http://localhost:${wiremock.authorization-server.port}
+    private-jwt-audience:
 
 spring:
   application:
@@ -52,11 +55,11 @@ spring:
               - https://id.oidc.se/scope/naturalPersonNumber
         provider:
           myprovider:
-            # issuer-uri: http://localhost:${wiremock.authorization-server.port} commented out to not have to mock discovery
-            jwk-set-uri: http://localhost:${wiremock.authorization-server.port}/jwks
-            token-uri: http://localhost:${wiremock.authorization-server.port}/token
-            user-info-endpoint-uri: http://localhost:${wiremock.authorization-server.port}/userinfo
-            authorization-uri: http://localhost:${wiremock.authorization-server.port}/authorize
+            # issuer-uri: commented out to not have to mock discovery
+            jwk-set-uri: ${properties.authorization-server.baseurl}/jwks
+            token-uri: ${properties.authorization-server.baseurl}/token
+            user-info-endpoint-uri: ${properties.authorization-server.baseurl}/userinfo
+            authorization-uri: ${properties.authorization-server.baseurl}/authorize
 
 credential:
   bundles:

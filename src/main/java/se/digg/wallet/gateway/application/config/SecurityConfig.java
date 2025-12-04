@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.RestClientAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.RestClientRefreshTokenTokenResponseClient;
@@ -45,10 +47,12 @@ public class SecurityConfig {
   public static final String API_KEY_HEADER = "X-API-KEY";
 
   private final List<String> publicPaths;
+  private final Optional<String> privateJwtAudience;
 
   public SecurityConfig(
       ApplicationConfig applicationConfig) {
     this.publicPaths = applicationConfig.publicPaths();
+    this.privateJwtAudience = applicationConfig.authorizationServer().privateJwtAudience();
   }
 
   @Bean
@@ -134,11 +138,19 @@ public class SecurityConfig {
   @Bean
   RestClientAuthorizationCodeTokenResponseClient codeTokenResponseClient(
       final CredentialBundles credentialBundles) {
-    final RestClientAuthorizationCodeTokenResponseClient tokenResponseClient =
+    final var tokenResponseClient =
         new RestClientAuthorizationCodeTokenResponseClient();
-    tokenResponseClient.setParametersConverter(
-        new NimbusJwtClientAuthenticationParametersConverter<>(
-            this.parameterConverter(credentialBundles)));
+
+    final var parametersConverter =
+        new NimbusJwtClientAuthenticationParametersConverter<OAuth2AuthorizationCodeGrantRequest>(
+            this.parameterConverter(credentialBundles));
+
+    privateJwtAudience
+        .ifPresent(aud -> parametersConverter.setJwtClientAssertionCustomizer(context -> {
+          context.getClaims()
+              .audience(List.of(aud));
+        }));
+    tokenResponseClient.setParametersConverter(parametersConverter);
 
     return tokenResponseClient;
   }
