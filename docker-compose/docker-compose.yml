@@ -3,14 +3,14 @@
 
 services:
   valkey:
-    image: valkey/valkey:9.0.0
+    image: valkey/valkey:9.0.0@sha256:4503e204c900a00ad393bec83c8c7c4c76b0529cd629e23b34b52011aefd1d27
     ports:
       - "6379:6379"
     networks:
       - wallet-network
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.3.4-0
+    image: quay.io/keycloak/keycloak:26.3.4-0@sha256:2b32a51a31e8d780d9fa9a69a59ead69975263c61b5dd13559090e22aa26f100
     container_name: keycloak
     command:
       - start-dev
