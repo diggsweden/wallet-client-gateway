@@ -31,6 +31,8 @@ properties:
   authorization-server:
     baseurl: http://localhost:8089
     private-jwt-audience:
+  oidc-claims:
+    personal-identity-number: https://id.oidc.se/claim/personalIdentityNumber
 
 # Wallet Client Gateway Configuration
 server:

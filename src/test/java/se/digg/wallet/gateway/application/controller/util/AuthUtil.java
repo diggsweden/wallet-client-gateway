@@ -38,7 +38,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import se.digg.wallet.gateway.application.auth.OidcClaims;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
@@ -271,12 +270,12 @@ public class AuthUtil {
         .audience(aud)
         .expirationTime(Date.from(now.plusSeconds(lifetimeSeconds)))
         .issueTime(Date.from(now))
-        .claim("scope", "openid %s".formatted(OidcClaims.PERSONAL_IDENTITY_NUMBER_CLAIM.key()))
+        .claim("scope", "openid https://id.oidc.se/scope/naturalPersonNumber")
         .claim("roles", java.util.List.of("ROLE_USER"))
         .claim("preferred_username", subject)
         .claim("email", subject + "@example.com")
         .claim("nonce", nonce)
-        .claim(OidcClaims.PERSONAL_IDENTITY_NUMBER_CLAIM.key(), "198001022386")
+        .claim("https://id.oidc.se/claim/personalIdentityNumber", "198001022386")
         .build();
 
     JWSSigner signer = new RSASSASigner(rsaJwk.toPrivateKey());
