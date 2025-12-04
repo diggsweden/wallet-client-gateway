@@ -28,6 +28,9 @@ properties:
       get: /account
   challenge-cache:
     ttl-seconds: 30
+  authorization-server:
+    baseurl: http://localhost:8089
+    private-jwt-audience:
 
 # Wallet Client Gateway Configuration
 server:
@@ -54,10 +57,10 @@ spring:
             scope: openid
         provider:
           myprovider:
-            jwk-set-uri: "http://localhost:8089/realms/wallet/protocol/openid-connect/certs"
-            authorization-uri: "http://localhost:8089/realms/wallet/protocol/openid-connect/auth"
-            token-uri: "http://localhost:8089/realms/wallet/protocol/openid-connect/token"
-            user-info-endpoint-uri: "http://localhost:8089/realms/wallet/protocol/openid-connect/userinfo"
+            authorization-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/auth"
+            jwk-set-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/certs"
+            token-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/token"
+            user-info-endpoint-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/userinfo"
 
 credential:
   bundles:
