@@ -21,7 +21,8 @@ public record ApplicationConfig(
     @NotNull Attributeattestation attributeattestation,
     @NotNull Walletaccount walletaccount,
     @NotNull ChallengeCache challengeCache,
-    @NotNull AuthorizationServer authorizationServer) {
+    @NotNull AuthorizationServer authorizationServer,
+    @NotNull OidcClaims oidcClaims) {
 
   public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
   }
@@ -42,5 +43,9 @@ public record ApplicationConfig(
 
   public record AuthorizationServer(@NotBlank String baseurl, Optional<String> privateJwtAudience) {
   }
+
+  public record OidcClaims(@NotBlank String personalIdentityNumber) {
+  }
+
 }
 

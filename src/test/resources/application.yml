@@ -34,6 +34,8 @@ properties:
   authorization-server:
     baseurl: http://localhost:${wiremock.authorization-server.port}
     private-jwt-audience:
+  oidc-claims:
+    personal-identity-number: https://id.oidc.se/claim/personalIdentityNumber
 
 spring:
   application:

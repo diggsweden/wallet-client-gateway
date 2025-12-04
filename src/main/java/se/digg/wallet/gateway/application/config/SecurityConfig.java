@@ -4,6 +4,8 @@
 
 package se.digg.wallet.gateway.application.config;
 
+import static java.util.function.Predicate.not;
+
 import com.nimbusds.jose.jwk.JWK;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -52,7 +54,10 @@ public class SecurityConfig {
   public SecurityConfig(
       ApplicationConfig applicationConfig) {
     this.publicPaths = applicationConfig.publicPaths();
-    this.privateJwtAudience = applicationConfig.authorizationServer().privateJwtAudience();
+    this.privateJwtAudience = applicationConfig
+      .authorizationServer()
+      .privateJwtAudience()
+      .filter(not(String::isBlank));
   }
 
   @Bean
