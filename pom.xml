@@ -63,7 +63,7 @@
 
     <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>12.1.2</checkstyle.version>
+    <checkstyle.version>12.2.0</checkstyle.version>
     <record-builder.version>51</record-builder.version>
   </properties>
 
