@@ -41,7 +41,7 @@ public record ApplicationConfig(
   public record ChallengeCache(@NotBlank int ttlSeconds) {
   }
 
-  public record AuthorizationServer(@NotBlank String baseurl, Optional<String> privateJwtAudience) {
+  public record AuthorizationServer(Optional<String> privateJwtAudience) {
   }
 
   public record OidcClaims(@NotBlank String personalIdentityNumber) {

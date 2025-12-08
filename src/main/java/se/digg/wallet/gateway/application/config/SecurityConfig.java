@@ -55,9 +55,9 @@ public class SecurityConfig {
       ApplicationConfig applicationConfig) {
     this.publicPaths = applicationConfig.publicPaths();
     this.privateJwtAudience = applicationConfig
-      .authorizationServer()
-      .privateJwtAudience()
-      .filter(not(String::isBlank));
+        .authorizationServer()
+        .privateJwtAudience()
+        .filter(not(String::isBlank));
   }
 
   @Bean

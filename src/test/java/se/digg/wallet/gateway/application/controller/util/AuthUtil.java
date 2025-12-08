@@ -121,7 +121,7 @@ public class AuthUtil {
       throws Exception {
     final var walletClientGatewayBaseUrl = "http://localhost:" + port;
     final var authorizationServerBaseUrl = "http://localhost:" + authorizationServer.port();
-    final var redirectUri = walletClientGatewayBaseUrl + "/login/oauth2/code/myprovider";
+    final var redirectUri = walletClientGatewayBaseUrl + "/login/oauth2/code/iam";
 
     var httpClient = HttpClient.newBuilder()
         .build();
@@ -134,7 +134,7 @@ public class AuthUtil {
     assertThat(response1.statusCode()).isEqualTo(302);
     var location1 = response1.headers().firstValue("Location").orElseThrow();
     assertThat(location1)
-        .isEqualTo(walletClientGatewayBaseUrl + "/oauth2/authorization/myprovider");
+        .isEqualTo(walletClientGatewayBaseUrl + "/oauth2/authorization/iam");
     var session = response1.headers().firstValue("session").orElseThrow();
 
     // Call login endpoint, get redirected to wiremock /authorize
@@ -191,7 +191,7 @@ public class AuthUtil {
   private static void stubAsyncAuthorizationServerCalls(String code, String subject,
       String location2, WireMockServer authorizationServer, RSAKey rsaJwk)
       throws Exception {
-    authorizationServer.stubFor(get(urlEqualTo("/jwks"))
+    authorizationServer.stubFor(get(urlEqualTo("/certs"))
         .willReturn(
             okJson("""
                     {

@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+spring:
+  config:
+    import: optional:classpath:application-main.yml
+
+# Application Properties
+properties:
+  apisecret: my_secret_key
+  public-paths:
+    - "/actuator/**"
+    - "/v3/api-docs/**"
+    - "/swagger-ui.html"
+    - "/swagger-ui/**"
+    - "/public/**"
+    - "/wua"
+    - "/accounts/v1"
+    - "/oauth2/authorization/**"
+    - "/login/oauth2/code/*"
+  walletprovider:
+    baseurl: http://localhost:${wiremock.provider.port}
+    wua-path: /wallet-provider/wallet-unit-attestation
+  attributeattestation:
+    baseurl: http://localhost:${wiremock.attestation.port}
+    paths:
+      post: /attestation
+      get-by-id: /attestation
+      get-by-key: /attestation/user
+  walletaccount:
+    baseurl: http://localhost:${wiremock.account.port}
+    paths:
+      post: /account
+      get: /account
+  challenge-cache:
+    ttl-seconds: 10
+  authorization-server:
+    private-jwt-audience:
+  oidc-claims:
+    personal-identity-number: https://id.oidc.se/claim/personalIdentityNumber
+
+environment:
+  oauth2:
+    authorization-server-base-url: http://localhost:${wiremock.authorization-server.port}
+    client-id: localhost-test-client
+    private-jwt:
+      key-file: classpath:keystore.p12
+      key-file-password: changeit
+      file-type: PKCS12
+    jks:
+      store-reference: private-jwt-keys
+      name: Private JWT - KeyPair
+      key-alias: wallet-app-bff-local
+      key-password: changeit

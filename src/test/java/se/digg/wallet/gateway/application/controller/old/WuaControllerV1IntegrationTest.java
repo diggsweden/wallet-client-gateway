@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
@@ -26,6 +27,7 @@ import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletProviderMock
+@ActiveProfiles("test")
 class WuaControllerV1IntegrationTest {
   public static String TEST_JWK_STRING;
 

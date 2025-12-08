@@ -29,10 +29,23 @@ properties:
   challenge-cache:
     ttl-seconds: 30
   authorization-server:
-    baseurl: http://localhost:8089
     private-jwt-audience:
   oidc-claims:
     personal-identity-number: https://id.oidc.se/claim/personalIdentityNumber
+
+environment:
+  oauth2:
+    authorization-server-base-url:
+    client-id:
+    private-jwt:
+      key-file:
+      key-file-password:
+      file-type:
+    jks:
+      store-reference:
+      name:
+      key-alias:
+      key-password:
 
 # Wallet Client Gateway Configuration
 server:
@@ -51,33 +64,35 @@ spring:
     oauth2:
       client:
         registration:
-          myprovider:
-            client-id: http://localhost:8080/
+          iam:
+            client-id: "${environment.oauth2.client-id}"
             client-authentication-method: private_key_jwt
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: openid
+            scope:
+              - openid
+              - https://id.oidc.se/scope/naturalPersonNumber
         provider:
-          myprovider:
-            authorization-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/auth"
-            jwk-set-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/certs"
-            token-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/token"
-            user-info-endpoint-uri: "${properties.authorization-server.baseurl}/realms/wallet/protocol/openid-connect/userinfo"
+          iam:
+            authorization-uri: "${environment.oauth2.authorization-server-base-url}/auth"
+            jwk-set-uri: "${environment.oauth2.authorization-server-base-url}/certs"
+            token-uri: "${environment.oauth2.authorization-server-base-url}/token"
+            user-info-endpoint-uri: "${environment.oauth2.authorization-server-base-url}/userinfo"
 
 credential:
   bundles:
     keystore:
       private-jwt-keys:
-        location: classpath:keystore-wallet-app-bff-local.p12
-        password: changeit
-        type: PKCS12
+        location: ${environment.oauth2.private-jwt.key-file}
+        password: ${environment.oauth2.private-jwt.key-file-password}
+        type: ${environment.oauth2.private-jwt.file-type}
     jks:
-      myprovider:
-        store-reference: private-jwt-keys
-        name: "Private JWT - KeyPair"
+      iam:
+        store-reference: ${environment.oauth2.jks.store-reference}
+        name: ${environment.oauth2.jks.name}
         key:
-          alias: wallet-app-bff-local
-          key-password: changeit
+          alias: ${environment.oauth2.jks.key-alias}
+          key-password: ${environment.oauth2.jks.key-password}
 
 # Management and Monitoring
 management:

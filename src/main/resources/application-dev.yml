@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+spring:
+  config:
+    import: classpath:application-main.yml
+
+environment:
+  oauth2:
+    authorization-server-base-url: http://localhost:8089
+    client-id: http://localhost:8080/
+    private-jwt:
+      key-file: classpath:keystore-wallet-app-bff-local.p12
+      key-file-password: changeit
+      file-type: PKCS12
+    jks:
+      store-reference: private-jwt-keys
+      name: Private JWT - KeyPair
+      key-alias: wallet-app-bff-local
+      key-password: changeit
