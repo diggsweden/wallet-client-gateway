@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.9] - 2025-12-08
+
+### Added
+
+- Add configuration for pnr claim
+- Add configuration for private jwt audience
+- Add personal identity number as last name to users
+- Add create account v2 with oidc protection
+
+### Changed
+
+- Refactor config files
+- Update dependency com.puppycrawl.tools:checkstyle to v12.2.0 (#71)
+- Update java non-major to v2.1.0 (#70)
+- Update dependency prettier to v3.7.4 (#69)
+- Update diggsweden/reusable-ci action to v2.3.8 (#68)
+- Merge pull request #56 from diggsweden/renovate/pin-dependencies
+- Pin dependencies
+- Merge pull request #63 from diggsweden/renovate/actions-checkout-6.x
+- Update actions/checkout action to v6
+- Start one wiremockserver per service
+- Refactor v2 to v1 to match path
+- Update dependency org.springframework.boot:spring-boot-starter-parent to v3.5.8 (#62)
+
 ## [0.2.8] - 2025-11-24
 
 ### Added
@@ -16,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update diggsweden/reusable-ci action to v2.3.1
 - Update java non-major (#58)
 - Update github actions (#57)
+
 
 ## [0.2.7] - 2025-11-20
 
@@ -206,6 +231,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.2.9]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.8..v0.2.9
 [0.2.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.7..v0.2.8
 [0.2.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.6..v0.2.7
 [0.2.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.5..v0.2.6
