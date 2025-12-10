@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.oidc;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.EMAIL_ADDRESS;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
@@ -28,6 +29,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
+
+import se.digg.wallet.gateway.application.controller.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.AuthorizationServerMock;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -68,6 +71,20 @@ class AccountControllerV1IntegrationTest {
       restClient = AuthUtil.oauth2Login(port, authorizationServer, restClient);
       authenticated = true;
     }
+  }
+
+  @Test
+  void testGetSessionId() throws Exception {
+    var response = restClient.get()
+        .uri("/oidc/accounts/v1")
+        .exchange().expectStatus()
+        .is2xxSuccessful()
+        .expectBody()
+        .returnResult()
+        .getResponseBodyContent();
+        
+    var stringResponse = new String(response);
+    assertThat(stringResponse).contains("wallet-app://session?session_id=");
   }
 
   @Test
