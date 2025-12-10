@@ -150,6 +150,8 @@ public class SecurityConfig {
         new NimbusJwtClientAuthenticationParametersConverter<OAuth2AuthorizationCodeGrantRequest>(
             this.parameterConverter(credentialBundles));
 
+    // if using another host than the client to call the
+    // authorization server, we can specify the audience
     privateJwtAudience
         .ifPresent(aud -> parametersConverter.setJwtClientAssertionCustomizer(context -> {
           context.getClaims()
