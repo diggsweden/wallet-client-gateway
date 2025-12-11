@@ -26,11 +26,12 @@ import java.util.Date;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
@@ -45,6 +46,7 @@ import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 @Testcontainers
 @WalletAccountMock
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class AuthControllerIntegrationTest {
 
   @Container
@@ -58,7 +60,7 @@ class AuthControllerIntegrationTest {
   private ChallengeCache challengeCache;
 
   @Autowired
-  private WebTestClient restClient;
+  private RestTestClient restClient;
 
   @LocalServerPort
   private int port;
@@ -66,8 +68,6 @@ class AuthControllerIntegrationTest {
   @InjectWireMock(WalletAccountMock.NAME)
   private WireMockServer server;
 
-
-  @SuppressWarnings("null")
   @Test
   void testInitStoresChallengeInCache() throws Exception {
     var key = generateKey();
@@ -102,13 +102,12 @@ class AuthControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    @SuppressWarnings("null")
     var signedJwt = createSignedJwt(key, challenge.nonce());
     var postBody = new AuthChallengeResponseDto(signedJwt);
 
     restClient.post()
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
-        .bodyValue(postBody)
+        .body(postBody)
         .header("content-type", "application/json")
         .exchange()
         .expectStatus()
@@ -123,7 +122,7 @@ class AuthControllerIntegrationTest {
 
     restClient.post()
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
-        .bodyValue(postBody)
+        .body(postBody)
         .header("content-type", "application/json")
         .exchange()
         .expectStatus()

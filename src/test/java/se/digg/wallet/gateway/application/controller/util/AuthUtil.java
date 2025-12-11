@@ -37,7 +37,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
@@ -48,9 +48,8 @@ public class AuthUtil {
   public static final String KEY_ID = "123";
 
 
-  @SuppressWarnings("null")
-  public static WebTestClient login(WireMockServer wireMockServer, int port,
-      WebTestClient restClient)
+  public static RestTestClient login(WireMockServer wireMockServer, int port,
+      RestTestClient restClient)
       throws Exception {
     var generatedKeyPair = generateKey();
 
@@ -103,7 +102,7 @@ public class AuthUtil {
     var sessionId = new AtomicReference<String>();
     restClient.post()
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
-        .bodyValue(postBody)
+        .body(postBody)
         .header("content-type", "application/json")
         .exchange()
         .expectStatus()
@@ -116,8 +115,8 @@ public class AuthUtil {
         .build();
   }
 
-  public static WebTestClient oauth2Login(int port, WireMockServer authorizationServer,
-      WebTestClient restClient)
+  public static RestTestClient oauth2Login(int port, WireMockServer authorizationServer,
+      RestTestClient restClient)
       throws Exception {
     final var walletClientGatewayBaseUrl = "http://localhost:" + port;
     final var authorizationServerBaseUrl = "http://localhost:" + authorizationServer.port();

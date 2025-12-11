@@ -4,11 +4,11 @@
 
 package se.digg.wallet.gateway.domain.service.wua;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class WuaMapper {
@@ -23,7 +23,7 @@ public class WuaMapper {
     String jwkString;
     try {
       jwkString = objectMapper.writeValueAsString(createWuaDto.jwk());
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
     return new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(), jwkString);

@@ -18,6 +18,12 @@ docker-compose up -d
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
+or to let spring boot start the containers you can run
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev -Denv=dev
+```
+
 ## Notes
 
 The keycloak is bootstrapped with two users: test1/test1 and test2/test2.

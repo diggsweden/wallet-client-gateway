@@ -12,7 +12,7 @@ import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTe
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import java.util.Optional;
@@ -20,11 +20,12 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
@@ -39,6 +40,7 @@ import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 @AuthorizationServerMock
 @Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class AccountControllerV1IntegrationTest {
 
   @Container
@@ -46,7 +48,7 @@ class AccountControllerV1IntegrationTest {
   static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
 
   @Autowired
-  private WebTestClient restClient;
+  private RestTestClient restClient;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -108,7 +110,7 @@ class AccountControllerV1IntegrationTest {
         .build();
     var response = restClient.post()
         .uri("/oidc/accounts/v1")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
 
     response.expectStatus()
@@ -136,7 +138,7 @@ class AccountControllerV1IntegrationTest {
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
         .uri("/oidc/accounts/v1")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
 
     response.expectStatus()
@@ -150,7 +152,7 @@ class AccountControllerV1IntegrationTest {
         .build();
     var response = restClient.post()
         .uri("/oidc/accounts/v1")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
 
     response.expectStatus()

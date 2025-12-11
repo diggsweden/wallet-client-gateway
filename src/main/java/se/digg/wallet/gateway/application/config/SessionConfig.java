@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -14,6 +13,7 @@ import org.springframework.session.web.http.CompositeHttpSessionIdResolver;
 import org.springframework.session.web.http.CookieHttpSessionIdResolver;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 public class SessionConfig {
