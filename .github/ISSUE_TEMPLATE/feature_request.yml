@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
----
 name: Feature Suggestion
 description: Suggest something for this project.
 labels: ["enhancement"]

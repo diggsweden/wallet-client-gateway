@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
-
-SPDX-License-Identifier: CC0-1.0
--->
-
 # Security Reporting
 
 If you wish to report a security vulnerability privately, we appreciate your diligence. Please follow the guidelines below to submit your report.

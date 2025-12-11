@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
-
-SPDX-License-Identifier: EUPL-1.2
--->
-
 # Governance
 
 Decisions related to the project's direction, new features, and significant changes are made through a consensus-based process involving the maintainers and contributors.
@@ -18,10 +12,11 @@ This section describes the different roles, their responsibilities, and how they
 The project is maintained by a group of individuals who are responsible for overseeing the project's development, ensuring the adherence to the project's values, and making important decisions.
 
 The maintainers are responsible for:  
-    - Reviewing contributions
-    - Setting project goals and priorities
-    - Resolving conflicts and disputes within the community
-    - Adhering to the code of conduct
+
+- Reviewing contributions
+- Setting project goals and priorities
+- Resolving conflicts and disputes within the community
+- Adhering to the code of conduct
 
 The maintainers are selected based on their contributions, expertise, and dedication to the project's mission.  
 

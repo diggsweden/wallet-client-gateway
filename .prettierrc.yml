@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: Digg - Agency for Digital Government
 #
 # SPDX-License-Identifier: EUPL-1.2
----
 plugins:
   - "@prettier/plugin-xml"
 #

@@ -1,8 +1,3 @@
-# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
-#
-# SPDX-License-Identifier: CC0-1.0
-
----
 policies:
   - type: commit
     spec:
@@ -10,24 +5,13 @@ policies:
       gpg:
         required: true
       header:
-        length: 100
+        length: 90
         imperative: true
         case: lower
         invalidLastCharacters: .
       body:
         required: false
       conventional:
-        types:
-          [
-            "chore",
-            "build",
-            "docs",
-            "ci",
-            "perf",
-            "refactor",
-            "style",
-            "test",
-            "release",
-          ]
+        types: ["chore", "docs", "ci", "perf", "refactor", "style", "test", "release"]
         scopes: [".*"]
-        descriptionLength: 100
+        descriptionLength: 92

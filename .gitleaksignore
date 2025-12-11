@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# False positives - keystore filename references (not actual secrets)
+6fbd65dabc0ab7c96cb912b17233c6889d7de1c8:src/main/resources/application-dev.yml:generic-api-key:12
+97c7bb579f0708be328391d2abb7b32500ca071b:.gitignore:generic-api-key:71
+97c7bb579f0708be328391d2abb7b32500ca071b:REUSE.toml:generic-api-key:18
+97c7bb579f0708be328391d2abb7b32500ca071b:docker-compose/docker-compose.yml:generic-api-key:20
+97c7bb579f0708be328391d2abb7b32500ca071b:docker-compose/docker-compose.yml:generic-api-key:27
+97c7bb579f0708be328391d2abb7b32500ca071b:docker-compose/README.md:generic-api-key:2
+97c7bb579f0708be328391d2abb7b32500ca071b:docker-compose/README.md:generic-api-key:5
+97c7bb579f0708be328391d2abb7b32500ca071b:src/main/resources/application.yml:generic-api-key:66
+
+# False positives - API key configuration variable names (not actual secrets)
+78c5875d832061bf6c8f792f64bc45779fe63563:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:19
+78c5875d832061bf6c8f792f64bc45779fe63563:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:50
+f1d95c018188d7edfd93129565f0261159a46eab:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:19
+f1d95c018188d7edfd93129565f0261159a46eab:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:22
+f1d95c018188d7edfd93129565f0261159a46eab:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:24
+dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/application/config/ApiKeyAuthenticationManager.java:generic-api-key:14
+dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/application/config/ApiKeyAuthenticationManager.java:generic-api-key:18
+dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:21
+dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:29
+dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/resources/application.yml:generic-api-key:6

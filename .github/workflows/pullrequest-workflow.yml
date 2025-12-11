@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
----
 name: Pull Request Workflow
 
 on:
@@ -22,7 +21,7 @@ concurrency:
 
 jobs:
   pr-checks:
-    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@02decc6526ebd8994da90b923974e59e1cc9c22e # v2.3.8
+    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@e29145e720cef0b86ef147c72c2d001b5ac6c8b9 # v2.4.2
     secrets: inherit # Pass org-level secrets (for private Maven dependencies)
     permissions:
       contents: read # Clone repository and read source code
@@ -30,7 +29,11 @@ jobs:
       security-events: write # Upload SpotBugs/dependency check results to Security tab
     with:
       project-type: maven
-      linters.dependencyreview: false # Disabled: requires GitHub Advanced Security
+      # Use just+mise linting (replaces megalint, commitlint, licenselint)
+      linters.justmiselint: true
+      linters.megalint: false
+      linters.commitlint: false
+      linters.licenselint: false
 
   test:
     needs: [pr-checks]
