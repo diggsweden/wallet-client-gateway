@@ -9,14 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
@@ -35,12 +33,7 @@ class SessionIntegrationTest {
   @ServiceConnection
   static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
 
-  @Autowired
-  private WebTestClient rawRestClient;
-
-  private WebTestClient restClient;
-
-  private boolean authenticated = false;
+  private static RestTestClient restClient;
 
   @LocalServerPort
   private int port;
@@ -48,17 +41,18 @@ class SessionIntegrationTest {
   @InjectWireMock(WalletAccountMock.NAME)
   private WireMockServer accountServer;
 
+
   @BeforeEach
   void beforeEach() throws Exception {
-    if (!authenticated) {
-      restClient = AuthUtil.login(accountServer, port, rawRestClient);
-      authenticated = true;
-    }
+    restClient = RestTestClient.bindToServer()
+        .baseUrl("http://localhost:" + port)
+        .build();
   }
 
   @Test
-  void accountIdIsReturned() {
-    restClient.get()
+  void accountIdIsReturned() throws Exception {
+    var authenticatedRestClient = AuthUtil.login(accountServer, port, restClient);
+    authenticatedRestClient.get()
         .uri("/private/user/session/test")
         .exchange()
         .expectStatus()
@@ -87,10 +81,12 @@ class SessionIntegrationTest {
         .isEqualTo(403);
   }
 
-  @SuppressWarnings("null")
   @Test
   void noSessionIdIsForbidden() {
-    rawRestClient.get()
+    restClient = RestTestClient.bindToServer()
+        .baseUrl("http://localhost:" + port)
+        .build();
+    restClient.get()
         .uri("/private/user/session/test")
         .exchange()
         .expectStatus()
@@ -98,15 +94,15 @@ class SessionIntegrationTest {
   }
 
   @Test
-  @Order(99)
   void cannotUseInvalidatedSession() throws Exception {
-    restClient.get()
+    var authenticatedRestClient = AuthUtil.login(accountServer, port, restClient);
+    authenticatedRestClient.get()
         .uri("/private/user/session/logout")
         .exchange()
         .expectStatus()
         .isEqualTo(200);
 
-    restClient.get()
+    authenticatedRestClient.get()
         .uri("/private/user/session/test")
         .exchange()
         .expectStatus()

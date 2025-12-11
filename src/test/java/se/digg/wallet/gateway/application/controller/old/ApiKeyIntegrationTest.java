@@ -8,29 +8,31 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletProviderMock
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class ApiKeyIntegrationTest {
 
   @Autowired
-  private WebTestClient restClient;
+  private RestTestClient restClient;
 
   @Autowired
   ApplicationConfig applicationConfig;
@@ -73,7 +75,7 @@ class ApiKeyIntegrationTest {
     var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
     response.expectStatus()
@@ -85,7 +87,7 @@ class ApiKeyIntegrationTest {
     var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .header(SecurityConfig.API_KEY_HEADER, "SUPER-INVALID-KEY")
         .exchange();
     response.expectStatus()
@@ -97,7 +99,7 @@ class ApiKeyIntegrationTest {
     var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
     response.expectStatus()
         .isEqualTo(401);

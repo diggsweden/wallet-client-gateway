@@ -130,8 +130,8 @@ public class SecurityConfig {
           throw new IllegalStateException(
               "No private key found for privateJwtKeyAlias " + privateJwtKeyAlias);
         }
-        final JwkTransformerFunction function = new JwkTransformerFunction();
-        function.setKeyIdFunction(pkiCredential -> createKeyId(pkiCredential.getPublicKey()));
+        final JwkTransformerFunction function = new JwkTransformerFunction()
+            .withKeyIdFunction(pkiCredential -> createKeyId(pkiCredential.getPublicKey()));
         final JWK jwk = function.apply(keyPair);
 
         return jwk.toRSAKey();

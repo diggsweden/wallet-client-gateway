@@ -11,30 +11,32 @@ import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTe
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class AccountControllerIntegrationTest {
 
   @Autowired
-  private WebTestClient restClient;
+  private RestTestClient restClient;
 
   @Value("${wiremock.server.baseUrl}")
   private String wireMockUrl;
@@ -85,7 +87,7 @@ class AccountControllerIntegrationTest {
     var response = restClient.post()
         .uri("/accounts/v1")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
 
     response.expectStatus()
@@ -108,7 +110,7 @@ class AccountControllerIntegrationTest {
     var response = restClient.post()
         .uri("/accounts/v1")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
 
     response.expectStatus()
@@ -123,7 +125,7 @@ class AccountControllerIntegrationTest {
     var response = restClient.post()
         .uri("/accounts/v1")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .bodyValue(requestBody)
+        .body(requestBody)
         .exchange();
 
     response.expectStatus()

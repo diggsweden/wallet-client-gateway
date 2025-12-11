@@ -16,11 +16,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
@@ -35,6 +36,7 @@ import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto
 @WalletAttributeAttestationMock
 @Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class AttestationControllerIntegrationTest {
 
 
@@ -42,8 +44,7 @@ class AttestationControllerIntegrationTest {
   @ServiceConnection
   static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
 
-  @Autowired
-  private WebTestClient restClient;
+  private RestTestClient restClient;
 
   private boolean authenticated = false;
 
@@ -69,6 +70,9 @@ class AttestationControllerIntegrationTest {
   @BeforeEach
   public void beforeEach() throws Exception {
     if (!authenticated) {
+      restClient = RestTestClient.bindToServer()
+          .baseUrl("http://localhost:" + port)
+          .build();
       restClient = AuthUtil.login(accountServer, port, restClient);
       authenticated = true;
     }
@@ -78,7 +82,7 @@ class AttestationControllerIntegrationTest {
   void testCreateAttestation() {
     attestationServer.stubFor(post(applicationConfig.attributeattestation().paths().post())
         .withRequestBody(equalToJson("""
-             {
+            {
                 "id": null,
                 "hsmId": "%s",
                 "wuaId": "%s",
@@ -89,7 +93,7 @@ class AttestationControllerIntegrationTest {
             .withStatus(201)
             .withHeader("content-type", "application/json")
             .withBody("""
-                        {
+                {
                     "id": "%s",
                     "hsmId": "%s",
                     "wuaId": "%s",
@@ -102,17 +106,18 @@ class AttestationControllerIntegrationTest {
 
     var response = restClient.post()
         .uri("/attribute-attestations")
-        .bodyValue(createAttestationDto)
+        .body(createAttestationDto)
         .exchange();
     response.expectStatus()
         .isCreated()
         .expectBody()
         .json("""
-            { "id": "%s",
-                  "hsmId": "%s",
-                  "wuaId": "%s",
-                  "attestationData": "%s"
-              }
+            {
+                "id": "%s",
+                "hsmId": "%s",
+                "wuaId": "%s",
+                "attestationData": "%s"
+            }
               """.formatted(dbId, hsmId, wuaId,
             "a string"));
   }
@@ -125,7 +130,7 @@ class AttestationControllerIntegrationTest {
             .withStatus(201)
             .withHeader("content-type", "application/json")
             .withBody("""
-                        {
+                {
                     "id": "%s",
                     "hsmId": "%s",
                     "wuaId": "%s",
@@ -141,11 +146,12 @@ class AttestationControllerIntegrationTest {
         .isOk()
         .expectBody()
         .json("""
-            { "id": "%s",
-                  "hsmId": "%s",
-                  "wuaId": "%s",
-                  "attestationData": "%s"
-              }
+            {
+                "id": "%s",
+                "hsmId": "%s",
+                "wuaId": "%s",
+                "attestationData": "%s"
+            }
               """.formatted(dbId, hsmId, wuaId,
             "a string"));
   }
@@ -159,13 +165,17 @@ class AttestationControllerIntegrationTest {
             .withStatus(201)
             .withHeader("content-type", "application/json")
             .withBody("""
-                 {      "attestations": [
-                   { "id": "%s",
-                    "hsmId": "%s",
-                    "wuaId": "%s",
-                    "attestationData": "%s"}
-                ],
-                "hsmId": "%s" }
+                 {
+                    "attestations": [
+                        {
+                            "id": "%s",
+                            "hsmId": "%s",
+                            "wuaId": "%s",
+                            "attestationData": "%s"
+                        }
+                    ],
+                    "hsmId": "%s"
+                }
                 """.formatted(dbId, hsmId,
                 wuaId, "a string", hsmId))));
 
@@ -179,14 +189,18 @@ class AttestationControllerIntegrationTest {
         .isOk()
         .expectBody()
         .json("""
-            {      "attestations": [
-                        { "id": "%s",
-                         "hsmId": "%s",
-                         "wuaId": "%s",
-                         "attestationData": "%s"}
-                     ],
-                     "hsmId": "%s" }
-              """.formatted(dbId, hsmId, wuaId,
+            {
+                "attestations": [
+                    {
+                        "id": "%s",
+                        "hsmId": "%s",
+                        "wuaId": "%s",
+                        "attestationData": "%s"
+                    }
+                ],
+                "hsmId": "%s"
+            }
+            """.formatted(dbId, hsmId, wuaId,
             "a string", hsmId));
   }
 }
