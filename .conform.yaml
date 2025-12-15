@@ -12,6 +12,6 @@ policies:
       body:
         required: false
       conventional:
-        types: ["chore", "docs", "ci", "perf", "refactor", "style", "test", "release"]
+        types: ["build", "chore", "docs", "ci", "perf", "refactor", "style", "test", "release"]
         scopes: [".*"]
         descriptionLength: 92
