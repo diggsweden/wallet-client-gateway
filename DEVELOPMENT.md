@@ -3,7 +3,8 @@
 ## Table of Contents
 
 - [Setup and Configuration](#setup-and-configuration)
-  - [Prerequisites](#prerequisites)
+  - [Prerequisites - Linux](#prerequisites---linux)
+  - [Prerequisites - macOS](#prerequisites---macos)
   - [Quick Start](#quick-start)
 - [Development Workflow](#development-workflow)
   - [Available Commands](#available-commands)

@@ -8,6 +8,7 @@ LABEL maintainer="Digg - Agency for Digital Government"
 LABEL description="Build stage for Wallet Client Gateway"
 
 # Install dependencies needed for building
+# hadolint ignore=DL3018
 RUN apk add --no-cache curl
 
 # Create app directory
@@ -17,11 +18,9 @@ WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
-# Make mvnw executable
-RUN chmod +x ./mvnw
-
-# Download dependencies (this layer will be cached if pom.xml doesn't change)
-RUN ./mvnw dependency:go-offline -B
+# Make mvnw executable and download dependencies (cached if pom.xml doesn't change)
+RUN chmod +x ./mvnw && \
+    ./mvnw dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
