@@ -14,18 +14,22 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -37,6 +41,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.bundle.CredentialBundles;
@@ -61,6 +66,44 @@ public class SecurityConfig {
   }
 
   @Bean
+  AuthenticationSuccessHandler oidcDeepLinkSuccessHandler() {
+    return (HttpServletRequest req, HttpServletResponse res, Authentication auth) -> {
+      var session = req.getSession(false);
+      var sessionId = session != null ? session.getId() : "";
+
+      var html = """
+        <!doctype html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Continue</title>
+          </head>
+          <body>
+            <p>Opening the app…</p>
+            <p>
+              <a id="appLink" href="wallet-app://session?session_id=%s">
+                Open Wallet Session
+              </a>
+            </p>
+            <script>
+              window.addEventListener("load", () => {
+                const url = document.getElementById("appLink").href;
+                setTimeout(() => { window.location.href = url; }, 50);
+              });
+            </script>
+          </body>
+        </html>
+        """.formatted(sessionId);
+
+      res.setStatus(200);
+      res.setCharacterEncoding("utf-8");
+      res.setContentType(MediaType.TEXT_HTML_VALUE);
+      res.getWriter().write(html);
+    };
+  }
+
+  @Bean
   @Order(1)
   public SecurityFilterChain oidcSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
@@ -70,11 +113,9 @@ public class SecurityConfig {
             .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
             .anyRequest()
             .access(oidcAuthorizationManager()))
-        .oauth2Login(Customizer.withDefaults());
-
+            .oauth2Login(o -> o.successHandler(oidcDeepLinkSuccessHandler()));
     return httpSecurity.build();
   }
-
 
   @Bean
   @Order(2)

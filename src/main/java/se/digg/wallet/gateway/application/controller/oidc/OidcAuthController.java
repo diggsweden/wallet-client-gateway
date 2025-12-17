@@ -20,7 +20,7 @@ public class OidcAuthController {
   public ResponseEntity<String> getAppDeeplink(HttpSession oidcSession) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .contentType(MediaType.TEXT_PLAIN)
+        .contentType(MediaType.TEXT_HTML)
         .body("""
                 <!DOCTYPE html>
                 <html>
