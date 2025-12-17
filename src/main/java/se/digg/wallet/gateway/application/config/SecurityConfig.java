@@ -21,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -103,7 +104,9 @@ public class SecurityConfig {
   private AuthorizationManager<RequestAuthorizationContext> oidcAuthorizationManager() {
     var defaultAuthenticationManager = AuthenticatedAuthorizationManager.authenticated();
     return (authentication, context) -> new AuthorizationDecision(
-        defaultAuthenticationManager.authorize(authentication, context).isGranted()
+        Optional.ofNullable(defaultAuthenticationManager.authorize(authentication, context))
+            .filter(AuthorizationResult::isGranted)
+            .isPresent()
             && authentication.get() instanceof OAuth2AuthenticationToken);
   }
 
@@ -114,7 +117,9 @@ public class SecurityConfig {
   private AuthorizationManager<RequestAuthorizationContext> challengeResponseAuthorizationMgr() {
     var defaultAuthenticationManager = AuthenticatedAuthorizationManager.authenticated();
     return (authentication, context) -> new AuthorizationDecision(
-        defaultAuthenticationManager.authorize(authentication, context).isGranted()
+        Optional.ofNullable(defaultAuthenticationManager.authorize(authentication, context))
+            .filter(AuthorizationResult::isGranted)
+            .isPresent()
             && authentication.get() instanceof ChallengeResponseAuthentication);
   }
 
@@ -187,7 +192,7 @@ public class SecurityConfig {
       final byte[] sha256Digest = MessageDigest.getInstance("SHA-256").digest(key.getEncoded());
       return Base64.getUrlEncoder().withoutPadding().encodeToString(sha256Digest);
     } catch (final NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException(e);
     }
   }
 

@@ -47,8 +47,6 @@ public class AuthUtil {
   public static final String ACCOUNT_ID = UUID.randomUUID().toString();
   public static final String KEY_ID = "123";
 
-
-  @SuppressWarnings("null")
   public static WebTestClient login(WireMockServer wireMockServer, int port,
       WebTestClient restClient)
       throws Exception {

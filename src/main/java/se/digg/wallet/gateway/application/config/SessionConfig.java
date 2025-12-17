@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -21,7 +20,7 @@ public class SessionConfig {
 
   @Bean
   public RedisTemplate<String, String> redisTemplate(
-      RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+      RedisConnectionFactory redisConnectionFactory) {
     var template = new RedisTemplate<String, String>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());

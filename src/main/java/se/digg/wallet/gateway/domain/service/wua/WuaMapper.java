@@ -16,7 +16,7 @@ public class WuaMapper {
   private final ObjectMapper objectMapper;
 
   public WuaMapper(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
+    this.objectMapper = objectMapper.copy();
   }
 
   public WalletProviderCreateWuaDto toWalletProviderCreateWuaDto(CreateWuaDto createWuaDto) {
@@ -24,7 +24,7 @@ public class WuaMapper {
     try {
       jwkString = objectMapper.writeValueAsString(createWuaDto.jwk());
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException(e);
     }
     return new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(), jwkString);
   }

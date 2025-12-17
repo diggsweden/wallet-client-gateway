@@ -27,7 +27,7 @@ public class ChallengeCache {
       RedisTemplate<String, String> redisTemplate,
       ObjectMapper objectMapper) {
     this.redisTemplate = redisTemplate;
-    this.objectMapper = objectMapper;
+    this.objectMapper = objectMapper.copy();
     this.ttlSeconds = config.challengeCache().ttlSeconds();
   }
 
@@ -45,15 +45,15 @@ public class ChallengeCache {
     try {
       return objectMapper.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException(e);
     }
   }
 
   private AuthChallengeCacheValue fromJson(String json) {
     try {
       return objectMapper.readValue(json, AuthChallengeCacheValue.class);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 }

@@ -67,7 +67,6 @@ class AuthControllerIntegrationTest {
   private WireMockServer server;
 
 
-  @SuppressWarnings("null")
   @Test
   void testInitStoresChallengeInCache() throws Exception {
     var key = generateKey();
@@ -102,7 +101,6 @@ class AuthControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    @SuppressWarnings("null")
     var signedJwt = createSignedJwt(key, challenge.nonce());
     var postBody = new AuthChallengeResponseDto(signedJwt);
 

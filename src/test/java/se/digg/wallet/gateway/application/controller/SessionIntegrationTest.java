@@ -87,7 +87,6 @@ class SessionIntegrationTest {
         .isEqualTo(403);
   }
 
-  @SuppressWarnings("null")
   @Test
   void noSessionIdIsForbidden() {
     rawRestClient.get()

@@ -25,7 +25,7 @@ public class AttestationsClient {
   private Logger log = LoggerFactory.getLogger(AttestationsClient.class);
 
   public AttestationsClient(RestClient restClient, ApplicationConfig applicationConfig) {
-    this.restClient = restClient;
+    this.restClient = restClient.mutate().build();
     this.attestationConfig = applicationConfig.attributeattestation();
   }
 
