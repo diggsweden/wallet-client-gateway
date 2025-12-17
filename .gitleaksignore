@@ -23,3 +23,5 @@ dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/ap
 dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:21
 dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/java/se/digg/wallet/gateway/application/config/SecurityConfig.java:generic-api-key:29
 dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/resources/application.yml:generic-api-key:6
+9645becd4be58128c16e4049700258e6d7510f74:.gitleaksignore:generic-api-key:21
+9645becd4be58128c16e4049700258e6d7510f74:.gitleaksignore:generic-api-key:22
