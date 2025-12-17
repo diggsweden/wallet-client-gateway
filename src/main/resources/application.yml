@@ -14,13 +14,13 @@ properties:
     - "/accounts/v1"
   walletprovider:
     baseurl: http://
-    wua-path: /wallet-provider/wallet-unit-attestation
+    wua-path: /wallet-unit-attestation
   attributeattestation:
     baseurl: http://
     paths:
       post: /attestation
       get-by-id: /attestation
-      get-by-key: attestation/user
+      get-by-key: /attestation/user
   walletaccount:
     baseurl: http://
     paths:
@@ -40,10 +40,7 @@ environment:
     private-jwt:
       key-file:
       key-file-password:
-      file-type:
-    jks:
-      store-reference:
-      name:
+      key-file-type:
       key-alias:
       key-password:
 
@@ -85,14 +82,14 @@ credential:
       private-jwt-keys:
         location: ${environment.oauth2.private-jwt.key-file}
         password: ${environment.oauth2.private-jwt.key-file-password}
-        type: ${environment.oauth2.private-jwt.file-type}
+        type: ${environment.oauth2.private-jwt.key-file-type}
     jks:
       iam:
-        store-reference: ${environment.oauth2.jks.store-reference}
-        name: ${environment.oauth2.jks.name}
+        store-reference: private-jwt-keys
+        name: Private JWT - KeyPair
         key:
-          alias: ${environment.oauth2.jks.key-alias}
-          key-password: ${environment.oauth2.jks.key-password}
+          alias: ${environment.oauth2.private-jwt.key-alias}
+          key-password: ${environment.oauth2.private-jwt.key-password}
 
 # Management and Monitoring
 management:
