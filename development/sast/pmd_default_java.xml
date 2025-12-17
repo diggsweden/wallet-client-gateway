@@ -29,7 +29,6 @@
             <property name="maximumStaticImports" value="15" />
         </properties>
     </rule>
-    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
     <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
     <rule ref="category/java/codestyle.xml/UnnecessaryImport" />
     <rule ref="category/java/codestyle.xml/UnnecessaryModifier" />

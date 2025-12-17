@@ -50,7 +50,7 @@ public class DefaultExceptionHandler {
     var body = new BadRequestDto(
         null,
         "Validation error",
-        HttpStatus.BAD_REQUEST.value(),
+        BAD_REQUEST.value(),
         getErrorsMap(e).toString(),
         instance);
     LOGGER.debug("Validation error, not able to parse input {}", getErrorsMap(e));
@@ -65,7 +65,7 @@ public class DefaultExceptionHandler {
     var body = new BadRequestDto(
         null,
         "Validation error",
-        HttpStatus.BAD_REQUEST.value(),
+        BAD_REQUEST.value(),
         e.detail(),
         instance);
     LOGGER.debug("Validation error", e);
