@@ -45,15 +45,15 @@ public class ChallengeCache {
     try {
       return objectMapper.writeValueAsString(value);
     } catch (JacksonException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException(e);
     }
   }
 
   private AuthChallengeCacheValue fromJson(String json) {
     try {
       return objectMapper.readValue(json, AuthChallengeCacheValue.class);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (JacksonException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 }

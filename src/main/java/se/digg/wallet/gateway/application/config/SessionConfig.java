@@ -13,7 +13,6 @@ import org.springframework.session.web.http.CompositeHttpSessionIdResolver;
 import org.springframework.session.web.http.CookieHttpSessionIdResolver;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
-import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 public class SessionConfig {
@@ -21,7 +20,7 @@ public class SessionConfig {
 
   @Bean
   public RedisTemplate<String, String> redisTemplate(
-      RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+      RedisConnectionFactory redisConnectionFactory) {
     var template = new RedisTemplate<String, String>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());

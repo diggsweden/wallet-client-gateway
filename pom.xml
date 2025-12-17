@@ -326,7 +326,8 @@
         <configuration>
           <effort>Max</effort>
           <threshold>Low</threshold>
-          <failOnError>false</failOnError>
+          <failOnError>true</failOnError>
+          <excludeFilterFile>development/spotbugs-exclude.xml</excludeFilterFile>
         </configuration>
       </plugin>
     </plugins>
