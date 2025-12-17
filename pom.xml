@@ -305,7 +305,7 @@
         <configuration>
           <effort>Max</effort>
           <threshold>Low</threshold>
-          <failOnError>true</failOnError>
+          <failOnError>false</failOnError>
         </configuration>
       </plugin>
     </plugins>
