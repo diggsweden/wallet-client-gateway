@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 public class ChallengeResponseAuthentication extends AbstractAuthenticationToken {
 
+  private static final long serialVersionUID = 1;
   private final String accountId;
 
   public ChallengeResponseAuthentication(String accountId) {

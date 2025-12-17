@@ -1,0 +1,30 @@
+<!--
+SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+
+SPDX-License-Identifier: CC0-1.0
+-->
+<FindBugsFilter>
+    <!-- Accepting mutable fields such as List<String> in config classes -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Class name="se.digg.wallet.gateway.application.config.ApplicationConfig"/>
+    </Match>
+
+    <!-- Accepting mutable fields such as an injected RedisTemplate in component clasees -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Class name="se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache"/>
+    </Match>
+
+    <!-- Accepting mutable fields such as List<String> in DTO:s -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Class name="~.*model.*Dto"/>
+    </Match>
+
+    <!-- Accepting generated builders to have unusual namings -->
+    <Match>
+        <Bug pattern="NM_METHOD_NAMING_CONVENTION"/>
+        <Class name="~.*Builder"/>
+    </Match>
+</FindBugsFilter>
