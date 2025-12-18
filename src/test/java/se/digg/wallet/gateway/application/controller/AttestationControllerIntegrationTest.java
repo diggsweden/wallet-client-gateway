@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -36,9 +35,7 @@ import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto
 @WalletAttributeAttestationMock
 @Testcontainers
 @ActiveProfiles("test")
-@AutoConfigureRestTestClient
 class AttestationControllerIntegrationTest {
-
 
   @Container
   @ServiceConnection
