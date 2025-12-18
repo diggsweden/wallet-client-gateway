@@ -24,6 +24,10 @@ public record ApplicationConfig(
     @NotNull AuthorizationServer authorizationServer,
     @NotNull OidcClaims oidcClaims) {
 
+  public ApplicationConfig {
+    publicPaths = List.copyOf(publicPaths);
+  }
+
   public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
   }
 

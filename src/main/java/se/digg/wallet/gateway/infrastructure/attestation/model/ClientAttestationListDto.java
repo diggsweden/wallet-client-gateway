@@ -8,4 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record ClientAttestationListDto(List<ClientAttestationDto> attestations, UUID hsmId) {
+  public ClientAttestationListDto {
+    attestations = List.copyOf(attestations);
+  }
 }
