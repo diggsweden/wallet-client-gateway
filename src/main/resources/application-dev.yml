@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 spring:
   config:
-    import: classpath:application-main.yml
+    import: classpath:application.yml
 
 environment:
   oauth2:
@@ -11,9 +11,7 @@ environment:
     private-jwt:
       key-file: classpath:keystore-wallet-app-bff-local.p12
       key-file-password: changeit
-      file-type: PKCS12
-    jks:
-      store-reference: private-jwt-keys
+      key-file-type: PKCS12
       name: Private JWT - KeyPair
       key-alias: wallet-app-bff-local
       key-password: changeit
