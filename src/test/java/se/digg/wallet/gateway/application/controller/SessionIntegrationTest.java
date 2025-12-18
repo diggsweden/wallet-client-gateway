@@ -83,9 +83,6 @@ class SessionIntegrationTest {
 
   @Test
   void noSessionIdIsForbidden() {
-    restClient = RestTestClient.bindToServer()
-        .baseUrl("http://localhost:" + port)
-        .build();
     restClient.get()
         .uri("/private/user/session/test")
         .exchange()
