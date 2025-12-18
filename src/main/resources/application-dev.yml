@@ -2,7 +2,11 @@
 # SPDX-License-Identifier: EUPL-1.2
 spring:
   config:
-    import: classpath:application-main.yml
+    import: classpath:application.yml
+  docker:
+    compose:
+      enabled: true
+      file: ./docker-compose/docker-compose.yml
 
 environment:
   oauth2:
