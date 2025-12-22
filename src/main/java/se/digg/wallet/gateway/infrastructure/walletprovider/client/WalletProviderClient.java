@@ -18,7 +18,7 @@ public class WalletProviderClient {
   private final String wuaPath;
 
   public WalletProviderClient(RestClient restClient, ApplicationConfig applicationConfig) {
-    this.restClient = restClient;
+    this.restClient = restClient.mutate().build();
     this.walletProviderUrl = applicationConfig.walletprovider().baseurl();
     this.wuaPath = applicationConfig.walletprovider().wuaPath();
   }

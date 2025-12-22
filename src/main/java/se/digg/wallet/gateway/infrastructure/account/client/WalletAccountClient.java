@@ -21,7 +21,7 @@ public class WalletAccountClient {
   private final String getAccountPath;
 
   public WalletAccountClient(RestClient restClient, ApplicationConfig applicationConfig) {
-    this.restClient = restClient;
+    this.restClient = restClient.mutate().build();
     this.baseUrl = applicationConfig.walletaccount().baseurl();
     this.createAccountPath = applicationConfig.walletaccount().paths().post();
     this.getAccountPath = applicationConfig.walletaccount().paths().get();
