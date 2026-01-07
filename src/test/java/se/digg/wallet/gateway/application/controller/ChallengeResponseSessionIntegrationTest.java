@@ -19,15 +19,16 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.SessionConfig;
-import se.digg.wallet.gateway.application.controller.SessionTestController.SessionTest;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
+import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
+import se.digg.wallet.gateway.application.controller.util.ChallengeResponseSessionTestController.SessionTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
 @Testcontainers
 @ActiveProfiles("test")
-class SessionIntegrationTest {
+class ChallengeResponseSessionIntegrationTest {
 
   @Container
   @ServiceConnection
