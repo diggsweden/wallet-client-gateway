@@ -26,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
+import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletAttributeAttestationMock;
 import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto;
