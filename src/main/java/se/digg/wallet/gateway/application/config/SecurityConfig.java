@@ -104,10 +104,12 @@ public class SecurityConfig {
   private AuthorizationManager<RequestAuthorizationContext> oidcAuthorizationManager() {
     var defaultAuthenticationManager = AuthenticatedAuthorizationManager.authenticated();
     return (authentication, context) -> new AuthorizationDecision(
-        Optional.ofNullable(defaultAuthenticationManager.authorize(authentication, context))
-            .filter(AuthorizationResult::isGranted)
-            .isPresent()
+        checkIfGranted(defaultAuthenticationManager.authorize(authentication, context))
             && authentication.get() instanceof OAuth2AuthenticationToken);
+  }
+
+  private boolean checkIfGranted(AuthorizationResult authorizationResult) {
+    return authorizationResult != null && authorizationResult.isGranted();
   }
 
   /**
@@ -117,9 +119,7 @@ public class SecurityConfig {
   private AuthorizationManager<RequestAuthorizationContext> challengeResponseAuthorizationMgr() {
     var defaultAuthenticationManager = AuthenticatedAuthorizationManager.authenticated();
     return (authentication, context) -> new AuthorizationDecision(
-        Optional.ofNullable(defaultAuthenticationManager.authorize(authentication, context))
-            .filter(AuthorizationResult::isGranted)
-            .isPresent()
+        checkIfGranted(defaultAuthenticationManager.authorize(authentication, context))
             && authentication.get() instanceof ChallengeResponseAuthentication);
   }
 

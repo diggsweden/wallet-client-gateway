@@ -5,7 +5,7 @@
 package se.digg.wallet.gateway.application.config;
 
 public class WalletRuntimeException extends RuntimeException {
-    public WalletRuntimeException(Throwable cause) {
-        super(cause);
-    }
+  public WalletRuntimeException(Throwable cause) {
+    super(cause);
+  }
 }
