@@ -106,4 +106,15 @@ class ChallengeResponseSessionIntegrationTest {
         .expectStatus()
         .isEqualTo(403);
   }
+
+  @Test
+  void cannotUseSessionForOidcEndpoint() throws Exception {
+    var authenticatedRestClient = AuthUtil.login(accountServer, port, restClient);
+    authenticatedRestClient.post()
+        .uri("/oidc/session/test")
+        .body("bogusBody")
+        .exchange()
+        .expectStatus()
+        .isEqualTo(403);
+  }
 }

@@ -27,13 +27,16 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.core.io.ClassPathResource;
@@ -115,17 +118,29 @@ public class AuthUtil {
         .build();
   }
 
-  public static RestTestClient oauth2Login(int port, WireMockServer authorizationServer,
-      RestTestClient restClient)
-      throws Exception {
+  public record Step1Result(
+      HttpResponse<Void> response,
+      String location,
+      Optional<String> sessionId) {
+  }
+  public record Step2Result(
+      HttpResponse<Void> response,
+      String location) {
+  }
+  public record Step3Result(
+      String code,
+      String nonce,
+      String location) {
+
+  }
+  public record Step5Result(
+      HttpResponse<Void> response) {
+  }
+
+  public static Step1Result step1CallProtectedEndpoint(int port)
+      throws IOException, InterruptedException {
+    var httpClient = HttpClient.newHttpClient();
     final var walletClientGatewayBaseUrl = "http://localhost:" + port;
-    final var authorizationServerBaseUrl = "http://localhost:" + authorizationServer.port();
-    final var redirectUri = walletClientGatewayBaseUrl + "/login/oauth2/code/iam";
-
-    var httpClient = HttpClient.newBuilder()
-        .build();
-
-    // Call oidc protected endpoint, get redirected to login endpoint
     var response1 = httpClient.send(
         HttpRequest.newBuilder(URI.create(walletClientGatewayBaseUrl + "/oidc/accounts/v1"))
             .build(),
@@ -134,62 +149,45 @@ public class AuthUtil {
     var location1 = response1.headers().firstValue("Location").orElseThrow();
     assertThat(location1)
         .isEqualTo(walletClientGatewayBaseUrl + "/oauth2/authorization/iam");
-    var session = response1.headers().firstValue("session").orElseThrow();
+    return new Step1Result(response1,
+        location1,
+        response1.headers().firstValue("session"));
+  }
 
-    // Call login endpoint, get redirected to wiremock /authorize
+  public static Step2Result step2CallSpringLoginEndpoint(String uri, String loginSession)
+      throws IOException, InterruptedException {
+    var httpClient = HttpClient.newHttpClient();
     var response2 = httpClient.send(
-        HttpRequest.newBuilder(URI.create(location1))
-            .header("session", session)
+        HttpRequest.newBuilder(URI.create(uri))
+            .header("session", loginSession)
             .build(),
         BodyHandlers.discarding());
     assertThat(response2.statusCode()).isEqualTo(302);
     var location2 = response2.headers().firstValue("Location").orElseThrow();
 
-    assertThat(location2)
-        .startsWith(authorizationServerBaseUrl)
-        .contains(redirectUri);
+    return new Step2Result(response2, location2);
+  }
 
-
-    // The user logs in and gets redirected back to us with a code, and same state and nonce
+  public static Step3Result step3BuildFakedAsAuthResult(int port,
+      String authorizationServerLocation) {
     var code = "CODE1234";
-    var state = getQueryParam("state", location2);
-    var nonce = getQueryParam("nonce", location2);
+    var state = getQueryParam("state", authorizationServerLocation);
+    var nonce = getQueryParam("nonce", authorizationServerLocation);
+
+    var walletClientGatewayBaseUrl = "http://localhost:" + port;
+    var redirectUri = walletClientGatewayBaseUrl + "/login/oauth2/code/iam";
     var loggedInResultUri =
         redirectUri + "?code=%s&state=%s&nonce=%s".formatted(code, state, nonce);
 
+    return new Step3Result(code, nonce, loggedInResultUri);
+  }
+
+  public static void step4StubAsyncAuthorizationServerCalls(String code,
+      String nonce, WireMockServer authorizationServer)
+      throws Exception {
     var subject = "testuser";
     var rsaJwk = RSAKey.parse(Files.readString(
         new ClassPathResource("wiremock/authorization_server_key.jwk").getFile().toPath()));
-    stubAsyncAuthorizationServerCalls(code, subject, location2, authorizationServer, rsaJwk);
-
-    // go to /login/oauth2, get redirected back to original url that we tried to access
-    var response3 = httpClient.send(
-        HttpRequest.newBuilder(URI.create(loggedInResultUri))
-            .header("session", session)
-            .build(),
-        BodyHandlers.ofString());
-    var location3 = response3.headers().firstValue("location").orElseThrow();
-    assertThat(location3).startsWith(walletClientGatewayBaseUrl + "/oidc/accounts/v1");
-
-    return restClient.mutate()
-        .defaultHeader(SessionConfig.SESSION_HEADER,
-            response3.headers().firstValue(SessionConfig.SESSION_HEADER).orElseThrow())
-        .build();
-  }
-
-  private static ECKey generateKey() throws Exception {
-    return new ECKeyGenerator(Curve.P_256)
-        .keyID(KEY_ID)
-        .algorithm(Algorithm.NONE)
-        .keyUse(KeyUse.SIGNATURE)
-        .generate();
-  }
-
-
-
-  private static void stubAsyncAuthorizationServerCalls(String code, String subject,
-      String location2, WireMockServer authorizationServer, RSAKey rsaJwk)
-      throws Exception {
     authorizationServer.stubFor(get(urlEqualTo("/certs"))
         .willReturn(
             okJson("""
@@ -199,7 +197,6 @@ public class AuthUtil {
                 """
                 .formatted(rsaJwk.toPublicJWK().toJSONString()))));
 
-    var nonce = getQueryParam("nonce", location2);
     String idToken =
         createSignedJwt(subject, "http://localhost:" + authorizationServer.port(),
             "localhost-test-client", 300,
@@ -234,6 +231,60 @@ public class AuthUtil {
                 }
                 """.formatted(subject))));
   }
+
+  public static Step5Result step5CallLoginEndpointWithCode(String location, String loginSession)
+      throws IOException, InterruptedException {
+    var httpClient = HttpClient.newHttpClient();
+
+    var response3 = httpClient.send(
+        HttpRequest.newBuilder(URI.create(location))
+            .header("session", loginSession)
+            .build(),
+        BodyHandlers.discarding());
+    return new Step5Result(response3);
+    // var location3 = response3.headers().firstValue("location").orElseThrow();
+  }
+
+  public static String oauth2Login(int port, WireMockServer authorizationServer)
+      throws Exception {
+    final var walletClientGatewayBaseUrl = "http://localhost:" + port;
+    final var authorizationServerBaseUrl = "http://localhost:" + authorizationServer.port();
+    final var redirectUri = walletClientGatewayBaseUrl + "/login/oauth2/code/iam";
+    // Call oidc protected endpoint, get redirected to login endpoint
+    var step1Result = step1CallProtectedEndpoint(port);
+    var loginSession = step1Result.sessionId().orElseThrow();
+
+    // Call login endpoint, get redirected to wiremock /authorize
+    var step2Result = step2CallSpringLoginEndpoint(step1Result.location(), loginSession);
+    assertThat(step2Result.location())
+        .startsWith(authorizationServerBaseUrl)
+        .contains(redirectUri);
+
+
+    // The user logs in and gets redirected back to us with a code, and same state and nonce
+    var step3Result = step3BuildFakedAsAuthResult(port, step2Result.location());
+
+    // Prepare the authorization server wiremock that spring will call some endpoints
+    step4StubAsyncAuthorizationServerCalls(step3Result.code(), step3Result.nonce(),
+        authorizationServer);
+
+    // go to /login/oauth2, get redirected back to original url that we tried to access
+    var step5Result = step5CallLoginEndpointWithCode(step3Result.location(), loginSession);
+    var location3 = step5Result.response().headers().firstValue("location").orElseThrow();
+    assertThat(location3).startsWith(walletClientGatewayBaseUrl + "/oidc/accounts/v1");
+
+    return step5Result.response().headers().firstValue("SESSION").orElseThrow();
+  }
+
+  private static ECKey generateKey() throws Exception {
+    return new ECKeyGenerator(Curve.P_256)
+        .keyID(KEY_ID)
+        .algorithm(Algorithm.NONE)
+        .keyUse(KeyUse.SIGNATURE)
+        .generate();
+  }
+
+
 
   private static String getQueryParam(String param, String location2) {
     var fromParam = location2.substring(location2.indexOf(param + "=") + param.length() + 1);

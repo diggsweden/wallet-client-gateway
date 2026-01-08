@@ -68,7 +68,9 @@ class AccountControllerV1IntegrationTest {
   @BeforeEach
   public void beforeEach() throws Exception {
     if (!authenticated) {
-      restClient = AuthUtil.oauth2Login(port, authorizationServer, restClient);
+      restClient = restClient.mutate()
+          .defaultHeader("SESSION", AuthUtil.oauth2Login(port, authorizationServer))
+          .build();
       authenticated = true;
     }
   }
