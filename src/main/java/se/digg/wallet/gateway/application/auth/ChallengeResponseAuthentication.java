@@ -4,13 +4,16 @@
 
 package se.digg.wallet.gateway.application.auth;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 public class ChallengeResponseAuthentication extends AbstractAuthenticationToken {
 
-  private static final long serialVersionUID = 1;
+  @Serial
+  private static final long serialVersionUID = 1L;
+
   private final String accountId;
 
   public ChallengeResponseAuthentication(String accountId) {
