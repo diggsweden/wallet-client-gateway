@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.config.WalletRuntimeException;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
 
 @Component
@@ -45,7 +46,7 @@ public class ChallengeCache {
     try {
       return objectMapper.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new IllegalArgumentException(e);
+      throw new WalletRuntimeException(e);
     }
   }
 
@@ -53,7 +54,7 @@ public class ChallengeCache {
     try {
       return objectMapper.readValue(json, AuthChallengeCacheValue.class);
     } catch (JsonProcessingException e) {
-      throw new IllegalArgumentException(e);
+      throw new WalletRuntimeException(e);
     }
   }
 }

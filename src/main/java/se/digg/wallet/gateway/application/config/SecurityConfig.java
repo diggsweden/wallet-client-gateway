@@ -192,7 +192,7 @@ public class SecurityConfig {
       final byte[] sha256Digest = MessageDigest.getInstance("SHA-256").digest(key.getEncoded());
       return Base64.getUrlEncoder().withoutPadding().encodeToString(sha256Digest);
     } catch (final NoSuchAlgorithmException e) {
-      throw new IllegalArgumentException(e);
+      throw new WalletRuntimeException(e);
     }
   }
 
