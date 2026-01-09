@@ -17,8 +17,6 @@ properties:
     - "/public/**"
     - "/wua"
     - "/accounts/v1"
-    - "/oauth2/authorization/**"
-    - "/login/oauth2/code/*"
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port}
     wua-path: /wallet-provider/wallet-unit-attestation
@@ -47,9 +45,7 @@ environment:
     private-jwt:
       key-file: classpath:keystore.p12
       key-file-password: changeit
-      file-type: PKCS12
-    jks:
-      store-reference: private-jwt-keys
+      key-file-type: PKCS12
       name: Private JWT - KeyPair
       key-alias: wallet-app-bff-local
       key-password: changeit
