@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.util;
 
 import com.redis.testcontainers.RedisContainer;
 import org.testcontainers.utility.DockerImageName;

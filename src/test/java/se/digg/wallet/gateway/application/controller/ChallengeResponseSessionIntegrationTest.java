@@ -19,15 +19,16 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.SessionConfig;
-import se.digg.wallet.gateway.application.controller.SessionTestController.SessionTest;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
+import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
+import se.digg.wallet.gateway.application.controller.util.ChallengeResponseSessionTestController.SessionTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
 @Testcontainers
 @ActiveProfiles("test")
-class SessionIntegrationTest {
+class ChallengeResponseSessionIntegrationTest {
 
   @Container
   @ServiceConnection
@@ -101,6 +102,17 @@ class SessionIntegrationTest {
 
     authenticatedRestClient.get()
         .uri("/private/user/session/test")
+        .exchange()
+        .expectStatus()
+        .isEqualTo(403);
+  }
+
+  @Test
+  void cannotUseSessionForOidcEndpoint() throws Exception {
+    var authenticatedRestClient = AuthUtil.login(accountServer, port, restClient);
+    authenticatedRestClient.post()
+        .uri("/oidc/session/test")
+        .body("bogusBody")
         .exchange()
         .expectStatus()
         .isEqualTo(403);

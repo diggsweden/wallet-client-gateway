@@ -31,6 +31,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.AuthorizationServerMock;
+import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
@@ -67,7 +68,9 @@ class AccountControllerV1IntegrationTest {
   @BeforeEach
   public void beforeEach() throws Exception {
     if (!authenticated) {
-      restClient = AuthUtil.oauth2Login(port, authorizationServer, restClient);
+      restClient = restClient.mutate()
+          .defaultHeader("SESSION", AuthUtil.oauth2Login(port, authorizationServer))
+          .build();
       authenticated = true;
     }
   }
