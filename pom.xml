@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <relativePath />
   </parent>
 
@@ -63,7 +63,7 @@
     
     <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>12.3.0</checkstyle.version>
+    <checkstyle.version>12.3.1</checkstyle.version>
     <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
     <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
     <record-builder.version>51</record-builder.version>
@@ -111,7 +111,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>com.nimbusds</groupId>
@@ -175,7 +175,7 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
-      <version>1.21.3</version>
+      <version>1.21.4</version>
     </dependency>
     <dependency>
       <groupId>com.redis</groupId>
