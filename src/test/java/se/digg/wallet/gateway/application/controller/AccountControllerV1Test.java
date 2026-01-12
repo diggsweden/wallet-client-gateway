@@ -7,6 +7,8 @@ package se.digg.wallet.gateway.application.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -46,16 +48,19 @@ public class AccountControllerV1Test {
 
   @Test
   void createAccount() {
+    var personalIdentityNumber = "199010001001";
     var oidcUser = new DefaultOidcUser(List.of(), new OidcIdToken(
         "tokenValue",
         Instant.now().minusSeconds(5),
         Instant.now().plusSeconds(5),
         Map.of("sub", "DonnyDuck",
-            "pnr", "199010001001")));
-    var response =
-        controller.createAccount(CreateAccountRequestDtoTestBuilder.withDefaults().build(),
-            oidcUser, new MockHttpSession());
+            "pnr", personalIdentityNumber)));
+    var oidcSession = new MockHttpSession();
+    var requestDto = CreateAccountRequestDtoTestBuilder.withDefaults().build();
+    var response = controller.createAccount(requestDto, oidcUser, oidcSession);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
+    verify(service).createAccount(requestDto, personalIdentityNumber);
+    assertThat(oidcSession.isInvalid()).isEqualTo(true);
   }
 
   @Test
@@ -66,9 +71,14 @@ public class AccountControllerV1Test {
         Instant.now().plusSeconds(5),
         Map.of("sub", "DonnyDuck",
             "pnr", "19910001001")));
+    var oidcSession = new MockHttpSession();
     assertThrows(BadRequestException.class,
-        () -> controller.createAccount(
-            CreateAccountRequestDtoTestBuilder.withDefaults().build(),
-            oidcUser, new MockHttpSession()));
+        () -> {
+          controller.createAccount(
+              CreateAccountRequestDtoTestBuilder.withDefaults().build(),
+              oidcUser, oidcSession);
+        });
+    verifyNoInteractions(service);
+    assertThat(oidcSession.isInvalid()).isEqualTo(false);
   }
 }

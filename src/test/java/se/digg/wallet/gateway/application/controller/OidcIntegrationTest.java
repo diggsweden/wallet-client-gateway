@@ -63,7 +63,7 @@ class OidcIntegrationTest {
     var response = httpClient.send(
         HttpRequest.newBuilder().GET()
             .uri(URI.create(testGetEndpoint))
-            .header("SESSION", "nonexistant")
+            .header("SESSION", "missing")
             .build(),
         BodyHandlers.discarding());
     assertThat(response.statusCode()).isEqualTo(302);
@@ -183,7 +183,6 @@ class OidcIntegrationTest {
     var loginSession = step1Result.sessionId().orElseThrow();
     var step2Result =
         AuthUtil.step2CallSpringLoginEndpoint(step1Result.location(), loginSession);
-
 
     assertThat(step2Result.location())
         .contains(
