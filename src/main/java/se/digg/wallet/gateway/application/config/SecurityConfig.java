@@ -63,7 +63,7 @@ public class SecurityConfig {
 
   @Bean
   @Order(1)
-  public SecurityFilterChain oidcSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+  public SecurityFilterChain oidcSecurityFilterChain(HttpSecurity httpSecurity) {
     httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
         .securityMatcher("/oidc/**", "/oauth2/**", "/login/oauth2/**")
@@ -79,8 +79,7 @@ public class SecurityConfig {
 
   @Bean
   @Order(2)
-  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity)
-      throws Exception {
+  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) {
     httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests((authorize) -> authorize
@@ -93,7 +92,7 @@ public class SecurityConfig {
 
   // Disables auto config of user repository
   @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+  AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) {
     return cfg.getAuthenticationManager();
   }
 

@@ -28,7 +28,7 @@ public class ChallengeCache {
       RedisTemplate<String, String> redisTemplate,
       ObjectMapper objectMapper) {
     this.redisTemplate = redisTemplate;
-    this.objectMapper = objectMapper.copy();
+    this.objectMapper = objectMapper.rebuild().build();
     this.ttlSeconds = config.challengeCache().ttlSeconds();
   }
 
