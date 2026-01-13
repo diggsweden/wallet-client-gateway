@@ -17,7 +17,7 @@ public class RestClientConfig {
    * @return a RestClient instance.
    */
   @Bean
-  public RestClient webClient(RestClient.Builder builder) {
-    return builder.build();
+  public RestClient webClient() {
+    return RestClient.create();
   }
 }

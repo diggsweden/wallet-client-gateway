@@ -4,14 +4,14 @@
 
 package se.digg.wallet.gateway.application.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import se.digg.wallet.gateway.application.model.common.JwkDto;
 import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
 
@@ -19,7 +19,7 @@ public class ValidationTest {
 
   private Validator validator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
     validator = validatorFactory.getValidator();

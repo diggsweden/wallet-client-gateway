@@ -8,26 +8,28 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletProviderMock
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class WuaControllerV1IntegrationTest {
   public static String TEST_JWK_STRING;
 
@@ -37,7 +39,7 @@ class WuaControllerV1IntegrationTest {
       jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
       """;
   @Autowired
-  private WebTestClient restClient;
+  private RestTestClient restClient;
 
   @Autowired
   private ApplicationConfig applicationConfig;
@@ -74,7 +76,7 @@ class WuaControllerV1IntegrationTest {
     var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
@@ -104,7 +106,7 @@ class WuaControllerV1IntegrationTest {
     var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 
@@ -117,7 +119,7 @@ class WuaControllerV1IntegrationTest {
     var requestBody = CreateWuaDtoTestBuilder.invaliDto();
     var response = restClient.post()
         .uri("/wua")
-        .bodyValue(requestBody)
+        .body(requestBody)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange();
 

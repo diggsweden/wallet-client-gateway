@@ -4,8 +4,6 @@
 
 package se.digg.wallet.gateway.infrastructure.auth.cache;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Optional;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +11,8 @@ import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.WalletRuntimeException;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class ChallengeCache {
