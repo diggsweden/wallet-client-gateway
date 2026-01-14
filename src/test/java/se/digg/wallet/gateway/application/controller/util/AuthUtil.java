@@ -242,7 +242,6 @@ public class AuthUtil {
             .build(),
         BodyHandlers.discarding());
     return new Step5Result(response3);
-    // var location3 = response3.headers().firstValue("location").orElseThrow();
   }
 
   public static String oauth2Login(int port, WireMockServer authorizationServer)
