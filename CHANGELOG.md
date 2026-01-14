@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-01-14
+
+### Added
+
+- Add more verification to controller test and fix typo
+- Add more tests for oidc solution
+
+### Changed
+
+- Clean up comment
+- Refactor class names and packages
+- Clean up configuration options
+- Update java non-major (#86)
+- Update diggsweden/reusable-ci action to v2.6.0 (#84)
+
+### Fixed
+
+- Enable spotbugs and fix or ignore spotbugs reportings
+
+### Removed
+
+- Remove some exclusions and make records more immutable
+
 ## [0.3.0] - 2026-01-07
 
 ### Added
@@ -31,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stop failing on spotbugs errors (until we have fixed them)
 - Fix pmd issues
 - Correct lintwarnings for docs,container
+
 
 ## [0.2.9] - 2025-12-08
 
@@ -259,6 +283,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.3.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.3.0..v0.3.1
 [0.3.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.9..v0.3.0
 [0.2.9]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.8..v0.2.9
 [0.2.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.7..v0.2.8
