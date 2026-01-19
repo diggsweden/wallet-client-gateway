@@ -33,7 +33,7 @@ public class ChallengeResponseAuthentication extends AbstractAuthenticationToken
   }
 
   public String getAccountId() {
-      return this.accountId;
+    return this.accountId;
   }
 
   @Override

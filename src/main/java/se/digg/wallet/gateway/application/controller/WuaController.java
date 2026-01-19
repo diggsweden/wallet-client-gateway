@@ -30,8 +30,9 @@ public class WuaController {
   @PostMapping()
   @CreateWuaOpenApiDocumentation
   public ResponseEntity<WuaDto> createWua(
-          ChallengeResponseAuthentication challengeResponseAuthentication) {
-    logger.debug("Received request from account id: {}", challengeResponseAuthentication.getAccountId());
+      ChallengeResponseAuthentication challengeResponseAuthentication) {
+    logger.debug("Received request from account id: {}",
+        challengeResponseAuthentication.getAccountId());
     WuaDto wuaDto = wuaService.createWua(challengeResponseAuthentication.getAccountId());
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
   }

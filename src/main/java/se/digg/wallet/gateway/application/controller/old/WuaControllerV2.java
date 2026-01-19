@@ -32,21 +32,19 @@ public class WuaControllerV2 {
   @PostMapping()
   @CreateWuaOpenApiDocumentation
   public ResponseEntity<WuaDto> createWua(
-      @RequestBody @Valid
-      CreateWuaDto createWuaDto
-  ) {
+      @RequestBody @Valid CreateWuaDto createWuaDto) {
     logger.debug("Recieved request for wallet {}", createWuaDto.walletId());
     WuaDto wuaDto = wuaService.createWua(createWuaDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
   }
 
-//    @PostMapping()
-//    @CreateWuaOpenApiDocumentation
-//    public ResponseEntity<WuaDto> createWua() {
-//      // Where to find session info.
-//        logger.debug("Recieved request for wallet {}", createWuaDto.walletId());
-//        WuaDto wuaDto = wuaService.createWua(createWuaDto);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
-//    }
+  // @PostMapping()
+  // @CreateWuaOpenApiDocumentation
+  // public ResponseEntity<WuaDto> createWua() {
+  // // Where to find session info.
+  // logger.debug("Recieved request for wallet {}", createWuaDto.walletId());
+  // WuaDto wuaDto = wuaService.createWua(createWuaDto);
+  // return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
+  // }
 
 }

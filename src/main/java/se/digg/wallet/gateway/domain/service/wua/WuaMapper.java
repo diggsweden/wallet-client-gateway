@@ -32,14 +32,15 @@ public class WuaMapper {
     }
     return new WalletProviderCreateWuaDto(UUID.randomUUID().toString(), jwkString);
   }
-    @Deprecated (since = "0.3.1", forRemoval = true)
-    public WalletProviderCreateWuaDto toWalletProviderCreateWuaDto(CreateWuaDto createWuaDto) {
-        String jwkString;
-        try {
-            jwkString = objectMapper.writeValueAsString(createWuaDto.jwk());
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
-        return new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(), jwkString);
+
+  @Deprecated(since = "0.3.1", forRemoval = true)
+  public WalletProviderCreateWuaDto toWalletProviderCreateWuaDto(CreateWuaDto createWuaDto) {
+    String jwkString;
+    try {
+      jwkString = objectMapper.writeValueAsString(createWuaDto.jwk());
+    } catch (JacksonException e) {
+      throw new RuntimeException(e);
     }
+    return new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(), jwkString);
+  }
 }
