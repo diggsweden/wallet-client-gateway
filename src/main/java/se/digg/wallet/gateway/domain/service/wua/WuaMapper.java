@@ -29,5 +29,4 @@ public class WuaMapper {
     }
     return new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(), jwkString);
   }
-
 }
