@@ -4,8 +4,6 @@
 
 package se.digg.wallet.gateway.domain.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import tools.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -16,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class WuaMapperTest {
