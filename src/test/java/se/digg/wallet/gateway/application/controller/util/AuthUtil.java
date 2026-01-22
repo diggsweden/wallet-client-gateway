@@ -267,10 +267,9 @@ public class AuthUtil {
     step4StubAsyncAuthorizationServerCalls(step3Result.code(), step3Result.nonce(),
         authorizationServer);
 
-    // go to /login/oauth2, get redirected back to original url that we tried to access
+    // go to /login/oauth2, get the 200 OK with HTML deep link
     var step5Result = step5CallLoginEndpointWithCode(step3Result.location(), loginSession);
-    var location3 = step5Result.response().headers().firstValue("location").orElseThrow();
-    assertThat(location3).startsWith(walletClientGatewayBaseUrl + "/oidc/accounts/v1");
+    assertThat(step5Result.response().statusCode()).isEqualTo(200);
 
     return step5Result.response().headers().firstValue("SESSION").orElseThrow();
   }
