@@ -58,7 +58,7 @@ public class AccountControllerV1Test {
             "pnr", personalIdentityNumber)));
     var oidcSession = new MockHttpSession();
     var requestDto = CreateAccountRequestDtoTestBuilder.withDefaults().build();
-    var response = controller.createAccount(requestDto, oidcUser, oidcSession);
+    var response = controller.createAccount("session", requestDto, oidcUser, oidcSession);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
     verify(service).createAccount(requestDto, personalIdentityNumber);
     assertThat(oidcSession.isInvalid()).isEqualTo(true);
@@ -76,6 +76,7 @@ public class AccountControllerV1Test {
     assertThrows(BadRequestException.class,
         () -> {
           controller.createAccount(
+              "session",
               CreateAccountRequestDtoTestBuilder.withDefaults().build(),
               oidcUser, oidcSession);
         });

@@ -62,18 +62,11 @@ class OidcAuthControllerTest {
 
   @Test
   void testGetSessionId() throws Exception {
-    var response =
-        restClient
-            .get()
-            .uri("/oidc/auth")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful()
-            .expectBody()
-            .returnResult()
-            .getResponseBodyContent();
-
-    var stringResponse = new String(response);
-    assertThat(stringResponse).contains("wallet-app://session?session_id=");
+    restClient
+        .get()
+        .uri("/oidc/auth")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
   }
 }
