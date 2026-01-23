@@ -116,7 +116,7 @@ class WuaControllerV1IntegrationTest {
 
   @Test
   void testValidation() {
-    var requestBody = CreateWuaDtoTestBuilder.invaliDto();
+    var requestBody = CreateWuaDtoTestBuilder.invalidDto();
     var response = restClient.post()
         .uri("/wua")
         .body(requestBody)

@@ -54,9 +54,14 @@ public class AuthUtil {
   public static RestTestClient login(WireMockServer wireMockServer, int port,
       RestTestClient restClient)
       throws Exception {
-    var generatedKeyPair = generateKey();
+    return login(wireMockServer, port, restClient, ACCOUNT_ID, generateKey());
+  }
 
-    wireMockServer.stubFor(get("/account/" + ACCOUNT_ID)
+  public static RestTestClient login(WireMockServer wireMockServer, int port,
+      RestTestClient restClient, String accountId, ECKey generatedKeyPair)
+      throws Exception {
+
+    wireMockServer.stubFor(get("/account/" + accountId)
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "application/json")
@@ -77,7 +82,7 @@ public class AuthUtil {
                     }
                 }
                 """.formatted(
-                ACCOUNT_ID,
+                accountId,
                 CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER,
                 "a@b.c",
                 "007 007",
@@ -91,7 +96,7 @@ public class AuthUtil {
 
     var challenge = restClient.get()
         .uri("http://localhost:%s/public/auth/session/challenge?accountId=%s&keyId=%s"
-            .formatted(port, ACCOUNT_ID, KEY_ID))
+            .formatted(port, accountId, KEY_ID))
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -275,7 +280,7 @@ public class AuthUtil {
     return step5Result.response().headers().firstValue("SESSION").orElseThrow();
   }
 
-  private static ECKey generateKey() throws Exception {
+  public static ECKey generateKey() throws Exception {
     return new ECKeyGenerator(Curve.P_256)
         .keyID(KEY_ID)
         .algorithm(Algorithm.NONE)

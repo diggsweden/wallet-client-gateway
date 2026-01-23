@@ -8,11 +8,10 @@ import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.application.config.WalletRuntimeException;
 import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
 import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDto;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.UUID;
 
 @Component
 public class WuaMapper {
@@ -30,17 +29,17 @@ public class WuaMapper {
     } catch (JacksonException e) {
       throw new WalletRuntimeException(e);
     }
-    return new WalletProviderCreateWuaDto(UUID.randomUUID().toString(), jwkString);
+    return new WalletProviderCreateWuaDto(jwkString);
   }
 
   @Deprecated(since = "0.3.1", forRemoval = true)
-  public WalletProviderCreateWuaDto toWalletProviderCreateWuaDto(CreateWuaDto createWuaDto) {
+  public WalletProviderCreateWuaDtoV1 toWalletProviderCreateWuaDto(CreateWuaDto createWuaDto) {
     String jwkString;
     try {
       jwkString = objectMapper.writeValueAsString(createWuaDto.jwk());
     } catch (JacksonException e) {
-      throw new RuntimeException(e);
+      throw new WalletRuntimeException(e);
     }
-    return new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(), jwkString);
+    return new WalletProviderCreateWuaDtoV1(createWuaDto.walletId().toString(), jwkString);
   }
 }

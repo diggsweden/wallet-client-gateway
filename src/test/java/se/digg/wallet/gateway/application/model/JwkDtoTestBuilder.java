@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.application.model;
 
+import com.nimbusds.jose.jwk.ECKey;
 import se.digg.wallet.gateway.application.model.common.JwkDtoBuilder;
 
 public class JwkDtoTestBuilder {
@@ -17,6 +18,17 @@ public class JwkDtoTestBuilder {
         .x("X")
         .y("Y")
         .use("USE");
+  }
+
+  public static JwkDtoBuilder withGeneratedKeyValues(ECKey generatedKeyPair) {
+    return JwkDtoBuilder.builder()
+        .alg(generatedKeyPair.getAlgorithm().toString())
+        .kty(generatedKeyPair.getKeyType().getValue())
+        .kid(generatedKeyPair.getKeyID())
+        .crv(generatedKeyPair.getCurve().toString())
+        .x(generatedKeyPair.getX().toString())
+        .y(generatedKeyPair.getY().toString())
+        .use(generatedKeyPair.getKeyUse().toString());
   }
 
 

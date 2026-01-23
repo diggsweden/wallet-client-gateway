@@ -13,7 +13,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
-import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,7 +34,7 @@ class WuaMapperTest {
     // Given
     var createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
     var expectedWuaDto =
-        new WalletProviderCreateWuaDto(createWuaDto.walletId().toString(),
+        new WalletProviderCreateWuaDtoV1(createWuaDto.walletId().toString(),
             objectMapper.writeValueAsString(createWuaDto.jwk()));
 
     // When

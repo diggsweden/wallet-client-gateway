@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 
 @Component
@@ -24,6 +25,17 @@ public class WalletProviderClient {
   }
 
   public String createWua(WalletProviderCreateWuaDto createWuaDto) {
+    return restClient
+        .post()
+        .uri(walletProviderUrl + wuaPath)
+        .body(createWuaDto)
+        .contentType(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .body(String.class);
+  }
+
+  @Deprecated(since = "0.3.1", forRemoval = true)
+  public String createWua(WalletProviderCreateWuaDtoV1 createWuaDto) {
     return restClient
         .post()
         .uri(walletProviderUrl + wuaPath)
