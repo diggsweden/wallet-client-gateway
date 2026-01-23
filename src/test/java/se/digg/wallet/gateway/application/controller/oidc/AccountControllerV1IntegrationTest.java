@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.oidc;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -12,7 +12,6 @@ import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTe
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
-import tools.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import java.util.Optional;
@@ -35,6 +34,7 @@ import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
@@ -161,5 +161,4 @@ class AccountControllerV1IntegrationTest {
     response.expectStatus()
         .isEqualTo(400);
   }
-
 }

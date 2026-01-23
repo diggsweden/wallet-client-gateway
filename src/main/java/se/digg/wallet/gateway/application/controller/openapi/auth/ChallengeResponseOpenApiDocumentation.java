@@ -25,6 +25,7 @@ import se.digg.wallet.gateway.application.model.common.BadRequestDto;
         @Header(
             name = "session",
             description = "Session ID",
+            required = true,
             schema = @Schema(type = "string"))
     },
     content = @Content())

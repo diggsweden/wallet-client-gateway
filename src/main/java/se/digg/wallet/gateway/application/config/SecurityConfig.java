@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -22,7 +23,6 @@ import org.springframework.security.authorization.AuthenticatedAuthorizationMana
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.authorization.AuthorizationResult;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,6 +39,7 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
+import se.digg.wallet.gateway.application.auth.OidcAuthenticationSuccessHandler;
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.bundle.CredentialBundles;
 import se.swedenconnect.security.credential.nimbus.JwkTransformerFunction;
@@ -51,14 +52,17 @@ public class SecurityConfig {
 
   private final List<String> publicPaths;
   private final Optional<String> privateJwtAudience;
+  private final OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler;
 
   public SecurityConfig(
-      ApplicationConfig applicationConfig) {
+      ApplicationConfig applicationConfig,
+      OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler) {
     this.publicPaths = applicationConfig.publicPaths();
     this.privateJwtAudience = applicationConfig
         .authorizationServer()
         .privateJwtAudience()
         .filter(not(String::isBlank));
+    this.oidcAuthenticationSuccessHandler = oidcAuthenticationSuccessHandler;
   }
 
   @Bean
@@ -71,11 +75,9 @@ public class SecurityConfig {
             .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
             .anyRequest()
             .access(oidcAuthorizationManager()))
-        .oauth2Login(Customizer.withDefaults());
-
+        .oauth2Login(o -> o.successHandler(oidcAuthenticationSuccessHandler));
     return httpSecurity.build();
   }
-
 
   @Bean
   @Order(2)
@@ -194,6 +196,4 @@ public class SecurityConfig {
       throw new WalletRuntimeException(e);
     }
   }
-
-
 }

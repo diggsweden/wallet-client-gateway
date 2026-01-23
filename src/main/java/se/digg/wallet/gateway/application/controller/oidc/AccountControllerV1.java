@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller;
+package se.digg.wallet.gateway.application.controller.oidc;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
@@ -35,6 +38,12 @@ public class AccountControllerV1 {
   @PostMapping
   @PostOpenApiDocumentation
   public ResponseEntity<CreateAccountResponseDto> createAccount(
+      @Parameter(
+          name = "SESSION",
+          in = ParameterIn.HEADER,
+          required = true,
+          description = "OIDC session identifier")
+      @RequestHeader("SESSION") String sessionId,
       @RequestBody @Valid CreateAccountRequestDto requestDto,
       @AuthenticationPrincipal OidcUser oidcUser,
       HttpSession oidcSession) {
