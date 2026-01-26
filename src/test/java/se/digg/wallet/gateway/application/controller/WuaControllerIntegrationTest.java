@@ -4,11 +4,8 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,7 +25,10 @@ import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.common.JwkDto;
 import tools.jackson.databind.ObjectMapper;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
@@ -40,7 +40,7 @@ class WuaControllerIntegrationTest {
   @Container
   @ServiceConnection
   static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
-
+  private static JwkDto jwkDto;
   public static String TEST_JWK_STRING;
 
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
@@ -51,6 +51,8 @@ class WuaControllerIntegrationTest {
   private RestTestClient restClient;
 
   private boolean authenticated = false;
+  private static final String ACCOUNT_ID = UUID.randomUUID().toString();
+  private static ECKey generatedKeyPair;
 
   @LocalServerPort
   private int port;
@@ -63,9 +65,11 @@ class WuaControllerIntegrationTest {
 
   @BeforeAll
   public static void beforeAll() throws Exception {
+    generatedKeyPair = AuthUtil.generateKey();
+    jwkDto = JwkDtoTestBuilder.of(generatedKeyPair).build();
     TEST_JWK_STRING =
         new ObjectMapper().writeValueAsString(
-            new ObjectMapper().writeValueAsString(JwkDtoTestBuilder.withDefaults().build()));
+            new ObjectMapper().writeValueAsString(jwkDto));
     // remove wrapped outer quotes
     TEST_JWK_STRING = TEST_JWK_STRING.substring(1, TEST_JWK_STRING.length() - 1);
   }
@@ -76,7 +80,7 @@ class WuaControllerIntegrationTest {
       restClient = RestTestClient.bindToServer()
           .baseUrl("http://localhost:" + port)
           .build();
-      restClient = AuthUtil.login(accountServer, port, restClient);
+      restClient = AuthUtil.login(accountServer, port, restClient, ACCOUNT_ID, generatedKeyPair);
       authenticated = true;
     }
   }
@@ -95,7 +99,7 @@ class WuaControllerIntegrationTest {
             .withHeader("content-type", "text/plain")
             .withBody(SIGNED_JWT)));
 
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
+    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID, jwkDto);
     var response = restClient.post()
         .uri("/wua/v2")
         .body(requestBody)
@@ -107,6 +111,33 @@ class WuaControllerIntegrationTest {
         .json("""
             {
 
+              "jwt": "%s"
+            }
+            """.formatted(SIGNED_JWT));
+  }
+
+  @Test
+  void testRequestingWuaSuccessfullyReturnsCreatedV3() {
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+        .withRequestBody(equalToJson("""
+            {
+              "jwk": "%s"
+            }
+            """.formatted(TEST_JWK_STRING)))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "text/plain")
+            .withBody(SIGNED_JWT)));
+
+    var response = restClient.post()
+        .uri("/wua/v3")
+        .exchange();
+
+    response.expectStatus()
+        .isCreated()
+        .expectBody()
+        .json("""
+            {
               "jwt": "%s"
             }
             """.formatted(SIGNED_JWT));
@@ -135,8 +166,27 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
+  void testRequestingWuaFailsReturnsInternalServerErrorV3() {
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+        .withRequestBody(equalToJson("""
+            {
+              "jwk": "%s"
+            }
+            """.formatted(TEST_JWK_STRING)))
+        .willReturn(aResponse()
+            .withStatus(404)));
+
+    var response = restClient.post()
+        .uri("/wua/v3")
+        .exchange();
+
+    response.expectStatus()
+        .isEqualTo(500);
+  }
+
+  @Test
   void testValidation() {
-    var requestBody = CreateWuaDtoTestBuilder.invaliDto();
+    var requestBody = CreateWuaDtoTestBuilder.invalidDto();
     var response = restClient.post()
         .uri("/wua/v2")
         .body(requestBody)
@@ -145,5 +195,4 @@ class WuaControllerIntegrationTest {
     response.expectStatus()
         .isEqualTo(400);
   }
-
 }

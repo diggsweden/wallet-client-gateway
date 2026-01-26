@@ -21,7 +21,7 @@ import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
-import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 
 @ExtendWith(MockitoExtension.class)
 class WuaServiceTest {
@@ -43,7 +43,7 @@ class WuaServiceTest {
     // Given
     var createWoaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
     var expectedWua = new WuaDto("my dummy jwt");
-    var mappedDto = new WalletProviderCreateWuaDto("data", "doesnt matter");
+    var mappedDto = new WalletProviderCreateWuaDtoV1("data", "doesnt matter");
     when(wuaMapper.toWalletProviderCreateWuaDto(createWoaDto))
         .thenReturn(mappedDto);
     when(client.createWua(mappedDto))
@@ -54,7 +54,7 @@ class WuaServiceTest {
 
     // Then
     assertEquals(expectedWua, actualWuaDto);
-    verify(client).createWua(any());
+    verify(client).createWua(any(WalletProviderCreateWuaDtoV1.class));
     verifyNoMoreInteractions(client);
   }
 }

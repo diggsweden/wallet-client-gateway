@@ -32,6 +32,10 @@ public class ChallengeResponseAuthentication extends AbstractAuthenticationToken
     return accountId;
   }
 
+  public String getAccountId() {
+    return this.accountId;
+  }
+
   @Override
   public boolean equals(Object obj) {
     return obj instanceof ChallengeResponseAuthentication
