@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -67,7 +66,7 @@ class WuaControllerIntegrationTest {
   @BeforeAll
   public static void beforeAll() throws Exception {
     generatedKeyPair = AuthUtil.generateKey();
-    jwkDto = JwkDtoTestBuilder.withGeneratedKeyValues(generatedKeyPair).build();
+    jwkDto = JwkDtoTestBuilder.of(generatedKeyPair).build();
     TEST_JWK_STRING =
         new ObjectMapper().writeValueAsString(
             new ObjectMapper().writeValueAsString(jwkDto));

@@ -20,15 +20,15 @@ public class JwkDtoTestBuilder {
         .use("USE");
   }
 
-  public static JwkDtoBuilder withGeneratedKeyValues(ECKey generatedKeyPair) {
+  public static JwkDtoBuilder of(ECKey key) {
     return JwkDtoBuilder.builder()
-        .alg(generatedKeyPair.getAlgorithm().toString())
-        .kty(generatedKeyPair.getKeyType().getValue())
-        .kid(generatedKeyPair.getKeyID())
-        .crv(generatedKeyPair.getCurve().toString())
-        .x(generatedKeyPair.getX().toString())
-        .y(generatedKeyPair.getY().toString())
-        .use(generatedKeyPair.getKeyUse().toString());
+        .alg(key.getAlgorithm().toString())
+        .kty(key.getKeyType().getValue())
+        .kid(key.getKeyID())
+        .crv(key.getCurve().toString())
+        .x(key.getX().toString())
+        .y(key.getY().toString())
+        .use(key.getKeyUse().toString());
   }
 
 
