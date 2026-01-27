@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.application.controller.openapi.wua.CreateWuaOpenApiDocumentation;
-import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
+import se.digg.wallet.gateway.application.model.wua.CreateWuaDtoV2;
 import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
@@ -32,9 +32,9 @@ public class WuaController {
   @PostMapping()
   @CreateWuaOpenApiDocumentation
   public ResponseEntity<WuaDto> createWua(
-      @RequestBody @Valid CreateWuaDto createWuaDto) {
-    logger.debug("Recieved request for wallet {}", createWuaDto.walletId());
-    WuaDto wuaDto = wuaService.createWua(createWuaDto);
+      @RequestBody @Valid CreateWuaDtoV2 createWuaDto) {
+    logger.debug("Received request for wallet {}", createWuaDto.walletId());
+    WuaDto wuaDto = wuaService.createWuaV2(createWuaDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
   }
 }

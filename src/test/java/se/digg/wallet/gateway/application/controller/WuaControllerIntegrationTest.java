@@ -44,6 +44,7 @@ class WuaControllerIntegrationTest {
   public static String TEST_JWK_STRING;
 
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
+  public static final String TEST_NONCE = "nonce";
   private static final String SIGNED_JWT = """
       eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5\
       jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
@@ -82,20 +83,24 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
-  void testRequestingWuaSuccessfullyReturnsCreated() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+  void testRequestingWuaSuccessfullyReturnsCreatedV2() {
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation/v2")
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",
-              "jwk": "%s"
+              "jwk": "%s",
+              "nonce": "%s"
             }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
+            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING, TEST_NONCE)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")
             .withBody(SIGNED_JWT)));
 
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
+    var requestBody = CreateWuaDtoTestBuilder.withWalletIdV2(TEST_WALLET_ID);
+
+
+
     var response = restClient.post()
         .uri("/wua/v2")
         .body(requestBody)
@@ -113,18 +118,19 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
-  void testRequestingWuaFailsReturnsInternalServerError() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+  void testRequestingWuaFailsReturnsInternalServerErrorV2() {
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation/v2")
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",
-              "jwk": "%s"
+              "jwk": "%s",
+              "nonce": "%s"
             }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
+            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING, TEST_NONCE)))
         .willReturn(aResponse()
             .withStatus(404)));
 
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
+    var requestBody = CreateWuaDtoTestBuilder.withWalletIdV2(TEST_WALLET_ID);
     var response = restClient.post()
         .uri("/wua/v2")
         .body(requestBody)
@@ -135,8 +141,8 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
-  void testValidation() {
-    var requestBody = CreateWuaDtoTestBuilder.invaliDto();
+  void testValidationV2() {
+    var requestBody = CreateWuaDtoTestBuilder.invaliDtoV2();
     var response = restClient.post()
         .uri("/wua/v2")
         .body(requestBody)
