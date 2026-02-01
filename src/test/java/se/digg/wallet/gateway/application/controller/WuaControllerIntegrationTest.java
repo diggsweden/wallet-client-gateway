@@ -119,56 +119,22 @@ class WuaControllerIntegrationTest {
             """.formatted(SIGNED_JWT));
   }
 
-    @Test
-    void testRequestingWuaSuccessfullyReturnsCreatedV2() {
-        providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation/v2")
-                .withRequestBody(equalToJson("""
+  @Test
+  void testRequestingWuaSuccessfullyReturnsCreatedV3() {
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation/v2")
+        .withRequestBody(equalToJson("""
             {
-              "walletId": "%s",
               "jwk": "%s",
               "nonce": "%s"
             }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING, TEST_NONCE)))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withHeader("content-type", "text/plain")
-                        .withBody(SIGNED_JWT)));
-
-        var requestBody = CreateWuaDtoTestBuilder.withWalletIdV2(TEST_WALLET_ID);
-
-
-
-        var response = restClient.post()
-                .uri("/wua/v2")
-                .body(requestBody)
-                .exchange();
-
-        response.expectStatus()
-                .isCreated()
-                .expectBody()
-                .json("""
-            {
-
-              "jwt": "%s"
-            }
-            """.formatted(SIGNED_JWT));
-    }
-
-  @Test
-  void testRequestingWuaSuccessfullyReturnsCreatedV3() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
-        .withRequestBody(equalToJson("""
-            {
-              "jwk": "%s"
-            }
-            """.formatted(TEST_JWK_STRING)))
+            """.formatted(TEST_JWK_STRING, TEST_NONCE)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")
             .withBody(SIGNED_JWT)));
 
     var response = restClient.post()
-        .uri("/wua/v3")
+        .uri("/wua/v3?nonce=" + TEST_NONCE)
         .exchange();
 
     response.expectStatus()
@@ -181,7 +147,7 @@ class WuaControllerIntegrationTest {
             """.formatted(SIGNED_JWT));
   }
 
-    @Test
+  @Test
   void testRequestingWuaFailsReturnsInternalServerError() {
     providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
         .withRequestBody(equalToJson("""
@@ -203,32 +169,9 @@ class WuaControllerIntegrationTest {
         .isEqualTo(500);
   }
 
-    @Test
-    void testRequestingWuaFailsReturnsInternalServerErrorV2() {
-        providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation/v2")
-                .withRequestBody(equalToJson("""
-            {
-              "walletId": "%s",
-              "jwk": "%s",
-              "nonce": "%s"
-            }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING, TEST_NONCE)))
-                .willReturn(aResponse()
-                        .withStatus(404)));
-
-        var requestBody = CreateWuaDtoTestBuilder.withWalletIdV2(TEST_WALLET_ID);
-        var response = restClient.post()
-                .uri("/wua/v2")
-                .body(requestBody)
-                .exchange();
-
-        response.expectStatus()
-                .isEqualTo(500);
-    }
-
   @Test
   void testRequestingWuaFailsReturnsInternalServerErrorV3() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation/v2")
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s"
@@ -256,16 +199,4 @@ class WuaControllerIntegrationTest {
     response.expectStatus()
         .isEqualTo(400);
   }
-
-    @Test
-    void testValidationV2() {
-        var requestBody = CreateWuaDtoTestBuilder.invaliDtoV2();
-        var response = restClient.post()
-                .uri("/wua/v2")
-                .body(requestBody)
-                .exchange();
-
-        response.expectStatus()
-                .isEqualTo(400);
-    }
 }

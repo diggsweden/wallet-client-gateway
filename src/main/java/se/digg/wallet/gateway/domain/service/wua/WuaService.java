@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
-import se.digg.wallet.gateway.application.model.wua.CreateWuaDtoV2;
 import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
@@ -28,15 +27,16 @@ public class WuaService {
     this.wuaMapper = wuaMapper;
   }
 
-  public WuaDto createWua(String accountId) {
+  public WuaDto createWua(String accountId, String nonce) {
     var mapped = wuaMapper.toWalletProviderCreateWuaDto(
         walletAccountClient
             .getAccount(accountId)
-            .orElseThrow(() -> new IllegalArgumentException("Account not found")));
+            .orElseThrow(() -> new IllegalArgumentException("Account not found")),
+        nonce);
     var result = walletProviderClient.createWua(mapped);
     if (logger.isDebugEnabled()) {
-      logger.debug("Mapped request from accountId: {} to new wua dto {}",
-          accountId, result.substring(0, 10));
+      logger.debug("Mapped request from accountId: {}, nonce: {} to new wua dto {}",
+          accountId, result.substring(0, 10), nonce);
     }
     return new WuaDto(result);
   }
@@ -46,18 +46,6 @@ public class WuaService {
 
     var mapped = wuaMapper.toWalletProviderCreateWuaDto(createWuaDto);
     var result = walletProviderClient.createWua(mapped);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Mapped request {} to new wua dto {}",
-          createWuaDto.walletId(), result.substring(0, 10));
-    }
-    return new WuaDto(result);
-  }
-
-
-  public WuaDto createWuaV2(CreateWuaDtoV2 createWuaDto) {
-
-    var mapped = wuaMapper.toWalletProviderCreateWuaDtoV2(createWuaDto);
-    var result = walletProviderClient.createWuaV2(mapped);
     if (logger.isDebugEnabled()) {
       logger.debug("Mapped request {} to new wua dto {}",
           createWuaDto.walletId(), result.substring(0, 10));

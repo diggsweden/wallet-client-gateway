@@ -8,9 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
-import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV2;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 
 @Component
 public class WalletProviderClient {
@@ -32,16 +31,6 @@ public class WalletProviderClient {
   public String createWua(WalletProviderCreateWuaDto createWuaDto) {
     return restClient
         .post()
-        .uri(wuaUrlV1)
-        .body(createWuaDto)
-        .contentType(MediaType.APPLICATION_JSON)
-        .retrieve()
-        .body(String.class);
-  }
-
-  public String createWuaV2(WalletProviderCreateWuaDtoV2 createWuaDto) {
-    return restClient
-        .post()
         .uri(wuaUrlV2)
         .body(createWuaDto)
         .contentType(MediaType.APPLICATION_JSON)
@@ -53,11 +42,10 @@ public class WalletProviderClient {
   public String createWua(WalletProviderCreateWuaDtoV1 createWuaDto) {
     return restClient
         .post()
-        .uri(walletProviderUrl + wuaPath)
+        .uri(wuaUrlV1)
         .body(createWuaDto)
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
         .body(String.class);
   }
-
 }
