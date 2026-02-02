@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
-#
-# SPDX-License-Identifier: EUPL-1.2policies:
+# SPDX-License-Identifier: EUPL-1.2
+
+# Gitleaks configuration file for Wallet Client Gateway
+
 policies:
   - type: commit
     spec:
