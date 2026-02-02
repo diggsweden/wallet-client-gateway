@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+
+# Gitleaks configuration file for Wallet Client Gateway
+
 policies:
   - type: commit
     spec:
@@ -5,13 +10,13 @@ policies:
       gpg:
         required: true
       header:
-        length: 90
+        length: 200
         imperative: true
         case: lower
         invalidLastCharacters: .
       body:
         required: false
       conventional:
-        types: ["build", "chore", "docs", "ci", "perf", "refactor", "style", "test", "release"]
+        types: ["build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test", "release"]
         scopes: [".*"]
         descriptionLength: 92
