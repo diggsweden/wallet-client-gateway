@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
 import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDto;
 import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountJwkDto;
@@ -56,9 +56,9 @@ public class AuthService {
   }
 
   public Optional<ValidationResult> validateChallenge(
-      AuthChallengeResponseDto authChallengeResponseDto) {
+      ValidateAuthChallengeRequestDto validateAuthChallengeRequestDto) {
     try {
-      SignedJWT signedJwt = SignedJWT.parse(authChallengeResponseDto.signedJwt());
+      SignedJWT signedJwt = SignedJWT.parse(validateAuthChallengeRequestDto.signedJwt());
       String nonce = signedJwt.getJWTClaimsSet().getClaimAsString("nonce");
 
       var challengeValue = challengeCache.get(nonce);

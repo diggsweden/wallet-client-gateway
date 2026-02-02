@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.controller;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.Algorithm;
@@ -24,6 +25,8 @@ import com.nimbusds.jwt.SignedJWT;
 import com.redis.testcontainers.RedisContainer;
 import java.util.Date;
 import java.util.UUID;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -40,7 +43,8 @@ import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeResponseDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -104,7 +108,7 @@ class AuthControllerIntegrationTest {
         .getResponseBody();
 
     var signedJwt = createSignedJwt(key, challenge.nonce());
-    var postBody = new AuthChallengeResponseDto(signedJwt);
+    var postBody = new ValidateAuthChallengeRequestDto(signedJwt);
 
     restClient.post()
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
@@ -114,12 +118,17 @@ class AuthControllerIntegrationTest {
         .expectStatus()
         .is2xxSuccessful()
         .expectHeader()
-        .exists(SessionConfig.SESSION_HEADER);
+        .exists(SessionConfig.SESSION_HEADER)
+        .expectBody(ValidateAuthChallengeResponseDto.class)
+        .value(dto -> {
+          assertNotNull(dto);
+          assertThat(dto.sessionId()).isNotBlank();
+        });
   }
 
   @Test
   void testTooBigChallengeResponse() throws Exception {
-    var postBody = new AuthChallengeResponseDto("a".repeat(20000));
+    var postBody = new ValidateAuthChallengeRequestDto("a".repeat(20000));
 
     restClient.post()
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
