@@ -32,7 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.application.model.WalletAccountAccountDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
@@ -123,7 +123,8 @@ class AuthServiceTest {
         .thenReturn(Optional.of(fromNonce(nonce, ecJwk)));
 
     String signedJwt = createSignedJwt(ecJwk, nonce);
-    AuthChallengeResponseDto authChallangeResonse = new AuthChallengeResponseDto(signedJwt);
+    ValidateAuthChallengeRequestDto authChallangeResonse =
+        new ValidateAuthChallengeRequestDto(signedJwt);
     assertThat(authService.validateChallenge(authChallangeResonse)).isPresent();
   }
 
@@ -138,7 +139,8 @@ class AuthServiceTest {
     String nonce = AuthChallengeCacheValue.generate(accountId, ecJwk).nonce();
     when(challengeCache.get(nonce)).thenReturn(Optional.empty());
     String signedJwt = createSignedJwt(ecJwk, nonce);
-    AuthChallengeResponseDto authChallangeResonse = new AuthChallengeResponseDto(signedJwt);
+    ValidateAuthChallengeRequestDto authChallangeResonse =
+        new ValidateAuthChallengeRequestDto(signedJwt);
     assertThat(authService.validateChallenge(authChallangeResonse)).isNotPresent();
   }
 
@@ -159,7 +161,8 @@ class AuthServiceTest {
         .thenReturn(Optional.of(fromNonce(nonce, ecPublicJwk)));
 
     String signedJwt = createSignedJwt(ecJwk, nonce);
-    AuthChallengeResponseDto authChallangeResonse = new AuthChallengeResponseDto(signedJwt);
+    ValidateAuthChallengeRequestDto authChallangeResonse =
+        new ValidateAuthChallengeRequestDto(signedJwt);
     assertThat(authService.validateChallenge(authChallangeResonse)).isNotPresent();
   }
 
@@ -176,7 +179,8 @@ class AuthServiceTest {
         .thenReturn(Optional.of(fromNonce(nonce, ecJwk)));
 
     String signedJwt = createSignedJwt(ecJwk, nonce) + "bad";
-    AuthChallengeResponseDto authChallangeResonse = new AuthChallengeResponseDto(signedJwt);
+    ValidateAuthChallengeRequestDto authChallangeResonse =
+        new ValidateAuthChallengeRequestDto(signedJwt);
     assertThat(authService.validateChallenge(authChallangeResonse)).isEmpty();
   }
 

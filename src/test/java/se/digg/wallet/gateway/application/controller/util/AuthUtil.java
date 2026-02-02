@@ -44,7 +44,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
 
 public class AuthUtil {
   public static final String ACCOUNT_ID = UUID.randomUUID().toString();
@@ -105,7 +105,7 @@ public class AuthUtil {
         .getResponseBody();
 
     var signedJwt = createSignedJwt(generatedKeyPair, challenge.nonce());
-    var postBody = new AuthChallengeResponseDto(signedJwt);
+    var postBody = new ValidateAuthChallengeRequestDto(signedJwt);
 
     var sessionId = new AtomicReference<String>();
     restClient.post()

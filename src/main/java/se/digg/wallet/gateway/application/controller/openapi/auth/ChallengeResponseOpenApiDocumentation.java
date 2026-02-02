@@ -15,26 +15,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.http.MediaType;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeResponseDto;
 import se.digg.wallet.gateway.application.model.common.BadRequestDto;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-
-@ApiResponse(description = "Session created", responseCode = "200",
+@ApiResponse(
+    description = "Session created",
+    responseCode = "200",
     headers = {
         @Header(
             name = "session",
             description = "Session ID",
-            required = true,
+            deprecated = true,
             schema = @Schema(type = "string"))
     },
-    content = @Content())
-@ApiResponse(description = "Unknown error", responseCode = "500",
-    content = @Content())
-@ApiResponse(description = "Bad input, session not created", responseCode = "400",
-    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+    content = @Content(
+        mediaType = MediaType.APPLICATION_JSON_VALUE,
+        schema = @Schema(implementation = ValidateAuthChallengeResponseDto.class)))
+@ApiResponse(description = "Unknown error", responseCode = "500", content = @Content())
+@ApiResponse(
+    description = "Bad input, session not created",
+    responseCode = "400",
+    content = @Content(
+        mediaType = MediaType.APPLICATION_JSON_VALUE,
         schema = @Schema(implementation = BadRequestDto.class)))
-@RequestBody(description = "Challenge response",
+@RequestBody(
+    description = "Challenge response",
     content = @Content(
         examples = @ExampleObject("""
                 {

@@ -19,7 +19,8 @@ import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.application.controller.openapi.auth.ChallengeResponseOpenApiDocumentation;
 import se.digg.wallet.gateway.application.controller.openapi.auth.InitChallengeOpenApiDocumentation;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeResponseDto;
 import se.digg.wallet.gateway.domain.service.auth.AuthService;
 import se.digg.wallet.gateway.domain.service.auth.AuthService.ValidationResult;
 
@@ -44,12 +45,14 @@ public class AuthController {
 
   @PostMapping("/session/response")
   @ChallengeResponseOpenApiDocumentation
-  public ResponseEntity<Void> validateChallenge(@RequestBody AuthChallengeResponseDto response,
+  public ResponseEntity<ValidateAuthChallengeResponseDto> validateChallenge(
+      @RequestBody ValidateAuthChallengeRequestDto response,
       HttpServletRequest req) {
     var validationResult = authService.validateChallenge(response);
     if (validationResult.isPresent()) {
       createAndSaveSession(req, validationResult.orElseThrow());
-      return ResponseEntity.ok().build();
+      String sessionId = req.getSession(false).getId();
+      return ResponseEntity.ok(new ValidateAuthChallengeResponseDto(sessionId));
     }
     return ResponseEntity.status(401).build();
   }
