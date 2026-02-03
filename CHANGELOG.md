@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-02-03
+
+### Added
+
+- Add session id to response body
+
+### Changed
+
+- Merge pull request #99 from diggsweden/renovate/docker.io-library-eclipse-temurin-25-jdk-alpine
+- Update docker.io/library/eclipse-temurin:25-jdk-alpine docker digest to 7ace075
+- Merge pull request #101 from diggsweden/fix/update-just-config
+- Merge pull request #100 from diggsweden/feat/auth-session-id-body
+- Update dependency org.assertj:assertj-core to v3.27.7 [security] (#97)
+
+### Fixed
+
+- License format
+- Increase header length for commit messages
+
 ## [0.4.0] - 2026-01-26
 
 ### Added
@@ -37,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove warnings for exceptions not thrown
 - Remove deprecated PMD rule
+
 
 ## [0.3.1] - 2026-01-14
 
@@ -317,6 +337,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.4.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.0..v0.4.1
 [0.4.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.3.1..v0.4.0
 [0.3.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.3.0..v0.3.1
 [0.3.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.2.9..v0.3.0
