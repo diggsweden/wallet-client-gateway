@@ -4,10 +4,13 @@
 
 package se.digg.wallet.gateway.application.controller;
 
+import jakarta.validation.Valid;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +22,7 @@ import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @RestController
 @RequestMapping("/wua/v3")
+@Validated
 public class WuaController {
   private final Logger logger = LoggerFactory.getLogger(WuaController.class);
   private final WuaService wuaService;
@@ -30,11 +34,16 @@ public class WuaController {
   @PostMapping()
   @CreateWuaOpenApiDocumentation
   public ResponseEntity<WuaDto> createWua(
-      ChallengeResponseAuthentication challengeResponseAuthentication,
-      @RequestParam(required = false) String nonce) {
+      @Valid ChallengeResponseAuthentication challengeResponseAuthentication,
+      @RequestParam Optional<String> nonce) {
+    if (nonce.isPresent() && nonce.get().isBlank()) {
+      logger.warn("Received request with empty nonce");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
     logger.debug("Received request from account id: {}, nonce: {}",
-        challengeResponseAuthentication.getAccountId(), nonce);
-    WuaDto wuaDto = wuaService.createWua(challengeResponseAuthentication.getAccountId(), nonce);
+        challengeResponseAuthentication.getAccountId(), nonce.orElse(""));
+    WuaDto wuaDto = wuaService.createWua(challengeResponseAuthentication.getAccountId(),
+        nonce.orElse(""));
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
   }
 }

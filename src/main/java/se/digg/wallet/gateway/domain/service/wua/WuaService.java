@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.domain.service.wua;
 
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class WuaService {
         walletAccountClient
             .getAccount(accountId)
             .orElseThrow(() -> new IllegalArgumentException("Account not found")),
-        nonce);
+        Optional.ofNullable(nonce).orElse(""));
     var result = walletProviderClient.createWua(mapped);
     if (logger.isDebugEnabled()) {
       logger.debug("Mapped request from accountId: {}, nonce: {} to new wua dto {}",
