@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-02-05
+
+### Added
+
+- Add WuaService test
+- Add deprecated annotations
+
+### Changed
+
+- Merge pull request #98 from diggsweden/feat/add-wua-v2
+- Clean up errors and warnings from spotbugs etc
+- Send nonce as an optional request parameter to wallet-provider
+- Use wua v2 from wallet-provider
+
+### Fixed
+
+- Handle empty or null nonce when creating wua
+- Format log parameters
+
 ## [0.4.1] - 2026-02-03
 
 ### Added
@@ -23,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - License format
 - Increase header length for commit messages
+
 
 ## [0.4.0] - 2026-01-26
 
@@ -337,6 +357,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.4.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.1..v0.4.2
 [0.4.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.0..v0.4.1
 [0.4.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.3.1..v0.4.0
 [0.3.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.3.0..v0.3.1
