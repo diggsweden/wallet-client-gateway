@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.application.controller.old.WuaControllerV2;
 import se.digg.wallet.gateway.application.controller.openapi.wua.CreateWuaOpenApiDocumentation;
 import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
@@ -20,7 +19,7 @@ import se.digg.wallet.gateway.domain.service.wua.WuaService;
 @RestController
 @RequestMapping("/wua/v3")
 public class WuaController {
-  private final Logger logger = LoggerFactory.getLogger(WuaControllerV2.class);
+  private final Logger logger = LoggerFactory.getLogger(WuaController.class);
   private final WuaService wuaService;
 
   public WuaController(WuaService wuaService) {
