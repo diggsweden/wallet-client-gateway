@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.infrastructure.walletprovider.model;
 
-public record WalletProviderCreateWuaDto(String jwk) {
+public record WalletProviderCreateWuaDto(String jwk, String nonce) {
 }

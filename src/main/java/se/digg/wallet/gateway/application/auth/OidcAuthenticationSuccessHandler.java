@@ -24,8 +24,8 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException {
-    var session = request.getSession(false);
-    var sessionId = session != null ? session.getId() : "";
+    final var session = request.getSession(false);
+    final var sessionId = session != null ? session.getId() : "";
 
     response.setStatus(200);
     response.setCharacterEncoding("utf-8");

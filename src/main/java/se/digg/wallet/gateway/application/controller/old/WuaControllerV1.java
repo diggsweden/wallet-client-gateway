@@ -19,6 +19,7 @@ import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
 import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
+@Deprecated(forRemoval = true)
 @RestController
 @RequestMapping("/wua")
 public class WuaControllerV1 {

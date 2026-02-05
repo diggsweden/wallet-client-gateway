@@ -11,10 +11,6 @@ import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
 
 public class CreateWuaDtoTestBuilder {
 
-  public static CreateWuaDto withDefaultValues() {
-    return withWalletId(UUID.randomUUID());
-  }
-
   public static CreateWuaDto withWalletId(UUID walletId) {
     return withWalletId(walletId, JwkDtoTestBuilder.withDefaults().build());
   }

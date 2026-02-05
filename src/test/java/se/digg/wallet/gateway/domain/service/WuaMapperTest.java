@@ -4,7 +4,7 @@
 
 package se.digg.wallet.gateway.domain.service;
 
-import tools.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +13,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
+import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDto;
+import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountJwkDto;
+import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class WuaMapperTest {
 
   public static final UUID TEST_ATTRIBUTE_ID = UUID.randomUUID();
+  private static final String TEST_NONCE = "nonce";
 
   @Spy
   private ObjectMapper objectMapper;
@@ -30,7 +35,7 @@ class WuaMapperTest {
 
 
   @Test
-  void map() throws Exception {
+  void mapFromCreateWuaDto() throws Exception {
     // Given
     var createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
     var expectedWuaDto =
@@ -39,6 +44,23 @@ class WuaMapperTest {
 
     // When
     var actualWuaDto = wuaMapper.toWalletProviderCreateWuaDto(createWuaDto);
+
+    // Then
+    assertEquals(expectedWuaDto, actualWuaDto);
+  }
+
+  @Test
+  void mapFromAccountAndNonce() throws Exception {
+    // Given
+    var publicKey = new WalletAccountJwkDto("kty", "kid", "alg", "use", "crv", "x", "y");
+    var accountDto = new WalletAccountAccountDto(UUID.randomUUID(), "", "",
+        Optional.empty(), publicKey);
+    var expectedWuaDto =
+        new WalletProviderCreateWuaDto(objectMapper.writeValueAsString(accountDto.publicKey()),
+            TEST_NONCE);
+
+    // When
+    var actualWuaDto = wuaMapper.toWalletProviderCreateWuaDto(accountDto, TEST_NONCE);
 
     // Then
     assertEquals(expectedWuaDto, actualWuaDto);

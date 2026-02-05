@@ -4,6 +4,10 @@
 
 package se.digg.wallet.gateway.application.controller;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
@@ -28,8 +32,6 @@ import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.common.JwkDto;
 import tools.jackson.databind.ObjectMapper;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
 @WalletProviderMock
@@ -44,11 +46,17 @@ class WuaControllerIntegrationTest {
   public static String TEST_JWK_STRING;
 
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
+  public static final String TEST_NONCE = "nonce";
   private static final String SIGNED_JWT = """
       eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5\
       jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
       """;
   private RestTestClient restClient;
+
+  @Deprecated
+  private static final String WUA_URL = "/wallet-provider/wallet-unit-attestation";
+
+  private static final String WUA_URL_V2 = "/wallet-provider/wallet-unit-attestation/v2";
 
   private boolean authenticated = false;
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
@@ -85,9 +93,10 @@ class WuaControllerIntegrationTest {
     }
   }
 
+  @Deprecated(forRemoval = true)
   @Test
   void testRequestingWuaSuccessfullyReturnsCreated() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",
@@ -118,19 +127,20 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testRequestingWuaSuccessfullyReturnsCreatedV3() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
-              "jwk": "%s"
+              "jwk": "%s",
+              "nonce": "%s"
             }
-            """.formatted(TEST_JWK_STRING)))
+            """.formatted(TEST_JWK_STRING, TEST_NONCE)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")
             .withBody(SIGNED_JWT)));
 
     var response = restClient.post()
-        .uri("/wua/v3")
+        .uri("/wua/v3?nonce=" + TEST_NONCE)
         .exchange();
 
     response.expectStatus()
@@ -143,9 +153,10 @@ class WuaControllerIntegrationTest {
             """.formatted(SIGNED_JWT));
   }
 
+  @Deprecated(forRemoval = true)
   @Test
   void testRequestingWuaFailsReturnsInternalServerError() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "walletId": "%s",
@@ -167,7 +178,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testRequestingWuaFailsReturnsInternalServerErrorV3() {
-    providerServer.stubFor(post("/wallet-provider/wallet-unit-attestation")
+    providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s"
@@ -184,6 +195,7 @@ class WuaControllerIntegrationTest {
         .isEqualTo(500);
   }
 
+  @Deprecated(forRemoval = true)
   @Test
   void testValidation() {
     var requestBody = CreateWuaDtoTestBuilder.invalidDto();
@@ -194,5 +206,74 @@ class WuaControllerIntegrationTest {
 
     response.expectStatus()
         .isEqualTo(400);
+  }
+
+  @Test
+  void testValidationV3_emptyNonce() {
+    providerServer.stubFor(post(WUA_URL_V2)
+        .withRequestBody(equalToJson("""
+            {
+              "jwk": "%s",
+              "nonce": "%s"
+            }
+            """.formatted(TEST_JWK_STRING, "")))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "text/plain")
+            .withBody(SIGNED_JWT)));
+
+    // Sending empty nonce should be fail
+    var response = restClient.post()
+        .uri("/wua/v3?nonce=")
+        .exchange();
+
+    response.expectStatus()
+        .isEqualTo(400);
+  }
+
+  @Test
+  void testValidationV3_nullNonce() {
+    providerServer.stubFor(post(WUA_URL_V2)
+        .withRequestBody(equalToJson("""
+            {
+              "jwk": "%s",
+              "nonce": "%s"
+            }
+            """.formatted(TEST_JWK_STRING, null)))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "text/plain")
+            .withBody(SIGNED_JWT)));
+
+    // Sending null nonce should be accepted
+    var response = restClient.post()
+        .uri("/wua/v3?nonce=" + null)
+        .exchange();
+
+    response.expectStatus()
+        .isEqualTo(201);
+  }
+
+  @Test
+  void testValidationV3_withoutNonce() {
+    providerServer.stubFor(post(WUA_URL_V2)
+        .withRequestBody(equalToJson("""
+            {
+              "jwk": "%s",
+              "nonce": ""
+            }
+            """.formatted(TEST_JWK_STRING)))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "text/plain")
+            .withBody(SIGNED_JWT)));
+
+    // Not sending nonce should be accepted
+    var response = restClient.post()
+        .uri("/wua/v3")
+        .exchange();
+
+    response.expectStatus()
+        .isEqualTo(201);
   }
 }

@@ -106,7 +106,7 @@ public class AuthService {
     try {
       WalletAccountJwkDto publicKey = account.get().publicKey();
       if (!keyId.equals(publicKey.kid())) {
-        log.info("No kid %s present on accountId %s {}", keyId, accountId);
+        log.info("No kid {} present on accountId {}", keyId, accountId);
         return Optional.empty();
       }
       ECKey publicEcKey = new ECKey.Builder(
