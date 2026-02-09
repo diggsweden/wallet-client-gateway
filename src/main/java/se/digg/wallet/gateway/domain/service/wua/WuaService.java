@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.application.model.wua.CreateWuaDto;
 import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
@@ -38,18 +37,6 @@ public class WuaService {
     if (logger.isDebugEnabled()) {
       logger.debug("Mapped request from accountId: {}, nonce: {} to new wua dto {}",
           accountId, result.substring(0, 10), nonce);
-    }
-    return new WuaDto(result);
-  }
-
-  @Deprecated(since = "0.3.1", forRemoval = true)
-  public WuaDto createWua(CreateWuaDto createWuaDto) {
-
-    var mapped = wuaMapper.toWalletProviderCreateWuaDto(createWuaDto);
-    var result = walletProviderClient.createWua(mapped);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Mapped request {} to new wua dto {}",
-          createWuaDto.walletId(), result.substring(0, 10));
     }
     return new WuaDto(result);
   }
