@@ -11,10 +11,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
+
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -27,7 +31,6 @@ import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
-import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.common.JwkDto;
 import tools.jackson.databind.ObjectMapper;
@@ -53,14 +56,12 @@ class WuaControllerIntegrationTest {
       """;
   private RestTestClient restClient;
 
-  @Deprecated
-  private static final String WUA_URL = "/wallet-provider/wallet-unit-attestation";
-
   private static final String WUA_URL_V2 = "/wallet-provider/wallet-unit-attestation/v2";
 
   private boolean authenticated = false;
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
   private static ECKey generatedKeyPair;
+  private static final List<String> WUA_PATHS = List.of("/wua", "/wua/v3");
 
   @LocalServerPort
   private int port;
@@ -93,40 +94,9 @@ class WuaControllerIntegrationTest {
     }
   }
 
-  @Deprecated(forRemoval = true)
-  @Test
-  void testRequestingWuaSuccessfullyReturnsCreated() {
-    providerServer.stubFor(post(WUA_URL)
-        .withRequestBody(equalToJson("""
-            {
-              "walletId": "%s",
-              "jwk": "%s"
-            }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
-        .willReturn(aResponse()
-            .withStatus(201)
-            .withHeader("content-type", "text/plain")
-            .withBody(SIGNED_JWT)));
-
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID, jwkDto);
-    var response = restClient.post()
-        .uri("/wua/v2")
-        .body(requestBody)
-        .exchange();
-
-    response.expectStatus()
-        .isCreated()
-        .expectBody()
-        .json("""
-            {
-
-              "jwt": "%s"
-            }
-            """.formatted(SIGNED_JWT));
-  }
-
-  @Test
-  void testRequestingWuaSuccessfullyReturnsCreatedV3() {
+  @ParameterizedTest
+  @FieldSource("WUA_PATHS")
+  void testRequestingWuaSuccessfullyReturnsCreated(String path) {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -140,7 +110,7 @@ class WuaControllerIntegrationTest {
             .withBody(SIGNED_JWT)));
 
     var response = restClient.post()
-        .uri("/wua/v3?nonce=" + TEST_NONCE)
+        .uri(path + "?nonce=" + TEST_NONCE)
         .exchange();
 
     response.expectStatus()
@@ -153,31 +123,9 @@ class WuaControllerIntegrationTest {
             """.formatted(SIGNED_JWT));
   }
 
-  @Deprecated(forRemoval = true)
-  @Test
-  void testRequestingWuaFailsReturnsInternalServerError() {
-    providerServer.stubFor(post(WUA_URL)
-        .withRequestBody(equalToJson("""
-            {
-              "walletId": "%s",
-              "jwk": "%s"
-            }
-            """.formatted(TEST_WALLET_ID, TEST_JWK_STRING)))
-        .willReturn(aResponse()
-            .withStatus(404)));
-
-    var requestBody = CreateWuaDtoTestBuilder.withWalletId(TEST_WALLET_ID);
-    var response = restClient.post()
-        .uri("/wua/v2")
-        .body(requestBody)
-        .exchange();
-
-    response.expectStatus()
-        .isEqualTo(500);
-  }
-
-  @Test
-  void testRequestingWuaFailsReturnsInternalServerErrorV3() {
+  @ParameterizedTest
+  @FieldSource("WUA_PATHS")
+  void testRequestingWuaFailsReturnsInternalServerError(String path) {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -188,28 +136,17 @@ class WuaControllerIntegrationTest {
             .withStatus(404)));
 
     var response = restClient.post()
-        .uri("/wua/v3")
+        .uri(path)
         .exchange();
 
     response.expectStatus()
         .isEqualTo(500);
   }
 
-  @Deprecated(forRemoval = true)
-  @Test
-  void testValidation() {
-    var requestBody = CreateWuaDtoTestBuilder.invalidDto();
-    var response = restClient.post()
-        .uri("/wua/v2")
-        .body(requestBody)
-        .exchange();
 
-    response.expectStatus()
-        .isEqualTo(400);
-  }
-
-  @Test
-  void testValidationV3_emptyNonce() {
+  @ParameterizedTest
+  @FieldSource("WUA_PATHS")
+  void testValidation_emptyNonce(String path) {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -224,15 +161,16 @@ class WuaControllerIntegrationTest {
 
     // Sending empty nonce should be fail
     var response = restClient.post()
-        .uri("/wua/v3?nonce=")
+        .uri(path + "?nonce=")
         .exchange();
 
     response.expectStatus()
         .isEqualTo(400);
   }
 
-  @Test
-  void testValidationV3_nullNonce() {
+  @ParameterizedTest
+  @FieldSource("WUA_PATHS")
+  void testValidation_nullNonce(String path) {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -247,15 +185,16 @@ class WuaControllerIntegrationTest {
 
     // Sending null nonce should be accepted
     var response = restClient.post()
-        .uri("/wua/v3?nonce=" + null)
+        .uri(path + "?nonce=" + null)
         .exchange();
 
     response.expectStatus()
         .isEqualTo(201);
   }
 
-  @Test
-  void testValidationV3_withoutNonce() {
+  @ParameterizedTest
+  @FieldSource("WUA_PATHS")
+  void testValidation_withoutNonce(String path) {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -270,7 +209,7 @@ class WuaControllerIntegrationTest {
 
     // Not sending nonce should be accepted
     var response = restClient.post()
-        .uri("/wua/v3")
+        .uri(path)
         .exchange();
 
     response.expectStatus()

@@ -21,7 +21,7 @@ import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @RestController
-@RequestMapping("/wua/v3")
+@RequestMapping({"/wua", "/wua/v3"})
 @Validated
 public class WuaController {
   private final Logger logger = LoggerFactory.getLogger(WuaController.class);

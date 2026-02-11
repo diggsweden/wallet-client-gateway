@@ -4,20 +4,19 @@
 
 package se.digg.wallet.gateway.domain.service;
 
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.digg.wallet.gateway.application.model.CreateWuaDtoTestBuilder;
 import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
 import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDto;
 import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountJwkDto;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
-import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDtoV1;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,21 +32,6 @@ class WuaMapperTest {
   @InjectMocks
   private WuaMapper wuaMapper;
 
-
-  @Test
-  void mapFromCreateWuaDto() throws Exception {
-    // Given
-    var createWuaDto = CreateWuaDtoTestBuilder.withWalletId(TEST_ATTRIBUTE_ID);
-    var expectedWuaDto =
-        new WalletProviderCreateWuaDtoV1(createWuaDto.walletId().toString(),
-            objectMapper.writeValueAsString(createWuaDto.jwk()));
-
-    // When
-    var actualWuaDto = wuaMapper.toWalletProviderCreateWuaDto(createWuaDto);
-
-    // Then
-    assertEquals(expectedWuaDto, actualWuaDto);
-  }
 
   @Test
   void mapFromAccountAndNonce() throws Exception {
