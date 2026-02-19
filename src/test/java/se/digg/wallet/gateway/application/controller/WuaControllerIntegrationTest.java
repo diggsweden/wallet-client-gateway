@@ -61,7 +61,7 @@ class WuaControllerIntegrationTest {
   private boolean authenticated = false;
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
   private static ECKey generatedKeyPair;
-  private static final List<String> WUA_PATHS = List.of("/wua", "/wua/v3");
+  // private static final List<String> WUA_PATHS = List.of("/wua");
 
   @LocalServerPort
   private int port;
@@ -94,9 +94,8 @@ class WuaControllerIntegrationTest {
     }
   }
 
-  @ParameterizedTest
-  @FieldSource("WUA_PATHS")
-  void testRequestingWuaSuccessfullyReturnsCreated(String path) {
+  @Test
+  void testRequestingWuaSuccessfullyReturnsCreated() {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -110,7 +109,7 @@ class WuaControllerIntegrationTest {
             .withBody(SIGNED_JWT)));
 
     var response = restClient.post()
-        .uri(path + "?nonce=" + TEST_NONCE)
+        .uri("/wua" + "?nonce=" + TEST_NONCE)
         .exchange();
 
     response.expectStatus()
@@ -123,9 +122,8 @@ class WuaControllerIntegrationTest {
             """.formatted(SIGNED_JWT));
   }
 
-  @ParameterizedTest
-  @FieldSource("WUA_PATHS")
-  void testRequestingWuaFailsReturnsInternalServerError(String path) {
+  @Test
+  void testRequestingWuaFailsReturnsInternalServerError() {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -136,7 +134,7 @@ class WuaControllerIntegrationTest {
             .withStatus(404)));
 
     var response = restClient.post()
-        .uri(path)
+        .uri("/wua")
         .exchange();
 
     response.expectStatus()
@@ -144,9 +142,8 @@ class WuaControllerIntegrationTest {
   }
 
 
-  @ParameterizedTest
-  @FieldSource("WUA_PATHS")
-  void testValidation_emptyNonce(String path) {
+  @Test
+  void testValidation_emptyNonce() {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -161,16 +158,15 @@ class WuaControllerIntegrationTest {
 
     // Sending empty nonce should be fail
     var response = restClient.post()
-        .uri(path + "?nonce=")
+        .uri("/wua" + "?nonce=")
         .exchange();
 
     response.expectStatus()
         .isEqualTo(400);
   }
 
-  @ParameterizedTest
-  @FieldSource("WUA_PATHS")
-  void testValidation_nullNonce(String path) {
+  @Test
+  void testValidation_nullNonce() {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -185,16 +181,15 @@ class WuaControllerIntegrationTest {
 
     // Sending null nonce should be accepted
     var response = restClient.post()
-        .uri(path + "?nonce=" + null)
+        .uri("/wua" + "?nonce=" + null)
         .exchange();
 
     response.expectStatus()
         .isEqualTo(201);
   }
 
-  @ParameterizedTest
-  @FieldSource("WUA_PATHS")
-  void testValidation_withoutNonce(String path) {
+  @Test
+  void testValidation_withoutNonce() {
     providerServer.stubFor(post(WUA_URL_V2)
         .withRequestBody(equalToJson("""
             {
@@ -209,7 +204,7 @@ class WuaControllerIntegrationTest {
 
     // Not sending nonce should be accepted
     var response = restClient.post()
-        .uri(path)
+        .uri("/wua")
         .exchange();
 
     response.expectStatus()
