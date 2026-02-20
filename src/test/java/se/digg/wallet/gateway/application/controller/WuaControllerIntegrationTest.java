@@ -61,7 +61,6 @@ class WuaControllerIntegrationTest {
   private boolean authenticated = false;
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
   private static ECKey generatedKeyPair;
-  // private static final List<String> WUA_PATHS = List.of("/wua");
 
   @LocalServerPort
   private int port;
