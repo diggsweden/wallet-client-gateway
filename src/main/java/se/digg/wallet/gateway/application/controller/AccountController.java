@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller.old;
+package se.digg.wallet.gateway.application.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,11 @@ import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDto;
 import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
-@Deprecated(forRemoval = true)
 @RestController
-@RequestMapping("/accounts/v1")
+@RequestMapping({"/accounts", "/accounts/v1"})
 public class AccountController {
   private final AccountService accountService;
-  private ApiKeyVerifier apiKeyVerifier;
+  private final ApiKeyVerifier apiKeyVerifier;
 
   public AccountController(AccountService accountService, ApiKeyVerifier apiKeyVerifier) {
     this.accountService = accountService;
