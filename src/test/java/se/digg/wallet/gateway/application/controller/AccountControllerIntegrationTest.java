@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller.old;
+package se.digg.wallet.gateway.application.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -12,8 +12,11 @@ import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTe
 import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+
+import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -35,6 +38,8 @@ import tools.jackson.databind.ObjectMapper;
 @AutoConfigureRestTestClient
 class AccountControllerIntegrationTest {
 
+  public static final List<String> ACCOUNTS_PATH = List.of("accounts", "accounts/v1");
+
   @Autowired
   private RestTestClient restClient;
 
@@ -53,9 +58,9 @@ class AccountControllerIntegrationTest {
   @InjectWireMock(WalletAccountMock.NAME)
   private WireMockServer server;
 
-
-  @Test
-  void testCreateAccount() throws Exception {
+  @ParameterizedTest
+  @FieldSource("ACCOUNTS_PATH")
+  void testCreateAccount(String path) throws Exception {
     var generatedAccountId = UUID.randomUUID();
     var jwkString = objectMapper.writeValueAsString(JwkDtoTestBuilder.withDefaults().build());
 
@@ -85,7 +90,7 @@ class AccountControllerIntegrationTest {
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri("/accounts/v1")
+        .uri(path)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
@@ -100,15 +105,16 @@ class AccountControllerIntegrationTest {
             """.formatted(generatedAccountId));
   }
 
-  @Test
-  void testAccountReturns500IfAccountServiceRespondsWith404() {
+  @ParameterizedTest
+  @FieldSource("ACCOUNTS_PATH")
+  void testAccountReturns500IfAccountServiceRespondsWith404(String path) {
     server.stubFor(post("/account")
         .willReturn(aResponse()
             .withStatus(404)));
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri("/accounts/v1")
+        .uri(path)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
@@ -117,13 +123,14 @@ class AccountControllerIntegrationTest {
         .isEqualTo(500);
   }
 
-  @Test
-  void testValidation() {
+  @ParameterizedTest
+  @FieldSource("ACCOUNTS_PATH")
+  void testValidation(String path) {
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults()
         .emailAdress(null)
         .build();
     var response = restClient.post()
-        .uri("/accounts/v1")
+        .uri(path)
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
@@ -131,5 +138,4 @@ class AccountControllerIntegrationTest {
     response.expectStatus()
         .isEqualTo(400);
   }
-
 }

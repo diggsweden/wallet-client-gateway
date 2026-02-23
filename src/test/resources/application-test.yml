@@ -16,6 +16,7 @@ properties:
     - "/swagger-ui/**"
     - "/public/**"
     - "/wua"
+    - "/accounts"
     - "/accounts/v1"
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port}

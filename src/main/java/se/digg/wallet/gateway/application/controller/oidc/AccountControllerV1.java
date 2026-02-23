@@ -24,6 +24,7 @@ import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDto;
 import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
+@Deprecated(forRemoval = true)
 @RestController
 @RequestMapping("/oidc/accounts/v1")
 public class AccountControllerV1 {
