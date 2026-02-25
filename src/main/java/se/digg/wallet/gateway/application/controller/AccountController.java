@@ -19,7 +19,7 @@ import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
 @RestController
-@RequestMapping({"/accounts", "/accounts/v1"})
+@RequestMapping("/accounts")
 public class AccountController {
   private final AccountService accountService;
   private final ApiKeyVerifier apiKeyVerifier;

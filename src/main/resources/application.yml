@@ -12,7 +12,6 @@ properties:
     - "/public/**"
     - "/wua"
     - "/accounts"
-    - "/accounts/v1"
   walletprovider:
     baseurl: http://
     wua-path: /wallet-unit-attestation
