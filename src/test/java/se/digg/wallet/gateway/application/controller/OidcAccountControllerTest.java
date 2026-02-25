@@ -25,14 +25,14 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.ApplicationConfig.OidcClaims;
 import se.digg.wallet.gateway.application.controller.exception.BadRequestException;
-import se.digg.wallet.gateway.application.controller.oidc.AccountControllerV1;
+import se.digg.wallet.gateway.application.controller.oidc.OidcAccountController;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
 @ExtendWith(MockitoExtension.class)
-public class AccountControllerV1Test {
+public class OidcAccountControllerTest {
 
-  private AccountControllerV1 controller;
+  private OidcAccountController controller;
 
   private AccountService service;
   private ApplicationConfig config;
@@ -44,7 +44,7 @@ public class AccountControllerV1Test {
     when(config.oidcClaims())
         .thenReturn(new OidcClaims("pnr"));
 
-    controller = new AccountControllerV1(service, config);
+    controller = new OidcAccountController(service, config);
   }
 
   @Test
