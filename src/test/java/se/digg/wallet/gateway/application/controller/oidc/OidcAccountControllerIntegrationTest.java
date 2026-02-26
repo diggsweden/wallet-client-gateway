@@ -42,7 +42,7 @@ import tools.jackson.databind.ObjectMapper;
 @Testcontainers
 @ActiveProfiles("test")
 @AutoConfigureRestTestClient
-class AccountControllerV1IntegrationTest {
+class OidcAccountControllerIntegrationTest {
 
   @Container
   @ServiceConnection

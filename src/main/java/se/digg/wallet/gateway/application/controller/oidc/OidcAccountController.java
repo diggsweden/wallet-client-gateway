@@ -27,11 +27,11 @@ import se.digg.wallet.gateway.domain.service.account.AccountService;
 @Deprecated(forRemoval = true)
 @RestController
 @RequestMapping("/oidc/accounts/v1")
-public class AccountControllerV1 {
+public class OidcAccountController {
   private final AccountService accountService;
   private final String personalIdentityNumberClaim;
 
-  public AccountControllerV1(AccountService accountService, ApplicationConfig applicationConfig) {
+  public OidcAccountController(AccountService accountService, ApplicationConfig applicationConfig) {
     this.accountService = accountService;
     this.personalIdentityNumberClaim = applicationConfig.oidcClaims().personalIdentityNumber();
   }

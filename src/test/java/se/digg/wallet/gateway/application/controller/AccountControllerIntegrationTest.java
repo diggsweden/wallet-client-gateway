@@ -13,10 +13,9 @@ import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTe
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
-import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.FieldSource;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -38,8 +37,6 @@ import tools.jackson.databind.ObjectMapper;
 @AutoConfigureRestTestClient
 class AccountControllerIntegrationTest {
 
-  public static final List<String> ACCOUNTS_PATH = List.of("accounts", "accounts/v1");
-
   @Autowired
   private RestTestClient restClient;
 
@@ -58,9 +55,8 @@ class AccountControllerIntegrationTest {
   @InjectWireMock(WalletAccountMock.NAME)
   private WireMockServer server;
 
-  @ParameterizedTest
-  @FieldSource("ACCOUNTS_PATH")
-  void testCreateAccount(String path) throws Exception {
+  @Test
+  void testCreateAccount() throws Exception {
     var generatedAccountId = UUID.randomUUID();
     var jwkString = objectMapper.writeValueAsString(JwkDtoTestBuilder.withDefaults().build());
 
@@ -90,7 +86,7 @@ class AccountControllerIntegrationTest {
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri(path)
+        .uri("accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
@@ -105,16 +101,15 @@ class AccountControllerIntegrationTest {
             """.formatted(generatedAccountId));
   }
 
-  @ParameterizedTest
-  @FieldSource("ACCOUNTS_PATH")
-  void testAccountReturns500IfAccountServiceRespondsWith404(String path) {
+  @Test
+  void testAccountReturns500IfAccountServiceRespondsWith404() {
     server.stubFor(post("/account")
         .willReturn(aResponse()
             .withStatus(404)));
 
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
-        .uri(path)
+        .uri("accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
@@ -123,14 +118,13 @@ class AccountControllerIntegrationTest {
         .isEqualTo(500);
   }
 
-  @ParameterizedTest
-  @FieldSource("ACCOUNTS_PATH")
-  void testValidation(String path) {
+  @Test
+  void testValidation() {
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults()
         .emailAdress(null)
         .build();
     var response = restClient.post()
-        .uri(path)
+        .uri("accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
