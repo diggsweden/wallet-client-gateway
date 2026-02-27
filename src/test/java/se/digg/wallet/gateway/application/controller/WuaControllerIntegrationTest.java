@@ -12,13 +12,10 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
 
-import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -56,7 +53,7 @@ class WuaControllerIntegrationTest {
       """;
   private RestTestClient restClient;
 
-  private static final String WUA_URL_V2 = "/wallet-provider/wallet-unit-attestation/v2";
+  private static final String WUA_URL = "/wallet-provider/wallet-unit-attestation";
 
   private boolean authenticated = false;
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
@@ -95,7 +92,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testRequestingWuaSuccessfullyReturnsCreated() {
-    providerServer.stubFor(post(WUA_URL_V2)
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s",
@@ -123,7 +120,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testRequestingWuaFailsReturnsInternalServerError() {
-    providerServer.stubFor(post(WUA_URL_V2)
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s"
@@ -143,7 +140,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testValidation_emptyNonce() {
-    providerServer.stubFor(post(WUA_URL_V2)
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s",
@@ -166,7 +163,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testValidation_nullNonce() {
-    providerServer.stubFor(post(WUA_URL_V2)
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s",
@@ -189,7 +186,7 @@ class WuaControllerIntegrationTest {
 
   @Test
   void testValidation_withoutNonce() {
-    providerServer.stubFor(post(WUA_URL_V2)
+    providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s",
