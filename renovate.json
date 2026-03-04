@@ -9,7 +9,8 @@
     "npm",
     "maven",
     "dockerfile",
-    "docker-compose"
+    "docker-compose",
+    "mise"
   ],
   "packageRules": [
     {
@@ -50,6 +51,20 @@
       "description": "Docker images",
       "matchManagers": ["dockerfile", "docker-compose"],
       "addLabels": ["docker", "infrastructure"]
+    },
+    {
+      "description": "Mise dependencies - Major updates",
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["dependencies", "major-update"],
+      "groupName": "mise major"
+    },
+    {
+      "description": "Mise dependencies - Non-major updates",
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "addLabels": ["dependencies"],
+      "groupName": "mise non-major"
     }
   ]
 }
