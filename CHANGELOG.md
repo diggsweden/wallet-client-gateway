@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.7] - 2026-03-04
+
+### Fixed
+
+- Use reuseable-ci 2.6.1
+
 ## [0.4.6] - 2026-03-04
 
 ### Removed
 
 - Remove wua/v2 (#108)
+
 
 ## [0.4.5] - 2026-02-26
 
@@ -395,6 +402,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.4.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.6..v0.4.7
 [0.4.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.5..v0.4.6
 [0.4.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.4..v0.4.5
 [0.4.4]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.3..v0.4.4
