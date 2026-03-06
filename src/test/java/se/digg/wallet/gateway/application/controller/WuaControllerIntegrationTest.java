@@ -137,7 +137,6 @@ class WuaControllerIntegrationTest {
         .isEqualTo(500);
   }
 
-
   @Test
   void testValidation_emptyNonce() {
     providerServer.stubFor(post(WUA_URL)
