@@ -14,6 +14,7 @@ public class ChallengeResponseAuthentication extends AbstractAuthenticationToken
   @Serial
   private static final long serialVersionUID = 1L;
 
+  /* digg account id */
   private final String accountId;
 
   public ChallengeResponseAuthentication(String accountId) {

@@ -5,7 +5,6 @@
 package se.digg.wallet.gateway.application.model.account;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.UUID;
 
 public record CreateAccountResponseDto(

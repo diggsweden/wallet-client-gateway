@@ -8,14 +8,3 @@ spring:
       enabled: true
       file: ./docker-compose/docker-compose.yml
 
-environment:
-  oauth2:
-    authorization-server-base-url: http://localhost:8089
-    client-id: http://localhost:8080/
-    private-jwt:
-      key-file: classpath:keystore-wallet-app-bff-local.p12
-      key-file-password: changeit
-      key-file-type: PKCS12
-      name: Private JWT - KeyPair
-      key-alias: wallet-app-bff-local
-      key-password: changeit
