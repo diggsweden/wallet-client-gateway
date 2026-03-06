@@ -9,23 +9,6 @@ services:
     networks:
       - wallet-network
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.3.4-0@sha256:2b32a51a31e8d780d9fa9a69a59ead69975263c61b5dd13559090e22aa26f100
-    container_name: wcg-keycloak
-    command:
-      - start-dev
-      - --import-realm
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    networks:
-      - wallet-network
-    ports:
-      - "8089:8080"
-    volumes:
-      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
-      - ./keystore-wallet-app-bff-local.p12:/opt/keycloak/conf/client-keystore.p12
-
 networks:
   wallet-network:
     driver: bridge
