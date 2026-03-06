@@ -92,6 +92,7 @@ lint-all: _ensure-devtools
 # Validate version control
 [group('lint')]
 lint-version-control:
+    @{{lint}}/version-control.sh
 
 # Validate commit messages
 [group('lint')]
