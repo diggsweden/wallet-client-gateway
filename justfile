@@ -89,6 +89,10 @@ verify: _ensure-devtools check-tools
 lint-all: _ensure-devtools
     @{{devtools_dir}}/scripts/verify.sh
 
+# Validate version control
+[group('lint')]
+lint-version-control:
+
 # Validate commit messages
 [group('lint')]
 lint-commits:
