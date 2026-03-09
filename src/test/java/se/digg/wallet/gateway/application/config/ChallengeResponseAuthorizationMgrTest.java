@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -33,7 +32,6 @@ class ChallengeResponseAuthorizationMgrTest {
   @BeforeEach
   void setUp() {
     ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
-    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
     SecurityConfig securityConfig = new SecurityConfig(applicationConfig);
     authorizationMgr = securityConfig.challengeResponseAuthorizationMgr();
   }
@@ -41,6 +39,7 @@ class ChallengeResponseAuthorizationMgrTest {
   @ParameterizedTest
   @ValueSource(strings = {"account-123", "550e8400-e29b-41d4-a716-446655440000"})
   void grantsAccessForValidChallengeResponseWithAccountId(String accountId) {
+    // Test that different account IDs are all accepted as long as they are valid ChallengeResponseAuthentication
     var auth = new ChallengeResponseAuthentication(accountId);
     AuthorizationResult decision = authorizationMgr.authorize(asSupplier(auth), null);
 
