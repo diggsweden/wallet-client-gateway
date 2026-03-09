@@ -48,5 +48,4 @@ public class ChallengeResponseAuthentication extends AbstractAuthenticationToken
   public int hashCode() {
     return super.hashCode() + Objects.hashCode(accountId);
   }
-
 }

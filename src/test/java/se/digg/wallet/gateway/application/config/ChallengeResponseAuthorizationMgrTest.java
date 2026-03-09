@@ -39,7 +39,8 @@ class ChallengeResponseAuthorizationMgrTest {
   @ParameterizedTest
   @ValueSource(strings = {"account-123", "550e8400-e29b-41d4-a716-446655440000"})
   void grantsAccessForValidChallengeResponseWithAccountId(String accountId) {
-    // Test that different account IDs are all accepted as long as they are valid ChallengeResponseAuthentication
+    // Test that different account IDs are all accepted as long as they are valid
+    // ChallengeResponseAuthentication
     var auth = new ChallengeResponseAuthentication(accountId);
     AuthorizationResult decision = authorizationMgr.authorize(asSupplier(auth), null);
 
