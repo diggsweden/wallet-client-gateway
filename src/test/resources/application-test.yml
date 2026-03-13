@@ -33,19 +33,4 @@ properties:
       get: /account
   challenge-cache:
     ttl-seconds: 10
-  authorization-server:
-    private-jwt-audience:
-  oidc-claims:
-    personal-identity-number: https://id.oidc.se/claim/personalIdentityNumber
 
-environment:
-  oauth2:
-    authorization-server-base-url: http://localhost:${wiremock.authorization-server.port}
-    client-id: localhost-test-client
-    private-jwt:
-      key-file: classpath:keystore.p12
-      key-file-password: changeit
-      key-file-type: PKCS12
-      name: Private JWT - KeyPair
-      key-alias: wallet-app-bff-local
-      key-password: changeit

@@ -28,21 +28,6 @@ properties:
       get: /account
   challenge-cache:
     ttl-seconds: 30
-  authorization-server:
-    private-jwt-audience:
-  oidc-claims:
-    personal-identity-number: https://id.oidc.se/claim/personalIdentityNumber
-
-environment:
-  oauth2:
-    authorization-server-base-url:
-    client-id:
-    private-jwt:
-      key-file:
-      key-file-password:
-      key-file-type:
-      key-alias:
-      key-password:
 
 # Wallet Client Gateway Configuration
 server:
@@ -57,39 +42,6 @@ spring:
     redis:
       host: localhost
       port: 6379
-  security:
-    oauth2:
-      client:
-        registration:
-          iam:
-            client-id: "${environment.oauth2.client-id}"
-            client-authentication-method: private_key_jwt
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope:
-              - openid
-              - https://id.oidc.se/scope/naturalPersonNumber
-        provider:
-          iam:
-            authorization-uri: "${environment.oauth2.authorization-server-base-url}/auth"
-            jwk-set-uri: "${environment.oauth2.authorization-server-base-url}/certs"
-            token-uri: "${environment.oauth2.authorization-server-base-url}/token"
-            user-info-endpoint-uri: "${environment.oauth2.authorization-server-base-url}/userinfo"
-
-credential:
-  bundles:
-    keystore:
-      private-jwt-keys:
-        location: ${environment.oauth2.private-jwt.key-file}
-        password: ${environment.oauth2.private-jwt.key-file-password}
-        type: ${environment.oauth2.private-jwt.key-file-type}
-    jks:
-      iam:
-        store-reference: private-jwt-keys
-        name: Private JWT - KeyPair
-        key:
-          alias: ${environment.oauth2.private-jwt.key-alias}
-          key-password: ${environment.oauth2.private-jwt.key-password}
 
 # Management and Monitoring
 management:

@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -20,9 +19,7 @@ public record ApplicationConfig(
     @NotNull Walletprovider walletprovider,
     @NotNull Attributeattestation attributeattestation,
     @NotNull Walletaccount walletaccount,
-    @NotNull ChallengeCache challengeCache,
-    @NotNull AuthorizationServer authorizationServer,
-    @NotNull OidcClaims oidcClaims) {
+    @NotNull ChallengeCache challengeCache) {
 
   public ApplicationConfig {
     publicPaths = List.copyOf(publicPaths);
@@ -43,12 +40,6 @@ public record ApplicationConfig(
   }
 
   public record ChallengeCache(@NotBlank int ttlSeconds) {
-  }
-
-  public record AuthorizationServer(Optional<String> privateJwtAudience) {
-  }
-
-  public record OidcClaims(@NotBlank String personalIdentityNumber) {
   }
 
 }
