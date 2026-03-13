@@ -4,26 +4,19 @@
 
 package se.digg.wallet.gateway.application.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.FieldSource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
+
+import java.util.function.Supplier;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class ChallengeResponseAuthorizationMgrTest {
 
@@ -36,28 +29,37 @@ class ChallengeResponseAuthorizationMgrTest {
     authorizationMgr = securityConfig.challengeResponseAuthorizationMgr();
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"account-123", "550e8400-e29b-41d4-a716-446655440000"})
-  void grantsAccessForValidChallengeResponseWithAccountId(String accountId) {
-    // Test that different account IDs are all accepted as long as they are valid
-    // ChallengeResponseAuthentication
-    var auth = new ChallengeResponseAuthentication(accountId);
+  @Test
+  void grantsWhenChallengeResponseAndAuthenticated() {
+    // instanceof ChallengeResponseAuthentication == true && isAuthenticated() == true
+    var auth = new ChallengeResponseAuthentication("dummyAccountId");
+    auth.setAuthenticated(true);
+
     AuthorizationResult decision = authorizationMgr.authorize(asSupplier(auth), null);
 
     assertThat(decision).isNotNull();
     assertThat(decision.isGranted()).isTrue();
   }
 
-  private static final List<AbstractAuthenticationToken> INVALID_TOKENS = List.of(
-      new AnonymousAuthenticationToken("key", "anonymous",
-          List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))),
-      new UsernamePasswordAuthenticationToken("user", "password"));
+  @Test
+  void deniesWhenChallengeResponseButNotAuthenticated() {
+    // instanceof ChallengeResponseAuthentication == true && isAuthenticated() == false
+    var auth = new ChallengeResponseAuthentication("dummyAccountId");
+    auth.setAuthenticated(false);
 
-  @ParameterizedTest
-  @FieldSource("INVALID_TOKENS")
-  @NullSource
-  void deniesAccessForAnonymousAuthentication(AbstractAuthenticationToken invalidToken) {
-    AuthorizationResult decision = authorizationMgr.authorize(asSupplier(invalidToken), null);
+    AuthorizationResult decision = authorizationMgr.authorize(asSupplier(auth), null);
+
+    assertThat(decision).isNotNull();
+    assertThat(decision.isGranted()).isFalse();
+  }
+
+  @Test
+  void deniesWhenNotChallengeResponseButAuthenticated() {
+    // instanceof ChallengeResponseAuthentication == false && isAuthenticated() == true
+    var auth = new TestingAuthenticationToken("dummyAccountId", "credentials");
+    auth.setAuthenticated(true);
+
+    AuthorizationResult decision = authorizationMgr.authorize(asSupplier(auth), null);
 
     assertThat(decision).isNotNull();
     assertThat(decision.isGranted()).isFalse();
