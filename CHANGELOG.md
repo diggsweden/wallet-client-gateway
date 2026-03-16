@@ -5,11 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.8] - 2026-03-16
+
+### Added
+
+- Add more challengeResponseAthentication test
+- Add auth challenge test
+- Add no-op version control linter
+
+### Changed
+
+- Merge pull request #110 from diggsweden/feat/remove-keycloak-oidc
+- Merge pull request #113 from diggsweden/fix/use-gommitlint
+- Use gommitlint
+- Merge pull request #112 from diggsweden/build/fail-on-dirty-working-tree
+- Enable version control linter
+- Merge pull request #111 from diggsweden/fix/bump-hadolint-to-v2.14.0
+
+### Fixed
+
+- Run formatting for test
+- Removal of unused mock
+- Bump hadolint to v2.14.0
+
+### Removed
+
+- Remove unnecessary dependencies
+- Remove keycloak and oidc login
+
 ## [0.4.7] - 2026-03-04
 
 ### Fixed
 
 - Use reuseable-ci 2.6.1
+
 
 ## [0.4.6] - 2026-03-04
 
@@ -402,6 +431,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.4.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.7..v0.4.8
 [0.4.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.6..v0.4.7
 [0.4.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.5..v0.4.6
 [0.4.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.4..v0.4.5
