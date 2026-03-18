@@ -1,0 +1,493 @@
+openapi: 3.0.3
+info:
+  title: Wallet Client Gateway API
+  version: 0.0.1
+  description: |
+    Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
+    statliga digitala identitetsplånboken.
+    
+    This API provides backend operations to be used by the clients of the swedish digital identity wallet.
+  contact:
+    name: Wallet software development team, Digg Sweden
+    email: tbd@tbd.xx
+    url: https://to.be.decided.xx
+  license:
+    name: TBD
+    url: https://to.be.decided.xx
+  x-sla:
+    availability: Test
+    responseTime: 24
+    support: Kontorstid
+  termsOfService: https://to.be.decided.xx
+externalDocs:
+  description: TBD. Text som ex. innehåller service level agreement, kända problem eller begränsningar.
+  url: https://to.be.decided.xx
+servers:
+  - url: '/'
+security:
+  - ApiKeyScheme: []
+    SessionIdScheme: []
+tags:
+  - name: API-info
+    description: Information about the API
+  - name: Account
+    description: Account operations
+  - name: Authentication
+    description: Authentication operations
+  - name: Attestation
+    description: Attestation operations
+  - name: WalletUnitAttestation
+    description: Wallet Unit Attestation operations
+
+paths:
+  /api-info:
+    get:
+      tags:
+        - API-info
+      summary: Get info about the API
+      description: Get name, version, release date, links and status.
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfoResponse'
+
+  /accounts:
+    post:
+      tags:
+        - Account
+      summary: Create account
+      description: Creates a new account
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountResponseDto'
+        '400':
+          description: 'Bad input, unable to create account'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Unauthorized
+        '500':
+          description: 'Could not create account, server error'
+
+  /public/auth/session/challenge:
+    get:
+      tags:
+        - Session
+      summary: Request challenge
+      description: Request new login challenge
+      operationId: initChallenge
+      parameters:
+        - name: accountId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: keyId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Challenge issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthChallengeDto'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Unknown error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+
+  /public/auth/session/response:
+    post:
+      tags:
+        - Session
+      summary: Request new Session
+      description: Creates a new Session from a given Challenge
+      operationId: validateChallenge
+      requestBody:
+        description: Challenge response
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateAuthChallengeRequestDto'
+            example:
+              signedJwt: insert.signed.jwt
+        required: true
+      responses:
+        '200':
+          description: Session created
+          headers:
+            session:
+              description: Session ID
+              deprecated: true
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateAuthChallengeResponseDto'
+        '400':
+          description: 'Bad input, session not created'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Unknown error
+
+  /wua:
+    post:
+      tags:
+        - WalletUnitAttestation
+      summary: Create WUA
+      description: Creates a Wallet Unit Attestation
+      operationId: createWua
+      parameters:
+        - name: nonce
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Wua created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WuaDto'
+        '400':
+          description: Bad input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Not authorized
+        '500':
+          description: Could not create Wua
+
+  /attribute-attestations:
+    get:
+      tags:
+        - Attestation
+      summary: Get attestations by key
+      description: Get attestations from a given key
+      operationId: getAttestationsById
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Attestation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientAttestationListDto'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+    post:
+      tags:
+        - Attestation
+      summary: Create attestation
+      description: Creates a new attestation
+      operationId: createAttribute
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttestationDto'
+        required: true
+      responses:
+        '201':
+          description: Attestation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientAttestationDto'
+        '400':
+          description: 'Bad input, unable to create attestation'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Unauthorized
+        '500':
+          description: 'Could not create attestation, server error'
+
+  /attribute-attestations/{id}:
+    get:
+      tags:
+        - Attestation
+      summary: Get attestation by id
+      description: Get an attestation by id
+      operationId: getAttestationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Attestation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientAttestationDto'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Attestation not found
+        '500':
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestDto'
+
+components:
+  schemas:
+
+    ApiInfoResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Wallet Client Gateway API
+        version:
+          type: string
+          example: 0.0.1
+        releaseDate:
+          type: string
+          format: date
+          example: '2026-03-18'
+        status:
+          type: string
+        links:
+          type: array
+          items:
+            type: string
+            example: 'https://docs.serverhost.xx/subfolder/infopage.html'
+
+    BadRequestDto:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+
+    WuaDto:
+      type: object
+      properties:
+        jwt:
+          type: string
+          description: Wallet unit attestation
+          example: ey5359ddf330...
+      required:
+        - jwt
+
+    ValidateAuthChallengeRequestDto:
+      type: object
+      properties:
+        signedJwt:
+          type: string
+          minLength: 1
+      required:
+        - signedJwt
+
+    ValidateAuthChallengeResponseDto:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Session ID
+          example: 3f2e7c0b-91d2-4a7e-9f34-0d8d9a5a9e77
+      required:
+        - sessionId
+
+    CreateAttestationDto:
+      type: object
+      properties:
+        hsmId:
+          type: string
+          format: uuid
+          example: cbe80ad0-6a7d-4a5a-9891-8b4e95fa4d49
+        wuaId:
+          type: string
+          format: uuid
+          example: 790acda4-3dec-4d93-8efe-71375109d30e
+        attestationData:
+          type: string
+          minLength: 1
+      required:
+        - attestationData
+        - hsmId
+        - wuaId
+
+    ClientAttestationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        hsmId:
+          type: string
+          format: uuid
+        wuaId:
+          type: string
+          format: uuid
+        attestationData:
+          type: string
+
+    CreateAccountRequestDto:
+      type: object
+      properties:
+        personalIdentityNumber:
+          type: string
+          example: 191010101010
+        emailAdress:
+          type: string
+          example: first.last@example.xx
+          minLength: 1
+        telephoneNumber:
+          type: string
+          example: 0700000000
+        publicKey:
+          $ref: '#/components/schemas/JwkDto'
+      required:
+        - emailAdress
+        - publicKey
+
+    JwkDto:
+      type: object
+      properties:
+        kty:
+          type: string
+          minLength: 1
+          example: EC
+        kid:
+          type: string
+          example: myKey
+        alg:
+          type: string
+        use:
+          type: string
+        crv:
+          type: string
+          minLength: 1
+          example: P-256
+        x:
+          type: string
+          minLength: 1
+          example: 1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc
+        y:
+          type: string
+          minLength: 1
+          example: 5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40
+      required:
+        - crv
+        - kty
+        - x
+        - y
+
+    CreateAccountResponseDto:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          description: Account ID
+          example: 3685BCB1-4AA4-4C81-8806-43FBD31A0957
+      required:
+        - accountId
+
+    AuthChallengeDto:
+      type: object
+      properties:
+        nonce:
+          type: string
+
+    ClientAttestationListDto:
+      type: object
+      properties:
+        attestations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientAttestationDto'
+        hsmId:
+          type: string
+          format: uuid
+
+  securitySchemes:
+    ApiKeyScheme:
+      type: apiKey
+      name: X-API-KEY
+      in: header
+    SessionIdScheme:
+      type: apiKey
+      name: SESSION
+      in: header
