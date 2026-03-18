@@ -91,6 +91,45 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
+  void testRequestingWuaNotAuthenticatedReturnsBadRequest() {
+    authenticated = false;
+
+    RestTestClient unauthenticatedClient = RestTestClient.bindToServer()
+        .baseUrl("http://localhost:" + port)
+        .build();
+
+    var response = unauthenticatedClient.post()
+        .uri("/wua" + "?nonce=" + TEST_NONCE)
+        .exchange();
+
+    response.expectStatus()
+        .isBadRequest();
+  }
+
+  @Test
+  void testRequestingWuaNoAccountIdReturnsUnAuthorized() {
+    AuthUtil.ACCOUNT_ID = null;
+
+    // Create a new RestTestClient without authentication (no session header)
+    RestTestClient unauthenticatedClient = RestTestClient.bindToServer()
+        .baseUrl("http://localhost:" + port)
+        .build();
+
+    var response = unauthenticatedClient.post()
+        .uri("/wua" + "?nonce=" + TEST_NONCE)
+        .exchange();
+
+    // Spring Security's challengeResponseAuthorizationMgr() blocks requests that don't have
+    // a valid ChallengeResponseAuthentication in the session, returning 403 Forbidden
+    response.expectStatus()
+        .isBadRequest();
+
+    // I am reverting the value for AuthUtil.ACCOUNT_ID because other tests like
+    // AttestationControllerIntegrationTest are using it
+    AuthUtil.ACCOUNT_ID = ACCOUNT_ID;
+  }
+
+  @Test
   void testRequestingWuaSuccessfullyReturnsCreated() {
     providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
