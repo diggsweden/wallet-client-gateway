@@ -5,4 +5,3 @@
 gommitlint:
   crypto_signature:
     required: true
-    require_ssh: true
