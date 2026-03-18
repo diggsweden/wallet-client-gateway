@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import jakarta.validation.Valid;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,16 @@ public class WuaController {
   @PostMapping()
   @CreateWuaOpenApiDocumentation
   public ResponseEntity<WuaDto> createWua(
-      @Valid ChallengeResponseAuthentication challengeResponseAuthentication,
+      ChallengeResponseAuthentication challengeResponseAuthentication,
       @RequestParam Optional<String> nonce) {
+    if (challengeResponseAuthentication == null) {
+      logger.warn("Received request with empty challenge response authentication");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+    if (challengeResponseAuthentication.getAccountId() == null) {
+      logger.warn("Received request with empty account id");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
     if (nonce.isPresent() && nonce.get().isBlank()) {
       logger.warn("Received request with empty nonce");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

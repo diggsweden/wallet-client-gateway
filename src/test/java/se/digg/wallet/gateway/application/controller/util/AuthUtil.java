@@ -30,7 +30,7 @@ import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
 
 public class AuthUtil {
-  public static final String ACCOUNT_ID = UUID.randomUUID().toString();
+  public static String ACCOUNT_ID = UUID.randomUUID().toString();
   public static final String KEY_ID = "123";
 
 
