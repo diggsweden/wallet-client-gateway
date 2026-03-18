@@ -18,7 +18,7 @@ path = [
   "DEVELOPMENT.md",
   "CONTRIBUTING.md",
   "SECURITY.md",
-  ".conform.yaml",
+  ".gommitlint.yaml",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Digg - Agency for Digital Government"

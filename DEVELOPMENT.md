@@ -128,7 +128,7 @@ Run `just` to see all available commands. Key commands:
 
 | Command | Tool | Description |
 |---------|------|-------------|
-| `just lint-commits` | conform | Validate commit messages |
+| `just lint-commits` | gommitlint | Validate commit messages |
 | `just lint-secrets` | gitleaks | Scan for secrets |
 | `just lint-yaml` | yamlfmt | Lint YAML files |
 | `just lint-markdown` | rumdl | Lint markdown files |
