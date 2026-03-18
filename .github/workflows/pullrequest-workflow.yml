@@ -21,13 +21,14 @@ concurrency:
 
 jobs:
   pr-checks:
-    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@659cc5dbdbedc47f1510817f38aba07de8a93ae8 # v2.6.1
+    uses: diggsweden/reusable-ci/.github/workflows/pullrequest-orchestrator.yml@feat/release-2.7.0 # feat/release-2.7.0
     secrets: inherit # Pass org-level secrets (for private Maven dependencies)
     permissions:
       contents: read # Clone repository and read source code
       packages: read # Access GitHub Packages for Maven dependencies
       security-events: write # Upload SpotBugs/dependency check results to Security tab
     with:
+      reusable-ci-ref: feat/release-2.7.0
       project-type: maven
       # Use devbase-check linting (replaces megalint, commitlint, licenselint)
       linters.devbasecheck: true
