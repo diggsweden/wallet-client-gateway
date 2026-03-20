@@ -35,8 +35,8 @@ tags:
   - name: Authentication
     description: Authentication operations
   - name: Attestation
-    description: Attestation operations
-  - name: WalletUnitAttestation
+    description: Attestation operations (not in use)
+  - name: Wallet Unit Attestation
     description: Wallet Unit Attestation operations
 
 paths:
@@ -89,7 +89,7 @@ paths:
   /public/auth/session/challenge:
     get:
       tags:
-        - Session
+        - Authentication
       summary: Request challenge
       description: Request new login challenge
       operationId: initChallenge
@@ -129,7 +129,7 @@ paths:
   /public/auth/session/response:
     post:
       tags:
-        - Session
+        - Authentication
       summary: Request new Session
       description: Creates a new Session from a given Challenge
       operationId: validateChallenge
@@ -170,8 +170,8 @@ paths:
   /wua:
     post:
       tags:
-        - WalletUnitAttestation
-      summary: Create WUA
+        - Wallet Unit Attestation
+      summary: Create Wallet Unit Attestation
       description: Creates a Wallet Unit Attestation
       operationId: createWua
       parameters:
