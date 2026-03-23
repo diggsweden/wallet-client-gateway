@@ -23,7 +23,7 @@ public class HsmController {
 
   private final HsmUseCase hsmUseCase;
 
-  public HsmController(HsmUseCase hsmUseCase) {
+HsmController(HsmUseCase hsmUseCase) {
     this.hsmUseCase = hsmUseCase;
   }
 

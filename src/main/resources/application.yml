@@ -26,7 +26,7 @@ properties:
     paths:
       post: /account
       get: /account
-  r2psrestapi:
+  wallet-r2ps:
     baseurl: http://
     paths:
       post: /service

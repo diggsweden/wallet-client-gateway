@@ -15,7 +15,7 @@ public class HsmService implements HsmUseCase {
 
   private final HsmPort hsmPort;
 
-  public HsmService(HsmPort hsmPort) {
+   HsmService(HsmPort hsmPort) {
     this.hsmPort = hsmPort;
   }
 
