@@ -26,6 +26,11 @@ properties:
     paths:
       post: /account
       get: /account
+  r2psrestapi:
+    baseurl: http://
+    paths:
+      post: /service
+      new-state: /new_state
   challenge-cache:
     ttl-seconds: 30
 

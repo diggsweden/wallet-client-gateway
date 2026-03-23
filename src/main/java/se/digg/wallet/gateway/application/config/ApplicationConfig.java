@@ -19,7 +19,8 @@ public record ApplicationConfig(
     @NotNull Walletprovider walletprovider,
     @NotNull Attributeattestation attributeattestation,
     @NotNull Walletaccount walletaccount,
-    @NotNull ChallengeCache challengeCache) {
+    @NotNull ChallengeCache challengeCache,
+    @NotNull WalletR2ps walletR2ps) {
 
   public ApplicationConfig {
     publicPaths = List.copyOf(publicPaths);
@@ -39,8 +40,13 @@ public record ApplicationConfig(
     }
   }
 
+  public record WalletR2ps(@NotBlank String baseurl, @NotBlank Paths paths){
+      public record Paths(@NotBlank String post, @NotBlank String newState){
+
+      }
+  }
+
   public record ChallengeCache(@NotBlank int ttlSeconds) {
   }
 
 }
-
