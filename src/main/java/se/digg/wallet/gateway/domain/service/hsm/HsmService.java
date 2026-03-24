@@ -7,6 +7,8 @@ package se.digg.wallet.gateway.domain.service.hsm;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
 import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
+import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
+import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
 import se.digg.wallet.gateway.domain.port.in.HsmUseCase;
 import se.digg.wallet.gateway.domain.port.out.HsmPort;
 
@@ -20,8 +22,8 @@ public class HsmService implements HsmUseCase {
   }
 
   @Override
-  public void registerState(String accountId, HsmRequestDto request) {
-    hsmPort.registerState(request);
+  public RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request) {
+    return hsmPort.registerState(request);
   }
 
   @Override

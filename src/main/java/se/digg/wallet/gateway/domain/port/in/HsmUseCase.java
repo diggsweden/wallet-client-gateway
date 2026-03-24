@@ -6,10 +6,12 @@ package se.digg.wallet.gateway.domain.port.in;
 
 import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
 import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
+import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
+import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
 
 public interface HsmUseCase {
 
-  void registerState(String accountId, HsmRequestDto request);
+  RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request);
 
   void registerPin(String accountId, HsmRequestDto request);
 
