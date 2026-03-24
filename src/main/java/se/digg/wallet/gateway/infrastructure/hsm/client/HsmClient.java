@@ -23,7 +23,7 @@ public class HsmClient implements HsmPort {
     private final String postPath;
     private final String newStatePath;
 
-    public HsmClient(RestClient client, ApplicationConfig applicationConfig){
+    HsmClient(RestClient client, ApplicationConfig applicationConfig){
         this.restClient = client.mutate().build();
         this.baseUrl = applicationConfig.walletR2ps().baseurl();
         this.postPath = applicationConfig.walletR2ps().paths().post();

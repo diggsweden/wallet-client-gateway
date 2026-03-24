@@ -28,9 +28,7 @@ import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletR2psMock;
 import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
 import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
@@ -103,11 +101,10 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(RegisterStateResponseDto.class)
-        .value(response -> {
-          assert response.clientId().equals(TEST_CLIENT_ID);
-          assert response.devAuthorizationCode().equals(TEST_DEV_AUTH_CODE);
-        });
+        .expectBody()
+        .json("""
+            { "clientId": "%s", "devAuthorizationCode": "%s" }
+            """.formatted(TEST_CLIENT_ID, TEST_DEV_AUTH_CODE));
   }
 
   @Test
@@ -165,10 +162,10 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(HsmResponseDto.class)
-        .value(response -> {
-          assert response.jwt().equals(TEST_JWT);
-        });
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
@@ -188,10 +185,10 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(HsmResponseDto.class)
-        .value(response -> {
-          assert response.jwt().equals(TEST_JWT);
-        });
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
@@ -211,10 +208,10 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponseDto.class)
-        .value(response -> {
-          assert response.jwt().equals(TEST_JWT);
-        });
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
@@ -253,10 +250,10 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponseDto.class)
-        .value(response -> {
-          assert response.jwt().equals(TEST_JWT);
-        });
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
