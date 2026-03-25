@@ -15,7 +15,6 @@ import com.redis.testcontainers.RedisContainer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -38,7 +37,6 @@ import tools.jackson.databind.ObjectMapper;
 @WalletProviderMock
 @Testcontainers
 @ActiveProfiles("test")
-@Disabled("Breaking change test")
 class WuaControllerIntegrationTest {
 
   @Container
