@@ -20,7 +20,7 @@ import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @RestController
-@RequestMapping("/wua")
+@RequestMapping("/borken-wua")
 @Validated
 public class WuaController {
   private final Logger logger = LoggerFactory.getLogger(WuaController.class);
