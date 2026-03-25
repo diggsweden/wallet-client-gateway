@@ -67,6 +67,8 @@
     <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
     <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
     <record-builder.version>51</record-builder.version>
+    <openapi-generator-maven-plugin.version>7.21.0</openapi-generator-maven-plugin.version>
+    <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
   </properties>
 
   <dependencies>
@@ -98,6 +100,11 @@
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
       <version>3.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+      <version>0.2.9</version>
     </dependency>
     <dependency>
       <groupId>com.nimbusds</groupId>
@@ -316,6 +323,62 @@
           <excludeFilterFile>development/spotbugs-exclude.xml</excludeFilterFile>
         </configuration>
       </plugin>
+
+      <!-- OpenAPI Generator plugin -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi-generator-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>wallet-client-gateway-openapi-v0</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>
+                ${project.basedir}/src/main/resources/wallet-client-gateway-openapi-v0.yaml
+              </inputSpec>
+              <generatorName>spring</generatorName>
+              <apiPackage>se.digg.wallet.gateway.api.v0</apiPackage>
+              <modelPackage>se.digg.wallet.gateway.api.v0.model</modelPackage>
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <generateApiTests>true</generateApiTests>
+              <configOptions>
+                <useSpringBoot4>true</useSpringBoot4>
+                <interfaceOnly>true</interfaceOnly>
+                <useTags>true</useTags>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <generateBuilders>true</generateBuilders>
+                <x-version-param>true</x-version-param>
+                <implicitHeaders>true</implicitHeaders>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Build Helper plugin -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${build-helper-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/target/generated-sources/openapi/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 </project>
