@@ -11,6 +11,7 @@ on:
       - develop
       - "release/**"
       - "feature/**"
+  workflow_dispatch:
 
 permissions:
   contents: read
