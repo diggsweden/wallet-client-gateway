@@ -62,14 +62,14 @@ jobs:
         run: |
           cd wallet-ecosystem
           cp .env.example .env
-          
+
           # Create transient override to use the local image
           cat <<EOF > docker-compose.override.yaml
           services:
             wallet-client-gateway:
               image: wallet-client-gateway:local
           EOF
-          
+
           # Generate TLS certificates for Traefik (mimics ecosystem CI)
           mkdir -p config/traefik/certs
           openssl req -x509 -newkey rsa:2048 \
@@ -88,6 +88,7 @@ jobs:
           echo "Waiting for services to become healthy..."
           # Give services time to initialize (especially Keycloak)
           for i in {1..40}; do
+            echo "Check attempt $i/40..."
             # Get statuses of all containers that have healthchecks
             UNHEALTHY=$(podman ps -a --format "{{.Names}} {{.Status}}" | grep -v "healthy" | grep -E "keycloak|wallet-client-gateway|wallet-attribute-attestation|wallet-account|valkey|db" || true)
             if [ -z "$UNHEALTHY" ]; then
@@ -110,6 +111,7 @@ jobs:
           PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd wallet-ecosystem
+          # shellcheck disable=SC2086
           mvn $MAVEN_CLI_OPTS test
 
       - name: Fetch Logs on Failure
