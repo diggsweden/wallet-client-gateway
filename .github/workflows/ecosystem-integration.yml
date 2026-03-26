@@ -7,10 +7,7 @@ name: Ecosystem Integration Test
 on:
   pull_request:
     branches:
-      - main
-      - develop
-      - "release/**"
-      - "feature/**"
+      - "**"
   workflow_dispatch:
 
 permissions:
@@ -52,11 +49,32 @@ jobs:
         run: |
           podman build -t wallet-client-gateway:local -f Containerfile .
 
+      - name: Determine Ecosystem Branch
+        id: branch-check
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          # Use head_ref for PRs, ref_name for workflow_dispatch
+          CURRENT_BRANCH="${HEAD_REF:-$REF_NAME}"
+          echo "Current branch in gateway: $CURRENT_BRANCH"
+
+          # Check if branch exists in ecosystem repo
+          EXISTS=$(git ls-remote --heads https://github.com/diggsweden/wallet-ecosystem.git "$CURRENT_BRANCH" | wc -l)
+
+          if [ "$EXISTS" -eq "1" ]; then
+            echo "Found matching branch '$CURRENT_BRANCH' in wallet-ecosystem."
+            echo "ECOSYSTEM_REF=$CURRENT_BRANCH" >> "$GITHUB_ENV"
+          else
+            echo "No matching branch '$CURRENT_BRANCH' found in wallet-ecosystem. Falling back to main."
+            echo "ECOSYSTEM_REF=main" >> "$GITHUB_ENV"
+          fi
       - name: Checkout Wallet Ecosystem
         uses: actions/checkout@v4
         with:
           repository: diggsweden/wallet-ecosystem
           path: wallet-ecosystem
+          ref: ${{ env.ECOSYSTEM_REF }}
 
       - name: Prepare Ecosystem
         run: |
