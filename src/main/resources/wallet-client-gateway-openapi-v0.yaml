@@ -191,7 +191,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/device/state:
+  /v0/wallet-security/device/state:
     post:
       tags:
         - HSM
@@ -220,7 +220,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/device/pin:
+  /v0/wallet-security/device/pin:
     post:
       tags:
         - HSM
@@ -249,7 +249,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/device/pin/change:
+  /v0/wallet-security/device/pin/change:
     post:
       tags:
         - HSM
@@ -278,7 +278,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/secure-session:
+  /v0/wallet-security/secure-session:
     post:
       tags:
         - HSM
@@ -307,7 +307,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/keys:
+  /v0/wallet-security/keys:
     post:
       tags:
         - HSM
@@ -336,7 +336,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/keys/list:
+  /v0/wallet-security/keys/list:
     post:
       tags:
         - HSM
@@ -365,7 +365,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/keys/delete:
+  /v0/wallet-security/keys/delete:
     post:
       tags:
         - HSM
@@ -394,7 +394,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestDto'
 
-  /wallet-security/v1/keys/sign:
+  /v0/wallet-security/keys/sign:
     post:
       tags:
         - HSM

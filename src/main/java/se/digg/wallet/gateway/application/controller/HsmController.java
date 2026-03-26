@@ -19,7 +19,7 @@ import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
 import se.digg.wallet.gateway.domain.port.in.HsmUseCase;
 
 @RestController
-@RequestMapping("/wallet-security/v1")
+@RequestMapping("/v0/wallet-security")
 public class HsmController {
 
   private final HsmUseCase hsmUseCase;

@@ -38,14 +38,14 @@ import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
 @ActiveProfiles("test")
 class HsmControllerIntegrationTest {
 
-  private static final String REGISTER_STATE_URL = "/wallet-security/v1/device/state";
-  private static final String REGISTER_PIN_URL = "/wallet-security/v1/device/pin";
-  private static final String CHANGE_PIN_URL = "/wallet-security/v1/device/pin/change";
-  private static final String CREATE_SESSION_URL = "/wallet-security/v1/secure-session";
-  private static final String CREATE_KEY_URL = "/wallet-security/v1/keys";
-  private static final String LIST_KEYS_URL = "/wallet-security/v1/keys/list";
-  private static final String DELETE_KEY_URL = "/wallet-security/v1/keys/delete";
-  private static final String SIGN_URL = "/wallet-security/v1/keys/sign";
+  private static final String REGISTER_STATE_URL = "/v0/wallet-security/device/state";
+  private static final String REGISTER_PIN_URL = "/v0/wallet-security/device/pin";
+  private static final String CHANGE_PIN_URL = "/v0/wallet-security/device/pin/change";
+  private static final String CREATE_SESSION_URL = "/v0/wallet-security/secure-session";
+  private static final String CREATE_KEY_URL = "/v0/wallet-security/keys";
+  private static final String LIST_KEYS_URL = "/v0/wallet-security/keys/list";
+  private static final String DELETE_KEY_URL = "/v0/wallet-security/keys/delete";
+  private static final String SIGN_URL = "/v0/wallet-security/keys/sign";
   private static final String TEST_JWT = "eyJhbGciOiJFUzI1NiJ9.test.signature";
   private static final String TEST_CLIENT_ID = UUID.randomUUID().toString();
   private static final String TEST_DEV_AUTH_CODE = "test-dev-auth-code";
