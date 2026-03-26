@@ -49,7 +49,7 @@ public class HsmController {
       @Valid ChallengeResponseAuthentication auth,
       @RequestBody @Valid HsmRequestDto request) {
     var response = hsmUseCase.changePin(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
   }
 
   @PostMapping("/secure-session")
@@ -81,7 +81,7 @@ public class HsmController {
       @Valid ChallengeResponseAuthentication auth,
       @RequestBody @Valid HsmRequestDto request) {
     var response = hsmUseCase.deleteKey(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
   }
 
   @PostMapping("/keys/sign")

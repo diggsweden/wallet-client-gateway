@@ -128,7 +128,7 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void changePin_returnsNoContent() {
+  void changePin_returnsAccepted() {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
@@ -143,7 +143,11 @@ class HsmControllerIntegrationTest {
         .body(new HsmRequestDto(TEST_JWT))
         .exchange()
         .expectStatus()
-        .isNoContent();
+        .isEqualTo(202)
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
@@ -216,7 +220,7 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void deleteKey_returnsNoContent() {
+  void deleteKey_returnsAccepted() {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
@@ -231,7 +235,11 @@ class HsmControllerIntegrationTest {
         .body(new HsmRequestDto(TEST_JWT))
         .exchange()
         .expectStatus()
-        .isNoContent();
+        .isEqualTo(202)
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
