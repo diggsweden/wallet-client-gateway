@@ -113,10 +113,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(REGISTER_PIN_URL)
@@ -132,10 +130,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(CHANGE_PIN_URL)
@@ -155,10 +151,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(CREATE_SESSION_URL)
@@ -178,10 +172,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(CREATE_KEY_URL)
@@ -201,10 +193,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(LIST_KEYS_URL)
@@ -224,10 +214,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(DELETE_KEY_URL)
@@ -247,10 +235,8 @@ class HsmControllerIntegrationTest {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                { "jwt": "%s" }
-                """.formatted(TEST_JWT))));
+            .withHeader("content-type", "text/plain")
+            .withBody(TEST_JWT)));
 
     restClient.post()
         .uri(SIGN_URL)
