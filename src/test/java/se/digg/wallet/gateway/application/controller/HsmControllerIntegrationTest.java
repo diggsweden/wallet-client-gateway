@@ -28,6 +28,7 @@ import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletR2psMock;
 import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
+import se.digg.wallet.gateway.application.model.hsm.EcPublicJwkDto;
 import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -97,7 +98,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto("{\"kty\":\"EC\"}", false, "30d"))
+        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false, "30d"))
         .exchange()
         .expectStatus()
         .isCreated()
@@ -265,7 +266,7 @@ class HsmControllerIntegrationTest {
     unauthenticated.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto("{\"kty\":\"EC\"}", false, "30d"))
+        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false, "30d"))
         .exchange()
         .expectStatus()
         .isForbidden();

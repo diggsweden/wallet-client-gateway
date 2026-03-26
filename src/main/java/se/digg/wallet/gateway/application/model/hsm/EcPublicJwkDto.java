@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.application.model.hsm;
 
-public record RegisterStateRequestDto(EcPublicJwkDto publicKey, boolean overwrite, String ttl) {
+public record EcPublicJwkDto(String kty, String crv, String x, String y, String kid) {
 }

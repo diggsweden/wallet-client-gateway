@@ -13,9 +13,9 @@ public interface HsmUseCase {
 
   RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request);
 
-  void registerPin(String accountId, HsmRequestDto request);
+  HsmResponseDto registerPin(String accountId, HsmRequestDto request);
 
-  void changePin(String accountId, HsmRequestDto request);
+  HsmResponseDto changePin(String accountId, HsmRequestDto request);
 
   HsmResponseDto createSession(String accountId, HsmRequestDto request);
 
@@ -23,7 +23,7 @@ public interface HsmUseCase {
 
   HsmResponseDto listKeys(String accountId, HsmRequestDto request);
 
-  void deleteKey(String accountId, HsmRequestDto request);
+  HsmResponseDto deleteKey(String accountId, HsmRequestDto request);
 
   HsmResponseDto sign(String accountId, HsmRequestDto request);
 

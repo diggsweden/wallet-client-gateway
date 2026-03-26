@@ -11,20 +11,20 @@ import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
 
 public interface HsmPort {
 
-  RegisterStateResponseDto registerState(RegisterStateRequestDto request);
+  RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request);
 
-  void registerPin(HsmRequestDto request);
+  HsmResponseDto registerPin(String accountId, HsmRequestDto request);
 
-  void changePin(HsmRequestDto request);
+  HsmResponseDto changePin(String accountId, HsmRequestDto request);
 
-  HsmResponseDto createSession(HsmRequestDto request);
+  HsmResponseDto createSession(String accountId, HsmRequestDto request);
 
-  HsmResponseDto createKey(HsmRequestDto request);
+  HsmResponseDto createKey(String accountId, HsmRequestDto request);
 
-  HsmResponseDto listKeys(HsmRequestDto request);
+  HsmResponseDto listKeys(String accountId, HsmRequestDto request);
 
-  void deleteKey(HsmRequestDto request);
+  HsmResponseDto deleteKey(String accountId, HsmRequestDto request);
 
-  HsmResponseDto sign(HsmRequestDto request);
+  HsmResponseDto sign(String accountId, HsmRequestDto request);
 
 }

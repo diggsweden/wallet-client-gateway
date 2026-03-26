@@ -23,42 +23,42 @@ public class HsmService implements HsmUseCase {
 
   @Override
   public RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request) {
-    return hsmPort.registerState(request);
+    return hsmPort.registerState(accountId, request);
   }
 
   @Override
-  public void registerPin(String accountId, HsmRequestDto request) {
-    hsmPort.registerPin(request);
+  public HsmResponseDto registerPin(String accountId, HsmRequestDto request) {
+    return hsmPort.registerPin(accountId, request);
   }
 
   @Override
-  public void changePin(String accountId, HsmRequestDto request) {
-    hsmPort.changePin(request);
+  public HsmResponseDto changePin(String accountId, HsmRequestDto request) {
+    return hsmPort.changePin(accountId, request);
   }
 
   @Override
   public HsmResponseDto createSession(String accountId, HsmRequestDto request) {
-    return hsmPort.createSession(request);
+    return hsmPort.createSession(accountId, request);
   }
 
   @Override
   public HsmResponseDto createKey(String accountId, HsmRequestDto request) {
-    return hsmPort.createKey(request);
+    return hsmPort.createKey(accountId, request);
   }
 
   @Override
   public HsmResponseDto listKeys(String accountId, HsmRequestDto request) {
-    return hsmPort.listKeys(request);
+    return hsmPort.listKeys(accountId, request);
   }
 
   @Override
-  public void deleteKey(String accountId, HsmRequestDto request) {
-    hsmPort.deleteKey(request);
+  public HsmResponseDto deleteKey(String accountId, HsmRequestDto request) {
+    return hsmPort.deleteKey(accountId, request);
   }
 
   @Override
   public HsmResponseDto sign(String accountId, HsmRequestDto request) {
-    return hsmPort.sign(request);
+    return hsmPort.sign(accountId, request);
   }
 
 }

@@ -37,19 +37,19 @@ public class HsmController {
   }
 
   @PostMapping("/device/pin")
-  public ResponseEntity<Void> registerPin(
+  public ResponseEntity<HsmResponseDto> registerPin(
       @Valid ChallengeResponseAuthentication auth,
       @RequestBody @Valid HsmRequestDto request) {
-    hsmUseCase.registerPin(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    var response = hsmUseCase.registerPin(auth.getAccountId(), request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PostMapping("/device/pin/change")
-  public ResponseEntity<Void> changePin(
+  public ResponseEntity<HsmResponseDto> changePin(
       @Valid ChallengeResponseAuthentication auth,
       @RequestBody @Valid HsmRequestDto request) {
-    hsmUseCase.changePin(auth.getAccountId(), request);
-    return ResponseEntity.noContent().build();
+    var response = hsmUseCase.changePin(auth.getAccountId(), request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PostMapping("/secure-session")
@@ -77,11 +77,11 @@ public class HsmController {
   }
 
   @PostMapping("/keys/delete")
-  public ResponseEntity<Void> deleteKey(
+  public ResponseEntity<HsmResponseDto> deleteKey(
       @Valid ChallengeResponseAuthentication auth,
       @RequestBody @Valid HsmRequestDto request) {
-    hsmUseCase.deleteKey(auth.getAccountId(), request);
-    return ResponseEntity.noContent().build();
+    var response = hsmUseCase.deleteKey(auth.getAccountId(), request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PostMapping("/keys/sign")
