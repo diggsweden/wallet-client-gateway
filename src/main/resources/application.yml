@@ -26,6 +26,11 @@ properties:
     paths:
       post: /account
       get: /account
+  wallet-r2ps:
+    baseurl: http://
+    paths:
+      post: /service
+      new-state: /new_state
   challenge-cache:
     ttl-seconds: 30
 

@@ -31,6 +31,11 @@ properties:
     paths:
       post: /account
       get: /account
+  wallet-r2ps:
+    baseurl: http://localhost:${wiremock.r2ps.port}
+    paths:
+      post: /service
+      new-state: /new_state
   challenge-cache:
     ttl-seconds: 10
 
