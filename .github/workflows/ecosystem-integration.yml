@@ -1,0 +1,154 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Ecosystem Integration Test
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration-test:
+    name: Ecosystem Integration
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout Wallet Client Gateway
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Install Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman podman-compose
+          systemctl --user start podman.socket
+          sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+          echo "PODMAN_SOCK=$XDG_RUNTIME_DIR/podman/podman.sock" >> "$GITHUB_ENV"
+
+      - name: Build Local Image
+        run: |
+          podman build -t wallet-client-gateway:local -f Containerfile .
+
+      - name: Determine Ecosystem Branch
+        id: branch-check
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          # Use head_ref for PRs, ref_name for workflow_dispatch
+          CURRENT_BRANCH="${HEAD_REF:-$REF_NAME}"
+          echo "Current branch in gateway: $CURRENT_BRANCH"
+
+          # Check if branch exists in ecosystem repo
+          EXISTS=$(git ls-remote --heads https://github.com/diggsweden/wallet-ecosystem.git "$CURRENT_BRANCH" | wc -l)
+
+          if [ "$EXISTS" -eq "1" ]; then
+            echo "Found matching branch '$CURRENT_BRANCH' in wallet-ecosystem."
+            echo "ECOSYSTEM_REF=$CURRENT_BRANCH" >> "$GITHUB_ENV"
+          else
+            echo "No matching branch '$CURRENT_BRANCH' found in wallet-ecosystem. Falling back to main."
+            echo "ECOSYSTEM_REF=main" >> "$GITHUB_ENV"
+          fi
+      - name: Checkout Wallet Ecosystem
+        uses: actions/checkout@v4
+        with:
+          repository: diggsweden/wallet-ecosystem
+          path: wallet-ecosystem
+          ref: ${{ env.ECOSYSTEM_REF }}
+
+      - name: Prepare Ecosystem
+        run: |
+          cd wallet-ecosystem
+          cp .env.example .env
+
+          # Create transient override to use the local image
+          cat <<EOF > docker-compose.override.yaml
+          services:
+            wallet-client-gateway:
+              image: wallet-client-gateway:local
+          EOF
+
+          # Generate TLS certificates for Traefik (mimics ecosystem CI)
+          mkdir -p config/traefik/certs
+          openssl req -x509 -newkey rsa:2048 \
+            -keyout config/traefik/certs/wallet-key.pem \
+            -out config/traefik/certs/wallet-cert.pem \
+            -days 1 -nodes -subj "/CN=localhost"
+
+      - name: Start Ecosystem
+        run: |
+          cd wallet-ecosystem
+          podman compose up -d
+
+      - name: Wait for Services to be Healthy
+        run: |
+          cd wallet-ecosystem
+          echo "Waiting for services to become healthy..."
+          # Give services time to initialize (especially Keycloak)
+          for i in {1..40}; do
+            echo "Check attempt $i/40..."
+            # Get statuses of all containers that have healthchecks
+            UNHEALTHY=$(podman ps -a --format "{{.Names}} {{.Status}}" | grep -v "healthy" | grep -E "keycloak|wallet-client-gateway|wallet-attribute-attestation|wallet-account|valkey|db" || true)
+            if [ -z "$UNHEALTHY" ]; then
+              echo "All required services are healthy!"
+              podman ps
+              exit 0
+            fi
+            echo "Waiting for services: $UNHEALTHY"
+            sleep 10
+          done
+          echo "Timeout waiting for services to become healthy"
+          podman ps
+          podman compose logs
+          exit 1
+
+      - name: Run Ecosystem Integration Tests
+        env:
+          MAVEN_CLI_OPTS: --batch-mode --no-transfer-progress --errors --fail-at-end -Dstyle.color=always
+          GITHUB_ACTOR: ${{ github.actor }}
+          PACKAGE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd wallet-ecosystem
+          # shellcheck disable=SC2086
+          mvn $MAVEN_CLI_OPTS test
+
+      - name: Fetch Logs on Failure
+        if: failure()
+        run: |
+          cd wallet-ecosystem
+          podman compose logs > ecosystem-failure.log
+
+      - name: Upload Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-logs
+          path: wallet-ecosystem/ecosystem-failure.log
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -d "wallet-ecosystem" ]; then
+            cd wallet-ecosystem
+            podman compose down
+          fi
