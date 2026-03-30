@@ -4,5 +4,6 @@
 
 package se.digg.wallet.gateway.application.model.hsm;
 
-public record RegisterStateResponseDto(String status, String clientId, String devAuthorizationCode) {
+public record RegisterStateResponseDto(String status, String clientId,
+    String devAuthorizationCode) {
 }

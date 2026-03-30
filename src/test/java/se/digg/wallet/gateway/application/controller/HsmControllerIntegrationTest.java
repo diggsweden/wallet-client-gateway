@@ -98,7 +98,8 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false, "30d"))
+        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false,
+            "30d"))
         .exchange()
         .expectStatus()
         .isCreated()
@@ -260,7 +261,8 @@ class HsmControllerIntegrationTest {
     unauthenticated.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false, "30d"))
+        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false,
+            "30d"))
         .exchange()
         .expectStatus()
         .isForbidden();

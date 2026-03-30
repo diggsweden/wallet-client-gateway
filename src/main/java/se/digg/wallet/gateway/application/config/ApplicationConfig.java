@@ -40,10 +40,10 @@ public record ApplicationConfig(
     }
   }
 
-  public record WalletR2ps(@NotBlank String baseurl, @NotBlank Paths paths){
-      public record Paths(@NotBlank String post, @NotBlank String newState){
+  public record WalletR2ps(@NotBlank String baseurl, @NotBlank Paths paths) {
+    public record Paths(@NotBlank String post, @NotBlank String newState) {
 
-      }
+    }
   }
 
   public record ChallengeCache(@NotBlank int ttlSeconds) {
