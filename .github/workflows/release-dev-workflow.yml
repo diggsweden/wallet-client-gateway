@@ -24,7 +24,7 @@ jobs:
     permissions:
       contents: read # Read code for building
       packages: write # Push dev images to ghcr.io
-    uses: diggsweden/reusable-ci/.github/workflows/release-dev-orchestrator.yml@2afbedbefbb457a5fc6175de232e4644cab58a69 # v2.7.3
+    uses: diggsweden/reusable-ci/.github/workflows/release-dev-orchestrator.yml@fix/missing-jar-sbom
     with:
       reusable-ci-ref: v2.7.3
       project-type: maven
