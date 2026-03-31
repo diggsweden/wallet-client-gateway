@@ -5,24 +5,20 @@
 package se.digg.wallet.gateway.application.controller;
 
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
+import se.digg.wallet.gateway.api.v0.WalletUnitAttestationApi;
+import se.digg.wallet.gateway.api.v0.model.WuaDto;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.application.controller.openapi.wua.CreateWuaOpenApiDocumentation;
-import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @RestController
-@RequestMapping("/wua")
-@Validated
-public class WuaController {
+public class WuaController implements WalletUnitAttestationApi {
   private final Logger logger = LoggerFactory.getLogger(WuaController.class);
   private final WuaService wuaService;
 
@@ -30,27 +26,35 @@ public class WuaController {
     this.wuaService = wuaService;
   }
 
-  @PostMapping()
-  @CreateWuaOpenApiDocumentation
-  public ResponseEntity<WuaDto> createWua(
-      ChallengeResponseAuthentication challengeResponseAuthentication,
-      @RequestParam Optional<String> nonce) {
+  @Override
+  public ResponseEntity<WuaDto> createWua(Optional<String> nonce) {
+
+    var challengeResponseAuthentication = getChallengeResponseAuthentication();
+
     if (challengeResponseAuthentication == null) {
       logger.warn("Received request with empty challenge response authentication");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-    if (challengeResponseAuthentication.getAccountId() == null) {
-      logger.warn("Received request with empty account id");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     if (nonce.isPresent() && nonce.get().isBlank()) {
       logger.warn("Received request with empty nonce");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
+    var accountId = challengeResponseAuthentication.getAccountId();
     logger.debug("Received request from account id: {}, nonce: {}",
-        challengeResponseAuthentication.getAccountId(), nonce.orElse(""));
-    WuaDto wuaDto = wuaService.createWua(challengeResponseAuthentication.getAccountId(),
-        nonce.orElse(""));
-    return ResponseEntity.status(HttpStatus.CREATED).body(wuaDto);
+        accountId, nonce.orElse(""));
+    var wuaDto = wuaService.createWua(accountId, nonce.orElse(""));
+    var wuaResponse = new WuaDto(wuaDto.jwt());
+    return ResponseEntity.status(HttpStatus.CREATED).body(wuaResponse);
+  }
+
+  private static @Nullable ChallengeResponseAuthentication getChallengeResponseAuthentication() {
+
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    return switch (authentication) {
+      case null -> null;
+      case ChallengeResponseAuthentication auth -> auth;
+      default -> null;
+    };
   }
 }

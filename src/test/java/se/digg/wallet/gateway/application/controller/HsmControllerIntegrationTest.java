@@ -38,14 +38,14 @@ import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
 @ActiveProfiles("test")
 class HsmControllerIntegrationTest {
 
-  private static final String REGISTER_STATE_URL = "/v0/wallet-security/device/state";
-  private static final String REGISTER_PIN_URL = "/v0/wallet-security/device/pin";
-  private static final String CHANGE_PIN_URL = "/v0/wallet-security/device/pin/change";
-  private static final String CREATE_SESSION_URL = "/v0/wallet-security/secure-session";
-  private static final String CREATE_KEY_URL = "/v0/wallet-security/keys";
-  private static final String LIST_KEYS_URL = "/v0/wallet-security/keys/list";
-  private static final String DELETE_KEY_URL = "/v0/wallet-security/keys/delete";
-  private static final String SIGN_URL = "/v0/wallet-security/keys/sign";
+  private static final String REGISTER_STATE_URL = "/v0/device/state";
+  private static final String REGISTER_PIN_URL = "/v0/device/pin";
+  private static final String CHANGE_PIN_URL = "/v0/device/pin";
+  private static final String CREATE_SESSION_URL = "/v0/secure-session";
+  private static final String CREATE_KEY_URL = "/v0/keys";
+  private static final String LIST_KEYS_URL = "/v0/keys/list";
+  private static final String DELETE_KEY_URL = "/v0/keys/delete";
+  private static final String SIGN_URL = "/v0/keys/sign";
   private static final String TEST_JWT = "eyJhbGciOiJFUzI1NiJ9.test.signature";
   private static final String TEST_CLIENT_ID = UUID.randomUUID().toString();
   private static final String TEST_DEV_AUTH_CODE = "test-dev-auth-code";
@@ -95,11 +95,22 @@ class HsmControllerIntegrationTest {
                 { "status": "ok", "clientId": "%s", "devAuthorizationCode": "%s" }
                 """.formatted(TEST_CLIENT_ID, TEST_DEV_AUTH_CODE))));
 
+    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+        .publicKey(se.digg.wallet.gateway.api.v0.model.EcPublicJwkDto.builder()
+            .kty("EC")
+            .crv("P-256")
+            .x("x")
+            .y("y")
+            .kid("kid")
+            .build())
+        .overwrite(false)
+        .ttl("30d")
+        .build();
+
     restClient.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false,
-            "30d"))
+        .body(registerStateRequest)
         .exchange()
         .expectStatus()
         .isCreated()
@@ -134,13 +145,13 @@ class HsmControllerIntegrationTest {
             .withHeader("content-type", "text/plain")
             .withBody(TEST_JWT)));
 
-    restClient.post()
+    restClient.put()
         .uri(CHANGE_PIN_URL)
         .header("content-type", "application/json")
         .body(new HsmRequestDto(TEST_JWT))
         .exchange()
         .expectStatus()
-        .isEqualTo(202)
+        .isEqualTo(200)
         .expectBody()
         .json("""
             { "jwt": "%s" }
@@ -211,7 +222,7 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void deleteKey_returnsAccepted() {
+  void deleteKey_returnsNoContent() {
     r2psServer.stubFor(WireMock.post("/service")
         .willReturn(aResponse()
             .withStatus(200)
@@ -224,11 +235,7 @@ class HsmControllerIntegrationTest {
         .body(new HsmRequestDto(TEST_JWT))
         .exchange()
         .expectStatus()
-        .isEqualTo(202)
-        .expectBody()
-        .json("""
-            { "jwt": "%s" }
-            """.formatted(TEST_JWT));
+        .isNoContent();
   }
 
   @Test

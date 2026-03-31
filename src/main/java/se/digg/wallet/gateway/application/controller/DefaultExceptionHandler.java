@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,16 +29,24 @@ public class DefaultExceptionHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
-  private HttpServletRequest httpServletRequest;
+  private final HttpServletRequest httpServletRequest;
 
   DefaultExceptionHandler(HttpServletRequest httpServletRequest) {
     this.httpServletRequest = httpServletRequest;
   }
 
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Throwable.class)
-  public void handleAnyException(Throwable e) {
+  public ResponseEntity<BadRequestDto> handleAnyException(Throwable e) {
+    var instance = httpServletRequest.getServletPath();
+    var body = new BadRequestDto(
+        null,
+        "Internal server error",
+        INTERNAL_SERVER_ERROR.value(),
+        e.getMessage(),
+        instance);
     LOGGER.warn("Uncaught exception, responding with 500", e);
+    return ResponseEntity.internalServerError().body(body);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -87,5 +95,3 @@ public class DefaultExceptionHandler {
     return errorResponse;
   }
 }
-
-

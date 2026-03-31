@@ -4,23 +4,20 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import jakarta.validation.Valid;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
+import se.digg.wallet.gateway.api.v0.HsmApi;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
 import se.digg.wallet.gateway.domain.port.in.HsmUseCase;
 
 @RestController
-@RequestMapping("/v0/wallet-security")
-public class HsmController {
+public class HsmController implements HsmApi {
 
   private final HsmUseCase hsmUseCase;
 
@@ -28,68 +25,128 @@ public class HsmController {
     this.hsmUseCase = hsmUseCase;
   }
 
-  @PostMapping("/device/state")
+  @Override
   public ResponseEntity<RegisterStateResponseDto> registerState(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid RegisterStateRequestDto request) {
-    var response = hsmUseCase.registerState(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+      se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto registerStateRequest) {
+    var authentication = getAuthentication();
+    var accountId = authentication
+        .map(ChallengeResponseAuthentication::getAccountId)
+        .orElseThrow();
+    var registerStateRequestDto = toRegisterStateRequestDto(registerStateRequest);
+    var registerStateResponseDto = hsmUseCase.registerState(accountId, registerStateRequestDto);
+    var registerStateResponse = toRegisterStateResponse(registerStateResponseDto);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(registerStateResponse);
   }
 
-  @PostMapping("/device/pin")
-  public ResponseEntity<HsmResponseDto> registerPin(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.registerPin(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  @Override
+  public ResponseEntity<HsmResponseDto> registerPin(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    hsmUseCase.registerPin(getAccountId(), hsmRequestDto);
+
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PostMapping("/device/pin/change")
-  public ResponseEntity<HsmResponseDto> changePin(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.changePin(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+  @Override
+  public ResponseEntity<HsmResponseDto> changePin(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    var hsmResponseDto = hsmUseCase.changePin(getAccountId(), hsmRequestDto);
+    var hsmResponse = toHsmResponse(hsmResponseDto);
+
+    return ResponseEntity.ok().body(hsmResponse);
   }
 
-  @PostMapping("/secure-session")
-  public ResponseEntity<HsmResponseDto> createSession(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.createSession(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  @Override
+  public ResponseEntity<HsmResponseDto> createHsmSession(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    var hsmResponseDto = hsmUseCase.createSession(getAccountId(), hsmRequestDto);
+    var hsmResponse = toHsmResponse(hsmResponseDto);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(hsmResponse);
   }
 
-  @PostMapping("/keys")
-  public ResponseEntity<HsmResponseDto> createKey(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.createKey(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  @Override
+  public ResponseEntity<HsmResponseDto> createKey(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    var hsmResponseDto = hsmUseCase.createKey(getAccountId(), hsmRequestDto);
+    var hsmResponse = toHsmResponse(hsmResponseDto);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(hsmResponse);
   }
 
-  @PostMapping("/keys/list")
-  public ResponseEntity<HsmResponseDto> listKeys(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.listKeys(auth.getAccountId(), request);
-    return ResponseEntity.ok(response);
+  @Override
+  public ResponseEntity<Void> deleteKey(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    hsmUseCase.deleteKey(getAccountId(), hsmRequestDto);
+
+    return ResponseEntity.noContent().build();
   }
 
-  @PostMapping("/keys/delete")
-  public ResponseEntity<HsmResponseDto> deleteKey(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.deleteKey(auth.getAccountId(), request);
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+  @Override
+  public ResponseEntity<HsmResponseDto> listKeys(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    var hsmResponseDto = hsmUseCase.listKeys(getAccountId(), hsmRequestDto);
+    var hsmResponse = toHsmResponse(hsmResponseDto);
+
+    return ResponseEntity.ok(hsmResponse);
   }
 
-  @PostMapping("/keys/sign")
-  public ResponseEntity<HsmResponseDto> sign(
-      @Valid ChallengeResponseAuthentication auth,
-      @RequestBody @Valid HsmRequestDto request) {
-    var response = hsmUseCase.sign(auth.getAccountId(), request);
-    return ResponseEntity.ok(response);
+  @Override
+  public ResponseEntity<HsmResponseDto> sign(HsmRequestDto hsmRequest) {
+    var hsmRequestDto = toHsmRequestDto(hsmRequest);
+    var hsmResponseDto = hsmUseCase.sign(getAccountId(), hsmRequestDto);
+    var hsmResponse = toHsmResponse(hsmResponseDto);
+
+    return ResponseEntity.ok(hsmResponse);
   }
 
+  private static String getAccountId() {
+    return getAuthentication()
+        .map(ChallengeResponseAuthentication::getAccountId)
+        .orElseThrow();
+  }
+
+  private static Optional<ChallengeResponseAuthentication> getAuthentication() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    return (authentication instanceof ChallengeResponseAuthentication auth) ? Optional.of(auth)
+        : Optional.empty();
+  }
+
+  private static se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto toRegisterStateRequestDto(
+      se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto registerStateRequest) {
+    var publicKeyRequest = registerStateRequest.getPublicKey();
+    var publicKeyDto = new se.digg.wallet.gateway.application.model.hsm.EcPublicJwkDto(
+        publicKeyRequest.getKty(),
+        publicKeyRequest.getCrv(),
+        publicKeyRequest.getX(),
+        publicKeyRequest.getY(),
+        publicKeyRequest.getKid().orElse(""));
+
+    return new se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto(
+        publicKeyDto,
+        registerStateRequest.getOverwrite(),
+        registerStateRequest.getTtl().orElse(""));
+  }
+
+  private static RegisterStateResponseDto toRegisterStateResponse(
+      se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto registerStateResponseDto) {
+    return RegisterStateResponseDto.builder()
+        .status(registerStateResponseDto.status())
+        .clientId(registerStateResponseDto.clientId())
+        .devAuthorizationCode(registerStateResponseDto.devAuthorizationCode())
+        .build();
+  }
+
+  private static se.digg.wallet.gateway.application.model.hsm.HsmRequestDto toHsmRequestDto(
+      HsmRequestDto hsmRequest) {
+    return new se.digg.wallet.gateway.application.model.hsm.HsmRequestDto(
+        hsmRequest.getJwt());
+  }
+
+  private static HsmResponseDto toHsmResponse(
+      se.digg.wallet.gateway.application.model.hsm.HsmResponseDto hsmResponseDto) {
+    return HsmResponseDto.builder()
+        .jwt(hsmResponseDto.jwt())
+        .build();
+  }
 }

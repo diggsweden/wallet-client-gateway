@@ -4,62 +4,83 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import jakarta.validation.Valid;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import se.digg.wallet.gateway.application.controller.openapi.attestation.GetListOpenApiDocumentation;
-import se.digg.wallet.gateway.application.controller.openapi.attestation.GetOpenApiDocumentation;
-import se.digg.wallet.gateway.application.controller.openapi.attestation.PostOpenApiDocumentation;
-import se.digg.wallet.gateway.application.model.attestation.AttestationDto;
-import se.digg.wallet.gateway.application.model.attestation.AttestationListDto;
-import se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto;
+import se.digg.wallet.gateway.api.v0.AttestationApi;
+import se.digg.wallet.gateway.api.v0.model.ClientAttestationDto;
+import se.digg.wallet.gateway.api.v0.model.ClientAttestationListDto;
+import se.digg.wallet.gateway.api.v0.model.CreateAttestationDto;
 import se.digg.wallet.gateway.domain.service.attestation.AttestationService;
 
 @RestController
-@RequestMapping("/attribute-attestations")
-public class AttestationController {
+// @RequestMapping("/attribute-attestations")
+public class AttestationController implements AttestationApi {
   private final AttestationService attetstationService;
 
   public AttestationController(AttestationService attetstationService) {
     this.attetstationService = attetstationService;
   }
 
-  @PostMapping
-  @PostOpenApiDocumentation
-  public ResponseEntity<AttestationDto> createAttribute(
-      @RequestBody @Valid CreateAttestationDto attestationDto) {
-    Optional<AttestationDto> attestation =
-        attetstationService.createAttestation(attestationDto);
-    if (attestation.isPresent()) {
-      return ResponseEntity
-          .status(HttpStatus.CREATED)
-          .body(attestation.get());
-    } else {
-      return ResponseEntity.badRequest().build();
-    }
+  @Override
+  public ResponseEntity<ClientAttestationDto> createAttestation(
+      CreateAttestationDto createAttestationRequest) {
+
+    var createAttestationDto = toCreateAttestationDto(createAttestationRequest);
+
+    return attetstationService.createAttestation(createAttestationDto)
+        .map(AttestationController::toClientAttestationResponse)
+        .map(clientAttestationDto -> ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(clientAttestationDto))
+        .orElse(ResponseEntity.badRequest().build());
   }
 
-  @GetMapping("/{id}")
-  @GetOpenApiDocumentation
-  public ResponseEntity<AttestationDto> getAttestationById(@PathVariable final UUID id) {
-    return attetstationService.getAttestation(id).map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+  @Override
+  public ResponseEntity<ClientAttestationDto> getAttestationById(UUID id) {
+
+    return attetstationService.getAttestation(id)
+        .map(AttestationController::toClientAttestationResponse)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
   }
 
-  @GetMapping
-  @GetListOpenApiDocumentation
-  public ResponseEntity<AttestationListDto> getAttestationsById(@RequestParam UUID key) {
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(attetstationService.getAttestationByHsmId(key));
+  @Override
+  public ResponseEntity<ClientAttestationListDto> getAttestationsById(UUID key) {
+
+    var clientAttestationListDto = attetstationService.getAttestationByHsmId(key);
+    var clientAttestationListResponse = toClientAttestationListResponse(clientAttestationListDto);
+    return ResponseEntity.ok(clientAttestationListResponse);
+  }
+
+  private static se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto toCreateAttestationDto(
+      CreateAttestationDto createAttestationRequest) {
+    return new se.digg.wallet.gateway.application.model.attestation.CreateAttestationDto(
+        createAttestationRequest.getHsmId(),
+        createAttestationRequest.getWuaId(),
+        createAttestationRequest.getAttestationData());
+  }
+
+  private static ClientAttestationDto toClientAttestationResponse(
+      se.digg.wallet.gateway.application.model.attestation.AttestationDto clientAttestationResponseDto) {
+    return ClientAttestationDto.builder()
+        .id(clientAttestationResponseDto.id())
+        .hsmId(clientAttestationResponseDto.hsmId())
+        .wuaId(clientAttestationResponseDto.wuaId())
+        .attestationData(clientAttestationResponseDto.attestationData())
+        .build();
+  }
+
+  private static ClientAttestationListDto toClientAttestationListResponse(
+      se.digg.wallet.gateway.application.model.attestation.AttestationListDto clientAttestationListDto) {
+    var clientAttestations = clientAttestationListDto.attestations().stream()
+        .map(AttestationController::toClientAttestationResponse)
+        .toList();
+
+    return ClientAttestationListDto.builder()
+        .hsmId(clientAttestationListDto.hsmId())
+        .attestations(clientAttestations)
+        .build();
   }
 }

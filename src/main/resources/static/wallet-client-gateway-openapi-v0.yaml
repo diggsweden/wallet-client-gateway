@@ -37,12 +37,12 @@ tags:
     description: Account operations
   - name: Authentication
     description: Authentication operations
-  - name: Attestation
-    description: Attestation operations (currently not in use)
   - name: Wallet Unit Attestation
     description: Wallet Unit Attestation operations
   - name: HSM
     description: Hardware Security Module operations
+  - name: Attestation
+    description: Attestation operations (currently not in use)
 
 paths:
   /api-info:
@@ -81,13 +81,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateAccountResponseDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
   /public/auth/session/challenge:
     get:
@@ -115,13 +111,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthChallengeDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
   /public/auth/session/response:
     post:
@@ -154,13 +146,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidateAuthChallengeResponseDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
   /wua:
     post:
@@ -183,15 +171,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/WuaDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/device/state:
+  /v0/device/state:
     post:
       tags:
         - HSM
@@ -212,15 +196,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/RegisterStateResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/device/pin:
+  /v0/device/pin:
     post:
       tags:
         - HSM
@@ -241,16 +221,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/device/pin/change:
-    post:
+    put:
       tags:
         - HSM
       summary: Change PIN
@@ -263,22 +238,18 @@ paths:
               $ref: '#/components/schemas/HsmRequestDto'
         required: true
       responses:
-        '202':
+        '200':
           description: PIN change accepted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/secure-session:
+  /v0/secure-session:
     post:
       tags:
         - HSM
@@ -299,15 +270,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/keys:
+  /v0/keys:
     post:
       tags:
         - HSM
@@ -328,15 +295,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/keys/list:
+  /v0/keys/delete:
+    post:
+      tags:
+        - HSM
+      summary: Delete key
+      description: Deletes a key from the HSM
+      operationId: deleteKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '204':
+          description: Key deletion accepted
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/keys/list:
     post:
       tags:
         - HSM
@@ -357,44 +341,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
-  /v0/wallet-security/keys/delete:
-    post:
-      tags:
-        - HSM
-      summary: Delete key
-      description: Deletes a key from the HSM
-      operationId: deleteKey
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '202':
-          description: Key deletion accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          description: Forbidden
-        'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
-
-  /v0/wallet-security/keys/sign:
+  /v0/keys/sign:
     post:
       tags:
         - HSM
@@ -415,16 +366,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
   /attribute-attestations:
     get:
+      deprecated: true
       tags:
         - Attestation
       summary: Get attestations by key
@@ -445,19 +393,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClientAttestationListDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         'default':
-          description: Request failure
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
     post:
+      deprecated: true
       tags:
         - Attestation
       summary: Create attestation
       description: Creates a new attestation
-      operationId: createAttribute
+      operationId: createAttestation
       requestBody:
         content:
           application/json:
@@ -472,16 +417,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClientAttestationDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
   /attribute-attestations/{id}:
     get:
+      deprecated: true
       tags:
         - Attestation
       summary: Get attestation by id
@@ -502,19 +444,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClientAttestationDto'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Entry not found
+          $ref: '#/components/responses/NotFound'
         'default':
-          description: Request failure
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/BadRequestDto'
+          $ref: '#/components/responses/default'
 
 components:
-  schemas:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+    Forbidden:
+      description: Forbidden
+    NotFound:
+      description: Not found
+    default:
+      description: Request failure
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/BadRequestDto'
 
+  schemas:
     ApiInfoResponse:
       type: object
       properties:
@@ -529,8 +480,9 @@ components:
           format: date
           example: '2026-03-18'
         status:
+          description: 'API lifecycle status keyword, such as alpha, beta, active, deprecated, retired or decommissioned.'
           type: string
-          example: 'UP'
+          example: 'active'
         links:
           type: array
           items:
@@ -663,6 +615,7 @@ components:
           example: 5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40
       required:
         - crv
+        - kid
         - kty
         - x
         - y

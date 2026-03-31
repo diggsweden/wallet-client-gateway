@@ -337,7 +337,7 @@
             </goals>
             <configuration>
               <inputSpec>
-                ${project.basedir}/src/main/resources/wallet-client-gateway-openapi-v0.yaml
+                ${project.basedir}/src/main/resources/static/wallet-client-gateway-openapi-v0.yaml
               </inputSpec>
               <generatorName>spring</generatorName>
               <apiPackage>se.digg.wallet.gateway.api.v0</apiPackage>
@@ -350,8 +350,8 @@
                 <useTags>true</useTags>
                 <skipDefaultInterface>true</skipDefaultInterface>
                 <generateBuilders>true</generateBuilders>
-                <x-version-param>true</x-version-param>
-                <implicitHeaders>true</implicitHeaders>
+                <useOptional>true</useOptional>
+                <includeHttpRequestContext>false</includeHttpRequestContext>
               </configOptions>
             </configuration>
           </execution>
