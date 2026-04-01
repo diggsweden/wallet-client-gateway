@@ -5,7 +5,10 @@
 properties:
   apisecret: secret
   public-paths:
+    - "/"
     - "/actuator/**"
+    - "/api-info"
+    - "/wallet-client-gateway-openapi-*.yaml"
     - "/v3/api-docs/**"
     - "/swagger-ui.html"
     - "/swagger-ui/**"
@@ -70,3 +73,15 @@ management:
       enabled: true
     diskspace:
       enabled: true
+
+# Swagger
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    use-root-path: true
+    disable-swagger-default-url: true
+    urls:
+      - url: /wallet-client-gateway-openapi-v0.yaml
+        name: Wallet Client Gateway API v0
+    urls-primary-name: Wallet Client Gateway API v0
