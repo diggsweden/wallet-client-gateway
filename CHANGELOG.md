@@ -5,11 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-04-01
+
+### Added
+
+- Add integration test workflow
+- Add ecosystem integration test
+
+### Changed
+
+- Implement code from openapi-generator (#125)
+- Merge pull request #123 from diggsweden/feature/reusable-integration-test
+- Refactor to use reusable ecosystem integration workflow
+- Feat/add hsm integration (#122)
+- Merge pull request #121 from diggsweden/feature/test-ecosystem-integration
+- Update integration tests to work on all branches
+- Restore wua path and re-enable local integration tests
+- Use openapi generator with yaml (#120)
+- Update reusable-ci to v2.7.3
+- Upgrade to reusable-ci 2.7.1
+- Feat/openapi spec yaml (#118)
+
+### Fixed
+
+- Fix formatting (#124)
+- Fix shellcheck warnings in integration workflow
+- Test(ecosystem): temporarily disable local tests to verify ecosystem
+- Allow any signed format
+
 ## [0.4.11] - 2026-03-18
 
 ### Changed
 
 - Clean up to use reusable ci 2.7
+
 
 ## [0.4.10] - 2026-03-18
 
@@ -461,6 +490,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.5.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.11..v0.5.0
 [0.4.11]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.10..v0.4.11
 [0.4.10]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.9..v0.4.10
 [0.4.9]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.8..v0.4.9
