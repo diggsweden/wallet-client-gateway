@@ -50,22 +50,6 @@ class WuaControllerUnitTest {
     verify(wuaService, never()).createWua(anyString(), anyString());
   }
 
-  /*
-   * @Test void testCreateWuaWithNullAccountIdReturnsUnauthorized() { // Arrange - Create a mock
-   * ChallengeResponseAuthentication with null accountId // Since the constructor requires non-null
-   * accountId, we'll mock it
-   *
-   * //ChallengeResponseAuthentication mockAuth = mock(ChallengeResponseAuthentication.class);
-   * //when(mockAuth.getAccountId()).thenReturn(null);
-   *
-   * SecurityContextHolder.getContext().setAuthentication( new ChallengeResponseAuthentication(null)
-   * ); var response = wuaController.createWua(Optional.of("test-nonce"));
-   *
-   * assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-   * assertThat(response.getBody()).isNull(); verify(wuaService, never()).createWua(anyString(),
-   * anyString()); }
-   */
-
   @Test
   void testCreateWuaWithEmptyNonceReturnsBadRequest() {
     // Arrange
