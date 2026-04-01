@@ -15,7 +15,6 @@ import se.digg.wallet.gateway.api.v0.model.CreateAttestationDto;
 import se.digg.wallet.gateway.domain.service.attestation.AttestationService;
 
 @RestController
-// @RequestMapping("/attribute-attestations")
 public class AttestationController implements AttestationApi {
   private final AttestationService attetstationService;
 
