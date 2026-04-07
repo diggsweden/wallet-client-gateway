@@ -169,6 +169,11 @@ lint-java-spotbugs:
 lint-java-fmt:
     @{{java_lint}}/format.sh check
 
+# Check REST API-profile compliance
+[group('lint')]
+lint-openapi:
+    ./openapi-linter.sh
+
 # ==================================================================================== #
 # LINT-FIX - Auto-fix code issues
 # ==================================================================================== #
