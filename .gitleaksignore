@@ -31,4 +31,7 @@ dd8e440fbec47528841c4f12ab902a4679eb1eea:src/main/resources/application.yml:gene
 bca46c45ee653fc9216d1196b8e4f03a1219ce42:pom.xml:generic-api-key:70
 bca46c45ee653fc9216d1196b8e4f03a1219ce42:pom.xml:generic-api-key:330
 bca46c45ee653fc9216d1196b8e4f03a1219ce42:pom.xml:generic-api-key:331
-b2918a469eeb8355f517041a6831f170e5e0f86e:openapi-linter.sh:generic-api-key:8
+13abdfc364f48f41444a73c58ffcdfe310b1020e:openapi-linter.sh:generic-api-key:8
+13abdfc364f48f41444a73c58ffcdfe310b1020e:README.md:generic-api-key:24
+13abdfc364f48f41444a73c58ffcdfe310b1020e:README.md:generic-api-key:48
+13abdfc364f48f41444a73c58ffcdfe310b1020e:README.md:generic-api-key:48
