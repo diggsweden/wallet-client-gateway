@@ -69,6 +69,7 @@
     <record-builder.version>51</record-builder.version>
     <openapi-generator-maven-plugin.version>7.21.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+    <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
   </properties>
 
   <dependencies>
@@ -374,6 +375,28 @@
               <sources>
                 <source>${project.basedir}/target/generated-sources/openapi/src/main/java</source>
               </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openapitools.openapidiff</groupId>
+        <artifactId>openapi-diff-maven</artifactId>
+        <version>${openapi-diff-maven.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>diff</goal>
+            </goals>
+            <configuration>
+              <oldSpec>https://wallet.sandbox.digg.se/api/wallet-client-gateway-openapi-v0.yaml</oldSpec>
+              <newSpec>${project.basedir}/target/classes/static/wallet-client-gateway-openapi-v0.yaml</newSpec>
+              <failOnIncompatible>true</failOnIncompatible>
+              <failOnChanged>true</failOnChanged>
+              <consoleOutputFileName>${project.basedir}/target/openapi-diff.txt</consoleOutputFileName>
+              <jsonOutputFileName>${project.basedir}/target/openapi-diff.json</jsonOutputFileName>
+              <markdownOutputFileName>${project.basedir}/target/openapi-diff.md</markdownOutputFileName>
             </configuration>
           </execution>
         </executions>
