@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   release:
-    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@2afbedbefbb457a5fc6175de232e4644cab58a69 # v2.7.3
+    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@0d87fcd4cd9550e50bfa1923b98afbed80708325 # v2.7.9
     permissions:
       contents: write # Create GitHub releases and tags
       packages: write # Publish JARs to GitHub Packages and images to ghcr.io
@@ -33,7 +33,7 @@ jobs:
       attestations: write # Attach SBOM attestation to container images
     secrets: inherit # Use org-level GPG keys, Maven credentials if configured
     with:
-      reusable-ci-ref: v2.7.3
+      reusable-ci-ref: v2.7.9
       artifacts-config: .github/artifacts.yml
       changelog-creator: git-cliff
       release-publisher: github-cli
