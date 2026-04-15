@@ -47,10 +47,11 @@ class WuaControllerIntegrationTest {
 
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
   public static final String TEST_NONCE = "nonce";
-  private static final String SIGNED_JWT = """
-      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5\
-      jeSBMYXJzb24iLCJpYXQiOjE1MTYyMzkwMjJ9.WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE
-      """;
+  /* # nosemgrep */
+  private static final String SIGNED_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+      + "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5jeSBMYXJzb24i"
+      + "LCJpYXQiOjE1MTYyMzkwMjJ9."
+      + "WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE";
   private RestTestClient restClient;
 
   private static final String WUA_URL = "/wallet-provider/wallet-unit-attestation";

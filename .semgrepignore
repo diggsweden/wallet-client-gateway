@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# OpenGrep / Semgrep ignore patterns
+# The .gitleaks.toml config file contains patterns for detecting keys that triggers OpenGrep secret detection
+.gitleaks.toml
