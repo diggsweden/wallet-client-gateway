@@ -21,7 +21,7 @@ concurrency:
 jobs:
   integration-test:
     # Use the specific commit hash from the wallet-ecosystem repository for stability.
-    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@c6548a93878f74cae1aaf756dd2f8efcda102b88
+    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@e2531e89aa1147a11cc04550e24f7a8fafa9d2d5
     with:
       service-name: wallet-client-gateway
       service-repo: ${{ github.repository }}
