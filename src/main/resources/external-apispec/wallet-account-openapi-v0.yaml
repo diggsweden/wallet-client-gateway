@@ -1,0 +1,420 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.0.3
+info:
+  title: OpenAPI definition
+  version: 0.0.1
+  description: |
+    Wallet Account API tillhandahåller serveroperationer för hantering av plånbokskonton till den svenska
+    statliga digitala identitetsplånboken. Detta API används endast internt.
+
+    Wallet Account API provides backend operations to handle wallet accounts with the Swedish digital identity wallet.
+    This API is only used internally.
+  contact:
+    name: Wallet software development team, Digg Sweden
+    email: tbd@tbd.xx
+    url: https://to.be.decided.xx
+  license:
+    name: EUPL-1.2 license
+    url: https://to.be.decided.xx
+  x-sla:
+    availability: Test
+    responseTime: 24
+    support: Kontorstid
+    termsOfService: https://to.be.decided.xx
+externalDocs:
+  description: TBD. Text som ex. innehåller service level agreement, kända problem eller begränsningar.
+  url: https://to.be.decided.xx
+servers:
+  - url: '/'
+
+tags:
+  - name: API-info
+    description: Information about the API
+  - name: Account
+    description: Account operations
+
+paths:
+  /api-info:
+    get:
+      tags:
+        - API-info
+      summary: Get info about the API
+      description: Get name, version, release date, links and status.
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfoResponse'
+
+  /v0/accounts:
+    post:
+      tags:
+        - Account
+      summary: Create account
+      description: Creates a new account.
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+        required: true
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/accounts/{id}:
+    get:
+      tags:
+        - Account
+      summary: Get account
+      description: Get account by id
+      operationId: getAccount
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '200':
+          description: The requested account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/accounts/{id}/wallet-keys:
+    post:
+      tags:
+        - Account
+      summary: Add a wallet key to an account
+      description: |
+        This operation adds a public wallet key (typically owned by the HSM) to the associated account.
+        Currently, only one wallet key per account is supported. Any existing key will be replaced.
+      operationId: addAccountWalletKey
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyRequest'
+        required: true
+      responses:
+        '201':
+          description: Public key added to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
+    get:
+      tags:
+        - Account
+      summary: Get account wallet key
+      description: Get the public wallet key(s) (typically owned by the HSM) of a given account.
+      operationId: getAccountWalletKey
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - name: kid
+          description: 'Optional. Filter on the key id attribute of the wallet key.'
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The account wallet key(s) being returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeysResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/accounts/{id}/security-envelopes:
+    post:
+      tags:
+        - Account
+      summary: Add a security envelope to an account
+      description: |
+        This operation will add a security envelope (typically used with the HSM) to the associated account.
+        An account can only have one security envelope for each type. Any existing envelope with the reqeusted
+        type will be replaced.
+      operationId: addAccountSecurityEnvelope
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityEnvelopeRequest'
+        required: true
+      responses:
+        '201':
+          description: The account security envelope being added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEnvelopeResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
+    get:
+      tags:
+        - Account
+      summary: Get account security envelopes
+      description: Get the security envelopes associated to a given account.
+      operationId: getAccountSecurityEnvelope
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - name: type
+          description: 'Optional. Filter on security envelope type.'
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/SecurityEnvelopeType'
+      responses:
+        '201':
+          description: The security envelopes being returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEnvelopesResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        'default':
+          $ref: '#/components/responses/default'
+
+components:
+  parameters:
+    AccountId:
+      in: path
+      description: 'The account id. Should be formatted as a UUID, example: b9f6edba-b69d-4e56-be22-dae25a45ff91'
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    NotFound:
+      description: Not found
+    default:
+      description: |
+        Default response indicates any undefined request failure.
+        A 4xx status code is for situations in which an error seems to have been caused by the client.
+        A 5xx status code indicates that the server is aware that it has encountered an error or is otherwise incapable
+        of performing the request.
+
+        For details please see the HTTP/1.1 RFC 2616, chapter 10.4 Client Error 4xx and chapter 10.5 Server Error 5xx
+        at https://www.rfc-editor.org/rfc/rfc2616.html
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemResponse'
+
+  schemas:
+    ProblemResponse:
+      type: object
+      description: This is a common standard object returned on request failure with any operation.
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          description: Reflects the http response status code with 3 digits returned by the server.
+          minLength: 3
+          maxLength: 3
+          example: 400
+        detail:
+          type: string
+        instance:
+          type: string
+
+    ApiInfoResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Wallet Client Gateway API
+        version:
+          type: string
+          example: 0.0.1
+        releaseDate:
+          type: string
+          format: date
+          example: '2026-03-18'
+        status:
+          description: 'API lifecycle status keyword, such as alpha, beta, active, deprecated, retired or decommissioned.'
+          type: string
+          example: 'active'
+        links:
+          type: array
+          items:
+            type: string
+            example: 'https://docs.serverhost.xx/subfolder/infopage.html'
+
+    AccountRequest:
+      type: object
+      description: |
+        Represents a new account to be created. The account will be dedicated to a specific device by adding the
+        public key created by the device in the deviceKey attribute.
+      properties:
+        personalIdentityNumber:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: Optional. The personal identity number.
+          example: '201010101010'
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 100
+          description: Optional. Account owner's e-mail address.
+          example: 'test.testsson@test.xx'
+        phoneNumber:
+          type: string
+          maxLength: 20
+          description: Optional. Account owner's phone number.
+          example: '073-1234567'
+        deviceKey:
+          $ref: '#/components/schemas/KeyRequest'
+      required:
+        - personalIdentityNumber
+        - email
+        - deviceKey
+
+    AccountResponse:
+      type: object
+      description: Represents an existing account.
+      allOf:
+        - $ref: '#/components/schemas/AccountRequest'
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Automatically generated unique account id.
+          example: 'b9f6edba-b69d-4e56-be22-dae25a45ff91'
+        deviceKey:
+          $ref: '#/components/schemas/KeyResponse'
+      required:
+        - id
+
+    KeyRequest:
+      type: object
+      description: Represents the attributes of a JWK (JSON Web Key) for a cryptographic (public) key.
+      properties:
+        kid:
+          type: string
+          minLength: 1
+          description: Key id. Used to match a specific key among a set of keys.
+          example: '77af5c98b799ad'
+        kty:
+          type: string
+          minLength: 1
+          description: |
+            Algorithm key type. Identifies the cryptographic algorithm family used with the key,
+            such as "RSA" or "EC".
+          example: 'EC'
+        alg:
+          type: string
+          description: |
+            Algorithm. Identifies the algorithm intended for use with the key,
+            such as "RS256" and "ES256".
+          example: 'RS256'
+        use:
+          type: string
+          description: |
+            Public key use, identifies the intended use of the public key. The "use" parameter is employed to
+            indicate whether a public key is used for encrypting data or verifying the signature on data,
+            such as "enc" or "sig".
+          example: 'enc'
+        crv:
+          type: string
+          minLength: 1
+          description: |
+            The cryptographic elliptic curve used with the key such as "P-256", "P-384" and "P-521".
+          example: 'P-256'
+        x:
+          type: string
+          minLength: 1
+          description: |
+            The x member contains the x coordinate for the elliptic curve point. It is represented as the base64url
+            encoding of the coordinate's big endian representation.
+          example: '1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc'
+        y:
+          type: string
+          minLength: 1
+          description: |
+            The y member contains the y coordinate for the elliptic curve point. It is represented as the base64url
+            encoding of the coordinate's big endian representation.
+          example: '5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40'
+      required:
+        - kid
+        - kty
+        - crv
+        - x
+        - y
+
+    KeyResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/KeyRequest'
+
+    KeysResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyResponse'
+
+    SecurityEnvelopeType:
+      type: string
+      description: 'Security envelope type enum constants.'
+      enum:
+        - SIGN
+        - OTHER
+
+    SecurityEnvelopeRequest:
+      properties:
+        type:
+          $ref: '#/components/schemas/SecurityEnvelopeType'
+        content:
+          type: string
+          description: The security envelope content. Typically encrypted opaque materials.
+          minLength: 1
+      required:
+        - type
+        - content
+
+    SecurityEnvelopeResponse:
+      allOf:
+        - $ref: '#/components/schemas/SecurityEnvelopeRequest'
+
+    SecurityEnvelopesResponse:
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityEnvelopeResponse'

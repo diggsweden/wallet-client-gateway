@@ -356,6 +356,28 @@
               </configOptions>
             </configuration>
           </execution>
+          <execution>
+            <id>wallet-accouint-api-client-v0</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>
+                ${project.basedir}/src/main/resources/external-apispec/wallet-account-openapi-v0.yaml
+              </inputSpec>
+              <generatorName>java</generatorName>
+              <configOptions>
+                <apiPackage>se.digg.wallet.gateway.client.account.v0.api</apiPackage>
+                <modelPackage>se.digg.wallet.gateway.client.account.v0.model</modelPackage>
+                <generateBuilders>true</generateBuilders>
+                <library>restclient</library>
+                <useSpringBoot4>true</useSpringBoot4>
+                <useJackson3>false</useJackson3>
+                <useJakartaEe>true</useJakartaEe>
+              </configOptions>
+            </configuration>
+          </execution>
+
         </executions>
       </plugin>
 
