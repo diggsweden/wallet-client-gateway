@@ -5,25 +5,33 @@
 package se.digg.wallet.gateway.domain.service.account;
 
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDto;
-import se.digg.wallet.gateway.application.model.account.CreateAccountResponseDto;
-import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
+
+import se.digg.wallet.gateway.domain.model.account.Account;
+import se.digg.wallet.gateway.domain.model.account.Jwk;
+import se.digg.wallet.gateway.domain.model.account.NewAccount;
+import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
+import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 
 @Service
 public class AccountService {
 
-  private final WalletAccountClient walletAccountClient;
-  private final AccountMapper accountMapper;
+  private final AccountPort accountPort;
 
-  public AccountService(WalletAccountClient walletAccountClient, AccountMapper accountMapper) {
-    this.walletAccountClient = walletAccountClient;
-    this.accountMapper = accountMapper;
+  public AccountService(AccountPort accountPort) {
+    this.accountPort = accountPort;
   }
 
-  public CreateAccountResponseDto createAccount(CreateAccountRequestDto request,
-      String personalIdentityNumber) {
-    var mapped = accountMapper.toAccountCreateAccountDto(request, personalIdentityNumber);
-    var result = walletAccountClient.createAccount(mapped);
-    return new CreateAccountResponseDto(result.id());
+  public Account createAccount(NewAccount request) {
+    return accountPort.createAccount(request);
   }
+
+  public void addAccountWalletKey(Jwk jwk, String accountId) {
+    accountPort.addWalletKey(jwk, accountId);
+  }
+
+  public void addAccountSecurityEnvelope(SecurityEnvelope securityEnvelope, String accountId) {
+    accountPort.addSecurityEnvelope(securityEnvelope, accountId);
+  }
+
+
 }

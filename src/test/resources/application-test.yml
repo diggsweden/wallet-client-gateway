@@ -17,22 +17,23 @@ properties:
     - "/public/**"
     - "/wua"
     - "/accounts"
+    - "/v0/accounts"
   walletprovider:
-    baseurl: http://localhost:${wiremock.provider.port}
+    baseurl: http://localhost:${wiremock.provider.port:0}
     wua-path: /wallet-provider/wallet-unit-attestation
   attributeattestation:
-    baseurl: http://localhost:${wiremock.attestation.port}
+    baseurl: http://localhost:${wiremock.attestation.port:0}
     paths:
       post: /attestation
       get-by-id: /attestation
       get-by-key: /attestation/user
   walletaccount:
-    baseurl: http://localhost:${wiremock.account.port}
+    baseurl: http://localhost:${wiremock.account.port:0}
     paths:
       post: /account
       get: /account
   wallet-r2ps:
-    baseurl: http://localhost:${wiremock.r2ps.port}
+    baseurl: http://localhost:${wiremock.r2ps.port:0}
     paths:
       post: /service
       new-state: /new_state

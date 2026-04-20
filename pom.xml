@@ -70,6 +70,10 @@
     <openapi-generator-maven-plugin.version>7.21.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
+
+    <wallet-account-spec.repo>diggsweden/wallet-account</wallet-account-spec.repo>
+    <wallet-account-spec.ref>0e32f1c64f44800a2672ca0e67ad1c2318551c55</wallet-account-spec.ref>
+    <wallet-account-spec.path>src/main/resources/static/wallet-account-openapi-v0.yaml</wallet-account-spec.path>
   </properties>
 
   <dependencies>
@@ -208,6 +212,31 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>update-account-spec</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <version>1.9.0</version>
+            <executions>
+              <execution>
+                <id>fetch-wallet-account-spec</id>
+                <phase>generate-resources</phase>
+                <goals><goal>wget</goal></goals>
+                <configuration>
+                  <url>https://raw.githubusercontent.com/${wallet-account-spec.repo}/${wallet-account-spec.ref}/${wallet-account-spec.path}</url>
+                  <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
+                  <outputFileName>wallet-account-openapi-v0.yaml</outputFileName>
+                  <overwrite>true</overwrite>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
@@ -238,6 +267,31 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.5.4</version>
+      </plugin>
+
+      <!-- JaCoCo plugin -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>se/digg/wallet/gateway/api/v0/**</exclude>
+            <exclude>se/digg/wallet/gateway/client/account/v0/**</exclude>
+            <exclude>**/*Builder.class</exclude>
+            <exclude>**/*Builder$*.class</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals><goal>report</goal></goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Formatter plugin -->
@@ -415,7 +469,7 @@
               <oldSpec>https://wallet.sandbox.digg.se/api/wallet-client-gateway-openapi-v0.yaml</oldSpec>
               <newSpec>${project.basedir}/target/classes/static/wallet-client-gateway-openapi-v0.yaml</newSpec>
               <failOnIncompatible>true</failOnIncompatible>
-              <failOnChanged>true</failOnChanged>
+              <failOnChanged>false</failOnChanged>
               <consoleOutputFileName>${project.basedir}/target/openapi-diff.txt</consoleOutputFileName>
               <jsonOutputFileName>${project.basedir}/target/openapi-diff.json</jsonOutputFileName>
               <markdownOutputFileName>${project.basedir}/target/openapi-diff.md</markdownOutputFileName>

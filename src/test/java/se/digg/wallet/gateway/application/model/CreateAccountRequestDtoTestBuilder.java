@@ -4,8 +4,8 @@
 
 package se.digg.wallet.gateway.application.model;
 
-import java.util.Optional;
-import se.digg.wallet.gateway.application.model.account.CreateAccountRequestDtoBuilder;
+
+import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
 
 public class CreateAccountRequestDtoTestBuilder {
 
@@ -13,12 +13,12 @@ public class CreateAccountRequestDtoTestBuilder {
   public static final String EMAIL_ADDRESS = "dig@digg.se";
   public static final String TELEPHONE_NUMBER = "070 007";
 
-  public static CreateAccountRequestDtoBuilder withDefaults() {
-    return CreateAccountRequestDtoBuilder.builder()
-        .personalIdentityNumber(Optional.of(PERSONAL_IDENTITY_NUMBER))
+  public static CreateAccountRequestDto.Builder withDefaults() {
+    return CreateAccountRequestDto.builder()
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
         .emailAdress(EMAIL_ADDRESS)
-        .telephoneNumber(Optional.of(TELEPHONE_NUMBER))
-        .publicKey(JwkDtoTestBuilder.withDefaults().build());
+        .telephoneNumber(TELEPHONE_NUMBER)
+        .publicKey(KeyRequestTestBuilder.withDefaults().build());
   }
 
 

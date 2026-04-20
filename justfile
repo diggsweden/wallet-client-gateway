@@ -237,6 +237,19 @@ clean:
     just_success "Clean completed"
 
 # ==================================================================================== #
+# SPECS - External API specs
+# ==================================================================================== #
+
+# ▪ Update wallet-account OpenAPI spec (fetches pinned ref from pom.xml)
+[group('specs')]
+update-account-spec:
+    #!/usr/bin/env bash
+    source "{{colors}}"
+    just_header "Updating wallet-account spec" "mvn -Pupdate-account-spec"
+    mvn {{maven_opts}} generate-resources -Pupdate-account-spec
+    just_success "wallet-account spec updated — review 'git diff' before committing"
+
+# ==================================================================================== #
 # INTERNAL
 # ==================================================================================== #
 
