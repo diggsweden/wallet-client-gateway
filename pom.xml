@@ -72,8 +72,9 @@
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
 
     <wallet-account-spec.repo>diggsweden/wallet-account</wallet-account-spec.repo>
-    <wallet-account-spec.ref>0e32f1c64f44800a2672ca0e67ad1c2318551c55</wallet-account-spec.ref>
+    <wallet-account-spec.ref>78f7591424f8dc17e320dec9c8764514e865da19</wallet-account-spec.ref>
     <wallet-account-spec.path>src/main/resources/static/wallet-account-openapi-v0.yaml</wallet-account-spec.path>
+    <wallet-account-origin-spec.path>src/main/resources/static/wallet-account-openapi-origin.yaml</wallet-account-origin-spec.path>
   </properties>
 
   <dependencies>
@@ -232,6 +233,17 @@
                   <overwrite>true</overwrite>
                 </configuration>
               </execution>
+              <execution>
+                <id>fetch-wallet-account-origin-spec</id>
+                <phase>generate-resources</phase>
+                <goals><goal>wget</goal></goals>
+                <configuration>
+                  <url>https://raw.githubusercontent.com/${wallet-account-spec.repo}/${wallet-account-spec.ref}/${wallet-account-origin-spec.path}</url>
+                  <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
+                  <outputFileName>wallet-account-openapi-origin.yaml</outputFileName>
+                  <overwrite>true</overwrite>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -277,6 +289,7 @@
           <excludes>
             <exclude>se/digg/wallet/gateway/api/v0/**</exclude>
             <exclude>se/digg/wallet/gateway/client/account/v0/**</exclude>
+            <exclude>se/digg/wallet/gateway/client/account/origin/**</exclude>
             <exclude>**/*Builder.class</exclude>
             <exclude>**/*Builder$*.class</exclude>
           </excludes>
@@ -423,6 +436,27 @@
               <configOptions>
                 <apiPackage>se.digg.wallet.gateway.client.account.v0.api</apiPackage>
                 <modelPackage>se.digg.wallet.gateway.client.account.v0.model</modelPackage>
+                <generateBuilders>true</generateBuilders>
+                <library>restclient</library>
+                <useSpringBoot4>true</useSpringBoot4>
+                <useJackson3>false</useJackson3>
+                <useJakartaEe>true</useJakartaEe>
+              </configOptions>
+            </configuration>
+          </execution>
+          <execution>
+            <id>wallet-account-api-client-origin</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>
+                ${project.basedir}/src/main/resources/external-apispec/wallet-account-openapi-origin.yaml
+              </inputSpec>
+              <generatorName>java</generatorName>
+              <configOptions>
+                <apiPackage>se.digg.wallet.gateway.client.account.origin.api</apiPackage>
+                <modelPackage>se.digg.wallet.gateway.client.account.origin.model</modelPackage>
                 <generateBuilders>true</generateBuilders>
                 <library>restclient</library>
                 <useSpringBoot4>true</useSpringBoot4>

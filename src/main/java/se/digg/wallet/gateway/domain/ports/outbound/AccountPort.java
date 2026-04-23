@@ -13,6 +13,8 @@ public interface AccountPort {
 
   Account createAccount(NewAccount account);
 
+  Account createAccountLegacy(NewAccount account);
+
   void addWalletKey(Jwk walletKey, String accountId);
 
   void addSecurityEnvelope(SecurityEnvelope securityEnvelope, String accountId);

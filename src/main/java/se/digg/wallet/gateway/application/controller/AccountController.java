@@ -48,7 +48,7 @@ public class AccountController implements AccountApi {
     apiKeyVerifier.verify();
 
     NewAccount newAccount = mapper.toDomain(createAccountRequest);
-    Account account = accountService.createAccount(newAccount);
+    Account account = accountService.createAccountLegacy(newAccount);
     CreateAccountResponseDto createAccountResponse = mapper.toResponse(account);
 
     return ResponseEntity

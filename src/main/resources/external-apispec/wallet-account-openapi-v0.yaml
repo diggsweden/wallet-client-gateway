@@ -181,17 +181,11 @@ paths:
         - Account
       summary: Get account security envelopes
       description: Get the security envelopes associated to a given account.
-      operationId: getAccountSecurityEnvelope
+      operationId: getAccountSecurityEnvelopes
       parameters:
         - $ref: '#/components/parameters/AccountId'
-        - name: type
-          description: 'Optional. Filter on security envelope type.'
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/SecurityEnvelopeType'
       responses:
-        '201':
+        '200':
           description: The security envelopes being returned
           content:
             application/json:
@@ -389,23 +383,13 @@ components:
           items:
             $ref: '#/components/schemas/KeyResponse'
 
-    SecurityEnvelopeType:
-      type: string
-      description: 'Security envelope type enum constants.'
-      enum:
-        - SIGN
-        - OTHER
-
     SecurityEnvelopeRequest:
       properties:
-        type:
-          $ref: '#/components/schemas/SecurityEnvelopeType'
         content:
           type: string
           description: The security envelope content. Typically encrypted opaque materials.
           minLength: 1
       required:
-        - type
         - content
 
     SecurityEnvelopeResponse:

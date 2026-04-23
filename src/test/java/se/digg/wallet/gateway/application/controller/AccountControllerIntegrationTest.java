@@ -29,6 +29,9 @@ import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
+import se.digg.wallet.gateway.client.account.origin.model.AccountDto;
+import se.digg.wallet.gateway.client.account.origin.model.CreateAccountRequestDto;
+import se.digg.wallet.gateway.client.account.origin.model.PublicKeyDto;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
@@ -61,7 +64,7 @@ class AccountControllerIntegrationTest {
 
   @Test
   void testCreateAccountLegacy() throws Exception {
-    var generatedAccountId = stubAccountCreation();
+    var generatedAccountId = stubLegacyAccountCreation();
 
     var response = restClient.post()
         .uri("accounts")
@@ -87,7 +90,7 @@ class AccountControllerIntegrationTest {
 
   @Test
   void testAccountReturns500IfAccountServiceRespondsWith404() {
-    server.stubFor(post("/v0/accounts")
+    server.stubFor(post("/account")
         .willReturn(aResponse()
             .withStatus(404)));
 
@@ -138,6 +141,38 @@ class AccountControllerIntegrationTest {
         .build();
 
     server.stubFor(post("/v0/accounts")
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedRequest)))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "application/json")
+            .withBody(objectMapper.writeValueAsString(expectedResponse))));
+
+    return generatedAccountId;
+  }
+
+  private UUID stubLegacyAccountCreation() throws Exception {
+    var generatedAccountId = UUID.randomUUID();
+
+    var expectedRequest = CreateAccountRequestDto.builder()
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .emailAdress(EMAIL_ADDRESS)
+        .telephoneNumber(TELEPHONE_NUMBER)
+        .publicKey(PublicKeyDto.builder()
+            .kty("KTY").kid("KID").alg("ALG").use("USE")
+            .crv("CRV").x("X").y("Y").build())
+        .build();
+
+    var expectedResponse = AccountDto.builder()
+        .id(generatedAccountId)
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .emailAdress(EMAIL_ADDRESS)
+        .telephoneNumber(TELEPHONE_NUMBER)
+        .publicKey(PublicKeyDto.builder()
+            .kty("KTY").kid("KID").alg("ALG").use("USE")
+            .crv("CRV").x("X").y("Y").build())
+        .build();
+
+    server.stubFor(post("/account")
         .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedRequest)))
         .willReturn(aResponse()
             .withStatus(201)

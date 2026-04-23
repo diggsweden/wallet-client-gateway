@@ -6,6 +6,9 @@ package se.digg.wallet.gateway.infrastructure.account.mapper;
 
 import org.springframework.stereotype.Component;
 
+import se.digg.wallet.gateway.client.account.origin.model.AccountDto;
+import se.digg.wallet.gateway.client.account.origin.model.CreateAccountRequestDto;
+import se.digg.wallet.gateway.client.account.origin.model.PublicKeyDto;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
@@ -47,12 +50,43 @@ public class AccountClientMapper {
     return SecurityEnvelopeRequest.builder().content(securityEnvelope.content()).build();
   }
 
+  public CreateAccountRequestDto toOriginClientRequest(NewAccount newAccount) {
+    return CreateAccountRequestDto.builder()
+        .personalIdentityNumber(newAccount.personalIdentityNumber())
+        .emailAdress(newAccount.emailAdress())
+        .telephoneNumber(newAccount.telephoneNumber())
+        .publicKey(toOriginClientRequest(newAccount.deviceKey()))
+        .build();
+  }
+
+  public PublicKeyDto toOriginClientRequest(Jwk deviceKey) {
+    return PublicKeyDto.builder()
+        .kty(deviceKey.kty())
+        .kid(deviceKey.kid())
+        .alg(deviceKey.alg())
+        .use(deviceKey.use())
+        .crv(deviceKey.crv())
+        .x(deviceKey.x())
+        .y(deviceKey.y())
+        .build();
+  }
+
   public Account toDomain(AccountResponse response) {
     return AccountBuilder.builder()
         .emailAdress(response.getEmail())
         .telephoneNumber(response.getPhoneNumber())
         .id(response.getId())
         .deviceKey(toDomain(response.getDeviceKey()))
+        .build();
+  }
+
+  public Account toDomain(AccountDto response) {
+    return AccountBuilder.builder()
+        .id(response.getId())
+        .personalIdentityNumber(response.getPersonalIdentityNumber())
+        .emailAdress(response.getEmailAdress())
+        .telephoneNumber(response.getTelephoneNumber())
+        .deviceKey(toDomain(response.getPublicKey()))
         .build();
   }
 
@@ -65,6 +99,21 @@ public class AccountClientMapper {
         .crv(response.getCrv())
         .x(response.getX())
         .y(response.getY())
+        .build();
+  }
+
+  public Jwk toDomain(PublicKeyDto publicKey) {
+    if (publicKey == null) {
+      return null;
+    }
+    return JwkBuilder.builder()
+        .kid(publicKey.getKid())
+        .kty(publicKey.getKty())
+        .alg(publicKey.getAlg())
+        .use(publicKey.getUse())
+        .crv(publicKey.getCrv())
+        .x(publicKey.getX())
+        .y(publicKey.getY())
         .build();
   }
 

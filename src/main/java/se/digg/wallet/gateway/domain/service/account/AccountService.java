@@ -25,6 +25,10 @@ public class AccountService {
     return accountPort.createAccount(request);
   }
 
+  public Account createAccountLegacy(NewAccount request) {
+    return accountPort.createAccountLegacy(request);
+  }
+
   public void addAccountWalletKey(Jwk jwk, String accountId) {
     accountPort.addWalletKey(jwk, accountId);
   }

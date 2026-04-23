@@ -65,6 +65,7 @@ paths:
       tags:
         - Account
       summary: Create account
+      deprecated: true
       description: Creates a new account
       operationId: createAccount
       requestBody:
