@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-04-24
+
+### Added
+
+- Add opengrep/semgrep ignore file for gitleaks config
+- Add openapi-diff maven plugin (#127)
+- Add openapi linter (#126)
+
+### Changed
+
+- Endpoints for walletKeys and securityEnvelope (#131)
+- Merge pull request #133 from diggsweden/fix/use-main-version-of-reusable-integration
+- Merge pull request #132 from diggsweden/chore/upgrade-java-25
+- Upgrade to java 25
+- Merge pull request #130 from diggsweden/chore/bump-reusable-integration-workflow
+- Bump reusable integration workflow
+- Merge pull request #129 from diggsweden/chore/bump-reusable-integration-workflow
+- Bump gommitlint to 0.9.10, switch rumdl from ubi to aqua
+- Bump reusable-ci to v2.7.9
+
+### Fixed
+
+- Use main version of reusable integration script
+- Bump reusable integration workflow
+
 ## [0.5.0] - 2026-04-01
 
 ### Added
@@ -32,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix shellcheck warnings in integration workflow
 - Test(ecosystem): temporarily disable local tests to verify ecosystem
 - Allow any signed format
+
 
 ## [0.4.11] - 2026-03-18
 
@@ -490,6 +516,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.5.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.0..v0.5.1
 [0.5.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.11..v0.5.0
 [0.4.11]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.10..v0.4.11
 [0.4.10]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.4.9..v0.4.10
