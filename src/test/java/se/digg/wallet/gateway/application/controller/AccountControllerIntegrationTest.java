@@ -28,7 +28,14 @@ import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
+import se.digg.wallet.gateway.client.account.origin.model.AccountDto;
+import se.digg.wallet.gateway.client.account.origin.model.CreateAccountRequestDto;
+import se.digg.wallet.gateway.client.account.origin.model.PublicKeyDto;
+import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
+import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
+import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
+import se.digg.wallet.gateway.client.account.v0.model.KeyResponse;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -56,49 +63,29 @@ class AccountControllerIntegrationTest {
   private WireMockServer server;
 
   @Test
-  void testCreateAccount() throws Exception {
-    var generatedAccountId = UUID.randomUUID();
-    var jwkString = objectMapper.writeValueAsString(JwkDtoTestBuilder.withDefaults().build());
+  void testCreateAccountLegacy() throws Exception {
+    var generatedAccountId = stubLegacyAccountCreation();
 
-    server.stubFor(post("/account")
-        .withRequestBody(equalToJson("""
-            {
-              "personalIdentityNumber": "%s",
-              "emailAdress": "%s",
-              "telephoneNumber": "%s",
-              "publicKey": %s
-            }
-            """.formatted(PERSONAL_IDENTITY_NUMBER, EMAIL_ADDRESS, TELEPHONE_NUMBER,
-            jwkString)))
-        .willReturn(aResponse()
-            .withStatus(201)
-            .withHeader("content-type", "application/json")
-            .withBody("""
-                {
-                  "id": "%s",
-                  "personalIdentityNumber": "%s",
-                  "emailAdress": "%s",
-                  "telephoneNumber": "%s",
-                  "publicKey": %s
-                }
-                """.formatted(generatedAccountId, PERSONAL_IDENTITY_NUMBER, EMAIL_ADDRESS,
-                TELEPHONE_NUMBER, jwkString))));
-
-    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
         .uri("accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(requestBody)
+        .body(CreateAccountRequestDtoTestBuilder.withDefaults().build())
         .exchange();
 
-    response.expectStatus()
-        .isCreated()
-        .expectBody()
-        .json("""
-            {
-              "accountId": "%s"
-            }
-            """.formatted(generatedAccountId));
+    expectCreatedWithAccountId(response, generatedAccountId);
+  }
+
+  @Test
+  void testCreateAccount() throws Exception {
+    var generatedAccountId = stubAccountCreation();
+
+    var response = restClient.post()
+        .uri("/v0/accounts")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
+        .body(CreateAccountRequestTestBuilder.withDefaults().build())
+        .exchange();
+
+    expectCreatedWithAccountId(response, generatedAccountId);
   }
 
   @Test
@@ -107,11 +94,10 @@ class AccountControllerIntegrationTest {
         .willReturn(aResponse()
             .withStatus(404)));
 
-    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults().build();
     var response = restClient.post()
         .uri("accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(requestBody)
+        .body(CreateAccountRequestDtoTestBuilder.withDefaults().build())
         .exchange();
 
     response.expectStatus()
@@ -131,5 +117,79 @@ class AccountControllerIntegrationTest {
 
     response.expectStatus()
         .isEqualTo(400);
+  }
+
+  private UUID stubAccountCreation() throws Exception {
+    var generatedAccountId = UUID.randomUUID();
+
+    var expectedRequest = AccountRequest.builder()
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .email(EMAIL_ADDRESS)
+        .phoneNumber(TELEPHONE_NUMBER)
+        .deviceKey(KeyRequest.builder()
+            .kty("KTY").kid("KID").alg("ALG").use("USE")
+            .crv("CRV").x("X").y("Y").build())
+        .build();
+
+    var expectedResponse = AccountResponse.builder()
+        .id(generatedAccountId)
+        .email(EMAIL_ADDRESS)
+        .phoneNumber(TELEPHONE_NUMBER)
+        .deviceKey(KeyResponse.builder()
+            .kty("KTY").kid("KID").alg("ALG").use("USE")
+            .crv("CRV").x("X").y("Y").build())
+        .build();
+
+    server.stubFor(post("/v0/accounts")
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedRequest)))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "application/json")
+            .withBody(objectMapper.writeValueAsString(expectedResponse))));
+
+    return generatedAccountId;
+  }
+
+  private UUID stubLegacyAccountCreation() throws Exception {
+    var generatedAccountId = UUID.randomUUID();
+
+    var expectedRequest = CreateAccountRequestDto.builder()
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .emailAdress(EMAIL_ADDRESS)
+        .telephoneNumber(TELEPHONE_NUMBER)
+        .publicKey(PublicKeyDto.builder()
+            .kty("KTY").kid("KID").alg("ALG").use("USE")
+            .crv("CRV").x("X").y("Y").build())
+        .build();
+
+    var expectedResponse = AccountDto.builder()
+        .id(generatedAccountId)
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .emailAdress(EMAIL_ADDRESS)
+        .telephoneNumber(TELEPHONE_NUMBER)
+        .publicKey(PublicKeyDto.builder()
+            .kty("KTY").kid("KID").alg("ALG").use("USE")
+            .crv("CRV").x("X").y("Y").build())
+        .build();
+
+    server.stubFor(post("/account")
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedRequest)))
+        .willReturn(aResponse()
+            .withStatus(201)
+            .withHeader("content-type", "application/json")
+            .withBody(objectMapper.writeValueAsString(expectedResponse))));
+
+    return generatedAccountId;
+  }
+
+  private void expectCreatedWithAccountId(RestTestClient.ResponseSpec response, UUID accountId) {
+    response.expectStatus()
+        .isCreated()
+        .expectBody()
+        .json("""
+            {
+              "accountId": "%s"
+            }
+            """.formatted(accountId));
   }
 }

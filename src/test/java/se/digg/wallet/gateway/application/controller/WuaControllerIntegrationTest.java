@@ -28,7 +28,7 @@ import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
-import se.digg.wallet.gateway.application.model.JwkDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.KeyRequestTestBuilder;
 import se.digg.wallet.gateway.application.model.common.JwkDto;
 import tools.jackson.databind.ObjectMapper;
 
@@ -72,7 +72,7 @@ class WuaControllerIntegrationTest {
   @BeforeAll
   public static void beforeAll() throws Exception {
     generatedKeyPair = AuthUtil.generateKey();
-    jwkDto = JwkDtoTestBuilder.of(generatedKeyPair).build();
+    jwkDto = KeyRequestTestBuilder.ofLegacy(generatedKeyPair).build();
     TEST_JWK_STRING =
         new ObjectMapper().writeValueAsString(
             new ObjectMapper().writeValueAsString(jwkDto));

@@ -13,7 +13,7 @@ import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
 import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
 import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
 import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
-import se.digg.wallet.gateway.domain.port.out.HsmPort;
+import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 
 @Component
 public class HsmClient implements HsmPort {

@@ -14,15 +14,15 @@ import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.domain.port.in.HsmUseCase;
+import se.digg.wallet.gateway.domain.service.hsm.HsmService;
 
 @RestController
 public class HsmController implements HsmApi {
 
-  private final HsmUseCase hsmUseCase;
+  private final HsmService hsmService;
 
-  HsmController(HsmUseCase hsmUseCase) {
-    this.hsmUseCase = hsmUseCase;
+  HsmController(HsmService hsmService) {
+    this.hsmService = hsmService;
   }
 
   @Override
@@ -33,7 +33,7 @@ public class HsmController implements HsmApi {
         .map(ChallengeResponseAuthentication::getAccountId)
         .orElseThrow();
     var registerStateRequestDto = toRegisterStateRequestDto(registerStateRequest);
-    var registerStateResponseDto = hsmUseCase.registerState(accountId, registerStateRequestDto);
+    var registerStateResponseDto = hsmService.registerState(accountId, registerStateRequestDto);
     var registerStateResponse = toRegisterStateResponse(registerStateResponseDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(registerStateResponse);
@@ -42,7 +42,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponseDto> registerPin(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    hsmUseCase.registerPin(getAccountId(), hsmRequestDto);
+    hsmService.registerPin(getAccountId(), hsmRequestDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -50,7 +50,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponseDto> changePin(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    var hsmResponseDto = hsmUseCase.changePin(getAccountId(), hsmRequestDto);
+    var hsmResponseDto = hsmService.changePin(getAccountId(), hsmRequestDto);
     var hsmResponse = toHsmResponse(hsmResponseDto);
 
     return ResponseEntity.ok().body(hsmResponse);
@@ -59,7 +59,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponseDto> createHsmSession(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    var hsmResponseDto = hsmUseCase.createSession(getAccountId(), hsmRequestDto);
+    var hsmResponseDto = hsmService.createSession(getAccountId(), hsmRequestDto);
     var hsmResponse = toHsmResponse(hsmResponseDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(hsmResponse);
@@ -68,7 +68,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponseDto> createKey(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    var hsmResponseDto = hsmUseCase.createKey(getAccountId(), hsmRequestDto);
+    var hsmResponseDto = hsmService.createKey(getAccountId(), hsmRequestDto);
     var hsmResponse = toHsmResponse(hsmResponseDto);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(hsmResponse);
@@ -77,7 +77,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<Void> deleteKey(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    hsmUseCase.deleteKey(getAccountId(), hsmRequestDto);
+    hsmService.deleteKey(getAccountId(), hsmRequestDto);
 
     return ResponseEntity.noContent().build();
   }
@@ -85,7 +85,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponseDto> listKeys(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    var hsmResponseDto = hsmUseCase.listKeys(getAccountId(), hsmRequestDto);
+    var hsmResponseDto = hsmService.listKeys(getAccountId(), hsmRequestDto);
     var hsmResponse = toHsmResponse(hsmResponseDto);
 
     return ResponseEntity.ok(hsmResponse);
@@ -94,7 +94,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponseDto> sign(HsmRequestDto hsmRequest) {
     var hsmRequestDto = toHsmRequestDto(hsmRequest);
-    var hsmResponseDto = hsmUseCase.sign(getAccountId(), hsmRequestDto);
+    var hsmResponseDto = hsmService.sign(getAccountId(), hsmRequestDto);
     var hsmResponse = toHsmResponse(hsmResponseDto);
 
     return ResponseEntity.ok(hsmResponse);

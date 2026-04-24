@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.port.out;
+package se.digg.wallet.gateway.domain.ports.outbound;
 
 import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
 import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;

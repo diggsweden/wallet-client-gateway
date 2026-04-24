@@ -1,0 +1,113 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: 'http://localhost:8099'
+    description: Generated server url
+paths:
+  /account:
+    post:
+      tags:
+        - account-controller
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+  '/account/{id}':
+    get:
+      tags:
+        - account-controller
+      operationId: getAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+
+components:
+  schemas:
+    CreateAccountRequestDto:
+      type: object
+      properties:
+        personalIdentityNumber:
+          type: string
+          minLength: 1
+        emailAdress:
+          type: string
+          minLength: 1
+        telephoneNumber:
+          type: string
+        publicKey:
+          $ref: '#/components/schemas/PublicKeyDto'
+      required:
+        - emailAdress
+        - personalIdentityNumber
+        - publicKey
+
+    PublicKeyDto:
+      type: object
+      properties:
+        kty:
+          type: string
+          minLength: 1
+        kid:
+          type: string
+        alg:
+          type: string
+        use:
+          type: string
+        crv:
+          type: string
+          minLength: 1
+        x:
+          type: string
+          minLength: 1
+        'y':
+          type: string
+          minLength: 1
+      required:
+        - kid
+        - kty
+        - crv
+        - x
+        - y
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        personalIdentityNumber:
+          type: string
+        emailAdress:
+          type: string
+        telephoneNumber:
+          type: string
+        publicKey:
+          $ref: '#/components/schemas/PublicKeyDto'
+      required:
+        - id
+        - emailAdress

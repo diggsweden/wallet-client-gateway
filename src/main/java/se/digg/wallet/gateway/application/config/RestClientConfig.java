@@ -1,12 +1,16 @@
+
 // SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
 package se.digg.wallet.gateway.application.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
+import se.digg.wallet.gateway.client.account.origin.api.AccountControllerApi;
+import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 
 @Configuration
 public class RestClientConfig {
@@ -19,5 +23,30 @@ public class RestClientConfig {
   @Bean
   public RestClient webClient() {
     return RestClient.create();
+  }
+
+  /**
+   * Creates a client bean to be used for remote calls to the Wallet Account API.
+   *
+   * @return an AccountAPI instance.
+   */
+  @Bean
+  public AccountApi accountApi(@Value("${properties.walletaccount.baseurl}") String basePath) {
+
+    var accountApi = new AccountApi();
+    accountApi.getApiClient()
+        .setBasePath(basePath);
+
+    return accountApi;
+  }
+
+  @Bean
+  public AccountControllerApi originAccountApi(
+      @Value("${properties.walletaccount.baseurl}") String basePath) {
+
+    var api = new AccountControllerApi();
+    api.getApiClient().setBasePath(basePath);
+
+    return api;
   }
 }

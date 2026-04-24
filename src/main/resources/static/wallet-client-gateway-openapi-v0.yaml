@@ -65,6 +65,7 @@ paths:
       tags:
         - Account
       summary: Create account
+      deprecated: true
       description: Creates a new account
       operationId: createAccount
       requestBody:
@@ -82,6 +83,76 @@ paths:
                 $ref: '#/components/schemas/CreateAccountResponseDto'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        'default':
+          $ref: '#/components/responses/default'
+  /v0/accounts:
+    post:
+      tags:
+        - Account
+      summary: Create account
+      description: Creates a new account
+      operationId: createAccounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+        required: true
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountResponseDto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        'default':
+          $ref: '#/components/responses/default'
+  /v0/accounts/wallet-keys:
+    post:
+      tags:
+        - Account
+      summary: Add a wallet key to an account
+      description: |
+        This operation adds a public wallet key (typically owned by the HSM) to the associated account.
+        Currently, only one wallet key per account is supported. Any existing key will be replaced.
+      operationId: addAccountWalletKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyRequest'
+        required: true
+      responses:
+        '201':
+          description: Public wallet key added to account
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/accounts/security-envelopes:
+    post:
+      tags:
+        - Account
+      summary: Add a security envelope to an account
+      description: |
+        This operation will add a security envelope (typically used with the HSM) to the associated account.
+        An account can only have one security envelope for each type. Any existing envelope with the reqeusted
+        type will be replaced.
+      operationId: addAccountSecurityEnvelope
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityEnvelopeRequest'
+        required: true
+      responses:
+        '201':
+          description: The account security envelope being added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEnvelopeResponse'
         'default':
           $ref: '#/components/responses/default'
 
@@ -582,12 +653,31 @@ components:
           type: string
           example: '0701234567'
         publicKey:
-          $ref: '#/components/schemas/JwkDto'
+          $ref: '#/components/schemas/KeyRequest'
       required:
         - emailAdress
         - publicKey
 
-    JwkDto:
+    CreateAccountRequest:
+      type: object
+      properties:
+        personalIdentityNumber:
+          type: string
+          example: '191010101010'
+        emailAdress:
+          type: string
+          example: first.last@example.xx
+          minLength: 1
+        telephoneNumber:
+          type: string
+          example: '0701234567'
+        deviceKey:
+          $ref: '#/components/schemas/KeyRequest'
+      required:
+        - emailAdress
+        - deviceKey
+
+    KeyRequest:
       type: object
       properties:
         kty:
@@ -619,6 +709,29 @@ components:
         - kty
         - x
         - y
+
+    SecurityEnvelopeRequest:
+      properties:
+        type:
+          $ref: '#/components/schemas/SecurityEnvelopeType'
+        content:
+          type: string
+          description: The security envelope content. Typically encrypted opaque materials.
+          minLength: 1
+      required:
+        - type
+        - content
+
+    SecurityEnvelopeResponse:
+      allOf:
+        - $ref: '#/components/schemas/SecurityEnvelopeRequest'
+
+    SecurityEnvelopeType:
+      type: string
+      description: 'Security envelope type enum constants.'
+      enum:
+        - SIGN
+        - OTHER
 
     CreateAccountResponseDto:
       type: object
