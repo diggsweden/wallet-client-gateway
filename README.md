@@ -13,6 +13,21 @@ A secure API gateway service for the European Digital Identity Wallet ecosystem.
 
 To run application locally, se docker-compose/README.md
 
+### Java Code Coverage Reports
+
+The JaCoCo tool is configured in this project with the `jacoco-maven-plugin` in pom.xml. When running `mvn test`
+JaCoCo will automatically measure how many lines of the code which are executed during automated tests and produce
+a code coverage report.
+
+The tool generates report output content in `./target/site/jacoco/`. For human reading, the most suitable format is
+HTML. To view the report, open the generated `./target/site/jacoco/index.html` in your web browser.
+
+*Additional output for machine reading is created in CSV and XML format. The tool will also create a coverage report in
+binary format `target/jacoco.exec`. Obviously we can’t interpret the output single-handedly, but other tools and plugins
+can, e.g. SonarQube.*
+
+[JaCoCo Maven plugin documentation](https://www.jacoco.org/jacoco/trunk/doc/maven.html)
+
 ### Service API
 
 This microservice honors the API-First strategy based on OpenAPI specification yaml file(s):
