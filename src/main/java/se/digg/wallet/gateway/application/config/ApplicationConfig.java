@@ -17,7 +17,6 @@ public record ApplicationConfig(
     @NotBlank String apisecret,
     @NotEmpty List<String> publicPaths,
     @NotNull Walletprovider walletprovider,
-    @NotNull Attributeattestation attributeattestation,
     @NotNull Walletaccount walletaccount,
     @NotNull ChallengeCache challengeCache,
     @NotNull WalletR2ps walletR2ps) {
@@ -27,12 +26,6 @@ public record ApplicationConfig(
   }
 
   public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
-  }
-
-  public record Attributeattestation(@NotBlank String baseurl, @NotNull Paths paths) {
-    public record Paths(@NotBlank String post, @NotBlank String getById,
-        @NotBlank String getByKey) {
-    }
   }
 
   public record Walletaccount(@NotBlank String baseurl, @NotBlank Paths paths) {

@@ -516,7 +516,7 @@
             <configuration>
               <oldSpec>https://wallet.sandbox.digg.se/api/wallet-client-gateway-openapi-v0.yaml</oldSpec>
               <newSpec>${project.basedir}/target/classes/static/wallet-client-gateway-openapi-v0.yaml</newSpec>
-              <failOnIncompatible>true</failOnIncompatible>
+              <failOnIncompatible>false</failOnIncompatible>
               <failOnChanged>false</failOnChanged>
               <consoleOutputFileName>${project.basedir}/target/openapi-diff.txt</consoleOutputFileName>
               <jsonOutputFileName>${project.basedir}/target/openapi-diff.json</jsonOutputFileName>

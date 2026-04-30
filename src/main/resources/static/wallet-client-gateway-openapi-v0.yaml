@@ -441,86 +441,6 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
-  /attribute-attestations:
-    get:
-      deprecated: true
-      tags:
-        - Attestation
-      summary: Get attestations by key
-      description: Get attestations from a given key
-      operationId: getAttestationsById
-      parameters:
-        - name: key
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Attestation found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientAttestationListDto'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        'default':
-          $ref: '#/components/responses/default'
-    post:
-      deprecated: true
-      tags:
-        - Attestation
-      summary: Create attestation
-      description: Creates a new attestation
-      operationId: createAttestation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateAttestationDto'
-        required: true
-      responses:
-        '201':
-          description: Attestation created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientAttestationDto'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /attribute-attestations/{id}:
-    get:
-      deprecated: true
-      tags:
-        - Attestation
-      summary: Get attestation by id
-      description: Get an attestation by id
-      operationId: getAttestationById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Attestation found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClientAttestationDto'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        'default':
-          $ref: '#/components/responses/default'
-
 components:
   responses:
     Unauthorized:
@@ -604,40 +524,6 @@ components:
           example: 3f2e7c0b-91d2-4a7e-9f34-0d8d9a5a9e77
       required:
         - sessionId
-
-    CreateAttestationDto:
-      type: object
-      properties:
-        hsmId:
-          type: string
-          format: uuid
-          example: cbe80ad0-6a7d-4a5a-9891-8b4e95fa4d49
-        wuaId:
-          type: string
-          format: uuid
-          example: 790acda4-3dec-4d93-8efe-71375109d30e
-        attestationData:
-          type: string
-          minLength: 1
-      required:
-        - attestationData
-        - hsmId
-        - wuaId
-
-    ClientAttestationDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        hsmId:
-          type: string
-          format: uuid
-        wuaId:
-          type: string
-          format: uuid
-        attestationData:
-          type: string
 
     CreateAccountRequestDto:
       type: object
@@ -822,17 +708,6 @@ components:
       properties:
         nonce:
           type: string
-
-    ClientAttestationListDto:
-      type: object
-      properties:
-        attestations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ClientAttestationDto'
-        hsmId:
-          type: string
-          format: uuid
 
   securitySchemes:
     ApiKeyScheme:
