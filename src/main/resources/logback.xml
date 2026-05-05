@@ -22,8 +22,6 @@ SPDX-License-Identifier: EUPL-1.2
     <logger name="org.apache.catalina" level="WARN" />
     <logger name="org.apache.coyote" level="WARN" />
     <logger name="com.zaxxer.hikari" level="WARN" />
-    <logger name="o.s.security.web.FilterChainProxy" level="INFO" />
-    <logger name="o.s.s.w.a.AnonymousAuthenticationFilter" level="INFO" />
     <logger name="liquibase" level="WARN" />
 
     <!-- Application-specific loggers -->
