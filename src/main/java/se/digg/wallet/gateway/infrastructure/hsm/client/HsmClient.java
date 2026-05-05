@@ -31,9 +31,9 @@ public class HsmClient implements HsmPort {
   }
 
   @Override
-  public RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request) {
+  public RegisterStateResponseDto registerState(RegisterStateRequestDto request) {
     var r2psRequest = new R2psNewStateRequestDto(
-        request.publicKey(), accountId, request.overwrite(), request.ttl());
+        request.publicKey(), request.overwrite(), request.ttl());
     return restClient
         .post()
         .uri(baseUrl + newStatePath)
@@ -44,45 +44,45 @@ public class HsmClient implements HsmPort {
   }
 
   @Override
-  public HsmResponseDto registerPin(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto registerPin(HsmRequestDto request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto changePin(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto changePin(HsmRequestDto request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto createSession(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto createSession(HsmRequestDto request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto createKey(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto createKey(HsmRequestDto request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto listKeys(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto listKeys(HsmRequestDto request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto deleteKey(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto deleteKey(HsmRequestDto request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto sign(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponseDto sign(HsmRequestDto request) {
+    return postRequest(request);
   }
 
-  private HsmResponseDto postRequest(String accountId, HsmRequestDto request) {
+  private HsmResponseDto postRequest(HsmRequestDto request) {
     String jws = restClient
         .post()
         .uri(baseUrl + postPath)
-        .body(new R2psRequestDto(accountId, request.jwt()))
+        .body(new R2psRequestDto(request.clientId(), request.jwt()))
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
         .body(String.class);

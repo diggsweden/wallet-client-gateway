@@ -4,8 +4,9 @@
 
 package se.digg.wallet.gateway.infrastructure.hsm.client;
 
+import java.util.Optional;
+
 import se.digg.wallet.gateway.application.model.hsm.EcPublicJwkDto;
 
-public record R2psNewStateRequestDto(EcPublicJwkDto publicKey, String clientId, boolean overwrite,
-    String ttl) {
+public record R2psNewStateRequestDto(EcPublicJwkDto publicKey, boolean overwrite, Optional<String> ttl) {
 }

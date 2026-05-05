@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -131,10 +132,14 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(REGISTER_PIN_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
-        .isCreated();
+        .isCreated()
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
@@ -148,7 +153,7 @@ class HsmControllerIntegrationTest {
     restClient.put()
         .uri(CHANGE_PIN_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isEqualTo(200)
@@ -169,7 +174,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(CREATE_SESSION_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isCreated()
@@ -190,7 +195,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(CREATE_KEY_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isCreated()
@@ -211,7 +216,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(LIST_KEYS_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isOk()
@@ -232,7 +237,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(DELETE_KEY_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -249,7 +254,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(SIGN_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isOk()
@@ -269,7 +274,7 @@ class HsmControllerIntegrationTest {
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
         .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false,
-            "30d"))
+            Optional.of("30d")))
         .exchange()
         .expectStatus()
         .isForbidden();

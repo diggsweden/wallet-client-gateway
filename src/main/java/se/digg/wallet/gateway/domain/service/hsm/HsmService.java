@@ -21,43 +21,43 @@ public class HsmService {
   }
 
 
-  public RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request) {
-    return hsmPort.registerState(accountId, request);
+  public RegisterStateResponseDto registerState(RegisterStateRequestDto request) {
+    return hsmPort.registerState(request);
   }
 
 
-  public HsmResponseDto registerPin(String accountId, HsmRequestDto request) {
-    return hsmPort.registerPin(accountId, request);
+  public HsmResponseDto registerPin(HsmRequestDto request) {
+    return hsmPort.registerPin(request);
   }
 
 
-  public HsmResponseDto changePin(String accountId, HsmRequestDto request) {
-    return hsmPort.changePin(accountId, request);
+  public HsmResponseDto changePin(HsmRequestDto request) {
+    return hsmPort.changePin(request);
   }
 
 
-  public HsmResponseDto createSession(String accountId, HsmRequestDto request) {
-    return hsmPort.createSession(accountId, request);
+  public HsmResponseDto createSession(HsmRequestDto request) {
+    return hsmPort.createSession(request);
   }
 
 
-  public HsmResponseDto createKey(String accountId, HsmRequestDto request) {
-    return hsmPort.createKey(accountId, request);
+  public HsmResponseDto createKey(HsmRequestDto request) {
+    return hsmPort.createKey(request);
   }
 
 
-  public HsmResponseDto listKeys(String accountId, HsmRequestDto request) {
-    return hsmPort.listKeys(accountId, request);
+  public HsmResponseDto listKeys(HsmRequestDto request) {
+    return hsmPort.listKeys(request);
   }
 
 
-  public HsmResponseDto deleteKey(String accountId, HsmRequestDto request) {
-    return hsmPort.deleteKey(accountId, request);
+  public HsmResponseDto deleteKey(HsmRequestDto request) {
+    return hsmPort.deleteKey(request);
   }
 
 
-  public HsmResponseDto sign(String accountId, HsmRequestDto request) {
-    return hsmPort.sign(accountId, request);
+  public HsmResponseDto sign(HsmRequestDto request) {
+    return hsmPort.sign(request);
   }
 
 }

@@ -751,8 +751,12 @@ components:
           type: string
           minLength: 1
           description: JWT payload for the HSM operation
+        clientId:
+          type: string
+          description: Client identifier
       required:
         - jwt
+        - clientId
 
     HsmResponseDto:
       type: object
