@@ -10,43 +10,49 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility for masking sensitive data in logs.
- * Prevents accidental exposure of passwords, tokens and personal data.
+ * Utility for masking sensitive data in logs. Prevents accidental exposure of passwords, tokens and
+ * personal data.
  */
 @Component
 public class SensitiveDataMasker {
 
-  private final ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @Value("${properties.logging-filter.sensitive-data-mask.headers:}")
   private List<String> sensitiveHeaders;
 
-  @Value("${properties.logging-filter.sensitive-data-mask.fields:}")
+  @Value("${properties.logging-filter.sensitive-data-mask.body-json-fields:}")
   private List<String> sensitiveFields;
+
+  @Value("${properties.logging-filter.sensitive-data-mask.mask-value:***MASKED***}")
+  private String mask;
 
   private static final Pattern EMAIL_PATTERN =
       Pattern.compile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
-
-  private static final String MASK = "***MASKED***";
-
-  public SensitiveDataMasker(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
 
   /**
    * Masks sensitive headers in a map.
    */
   public Map<String, String> maskHeaders(Map<String, String> headers) {
+
+    if (headers == null) {
+      return null;
+    }
+
     Map<String, String> maskedHeaders = new HashMap<>();
 
     headers.forEach((key, value) -> {
-      if (sensitiveHeaders.contains(key.toLowerCase())) {
+      if (sensitiveHeaders.contains(key.toLowerCase(Locale.getDefault()))) {
         // Mask the value but show first few characters
         maskedHeaders.put(key, maskValue(value));
       } else {
@@ -84,9 +90,9 @@ public class SensitiveDataMasker {
       objectNode.fieldNames().forEachRemaining(fieldName -> {
         JsonNode childNode = objectNode.get(fieldName);
 
-        if (sensitiveFields.contains(fieldName.toLowerCase())) {
+        if (sensitiveFields.contains(fieldName.toLowerCase(Locale.getDefault()))) {
           // Mask the entire value
-          objectNode.put(fieldName, MASK);
+          objectNode.put(fieldName, mask);
         } else if (childNode.isObject() || childNode.isArray()) {
           // Recurse into nested structures
           maskJsonNode(childNode);
@@ -113,9 +119,10 @@ public class SensitiveDataMasker {
       String email = match.group();
       int atIndex = email.indexOf('@');
       if (atIndex > 2) {
-        return email.substring(0, 2) + "***@" + email.substring(atIndex + 1);
+        return String.format("%s%s@%s",
+            email.substring(0, 2), mask, email.substring(atIndex + 1));
       }
-      return "***@" + email.substring(atIndex + 1);
+      return String.format("%s@%s", mask, email.substring(atIndex + 1));
     });
   }
 
@@ -124,8 +131,8 @@ public class SensitiveDataMasker {
    */
   private String maskValue(String value) {
     if (value == null || value.length() <= 4) {
-      return MASK;
+      return mask;
     }
-    return value.substring(0, 4) + "..." + MASK;
+    return value.substring(0, 4) + "..." + mask;
   }
 }

@@ -15,12 +15,14 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -33,10 +35,13 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
 
-  private final ObjectMapper objectMapper;
-  private final SensitiveDataMasker sensitiveDataMasker;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
+
+  @Autowired
+  private ObjectMapper objectMapper;
+
+  @Autowired
+  private SensitiveDataMasker sensitiveDataMasker;
 
   @Value("${properties.logging-filter.enabled:false}")
   private boolean isLoggingEnabled;
@@ -44,12 +49,11 @@ public class LoggingFilter extends OncePerRequestFilter {
   @Value("${properties.logging-filter.max-payload-length:10000}")
   private int maxPayloadLength;
 
-  public LoggingFilter(ObjectMapper objectMapper,
-      SensitiveDataMasker sensitiveDataMasker) {
+  @Value("${properties.logging-filter.exclude-path.starts-with:}")
+  private List<String> excludePathStartsWith;
 
-    this.objectMapper = objectMapper;
-    this.sensitiveDataMasker = sensitiveDataMasker;
-  }
+  @Value("${properties.logging-filter.exclude-path.contains:}")
+  private List<String> excludePathContains;
 
   @Override
   protected void doFilterInternal(
@@ -93,8 +97,7 @@ public class LoggingFilter extends OncePerRequestFilter {
             wrappedRequest,
             wrappedResponse,
             durationMs,
-            capturedException
-        );
+            capturedException);
       }
 
       // Copy response body back
@@ -193,7 +196,7 @@ public class LoggingFilter extends OncePerRequestFilter {
         LOGGER.info(jsonLog);
       }
 
-    } catch (Exception e) {
+    } catch (Throwable e) {
       LOGGER.error("Failed to create structured log entry", e);
     }
   }
@@ -228,15 +231,11 @@ public class LoggingFilter extends OncePerRequestFilter {
     return payload;
   }
 
-  // TODO get exclusions from properties
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getRequestURI();
-    return path.startsWith("/actuator")
-        || path.startsWith("/swagger")
-        || path.contains("/api-docs")
-        || path.contains(".html")
-        || path.contains(".js")
-        || path.contains(".yaml");
+
+    return excludePathStartsWith.stream().anyMatch(path::startsWith)
+        || excludePathContains.stream().anyMatch(path::contains);
   }
 }
