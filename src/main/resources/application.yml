@@ -51,7 +51,7 @@ properties:
       headers: >
         authorization, x-api-key, api-key, apikey, x-auth-token, cookie, set-cookie, x-csrf-token
       body-json-fields: >
-        password, secret, token, accessToken, access_token, refreshToken, refresh_token, apiKey, api_key #magic___^_^___line
+        password, secret, token, accessToken, access_token, refreshToken, refresh_token, apiKey, api_key
 # Wallet Client Gateway Configuration
 server:
   port: 8080
