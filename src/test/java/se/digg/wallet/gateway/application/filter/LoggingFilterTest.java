@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
     properties = {
         "properties.logging-filter.enabled=true",
-        "properties.logging-filter.exclude-path.starts-with=/actuator,/exclude",
+        "properties.logging-filter.exclude-path.exact-match=/,/exclude",
         "properties.logging-filter.exclude-path.contains=.html,.js,.yaml"
     })
 public class LoggingFilterTest {
@@ -98,11 +98,11 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void shouldNotLogWhenPathStartsWithExcludePattern(CapturedOutput console)
+  void shouldNotLogWhenPathMatchExcludePattern(CapturedOutput console)
       throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
-        .get("/exclude")
+        .get("/")
         .buildRequest(new SpringBootMockServletContext("/"));
     var httpServletResponse = new MockHttpServletResponse();
 
@@ -119,7 +119,7 @@ public class LoggingFilterTest {
 
     var httpServletRequest = MockMvcRequestBuilders
         .get("/the-path/test.js")
-        .buildRequest(new SpringBootMockServletContext("/"));
+        .buildRequest(new SpringBootMockServletContext("/api"));
     var httpServletResponse = new MockHttpServletResponse();
 
     filter.doFilter(httpServletRequest, httpServletResponse, filterChain);
