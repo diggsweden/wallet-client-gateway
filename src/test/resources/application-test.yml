@@ -40,3 +40,18 @@ properties:
   challenge-cache:
     ttl-seconds: 10
 
+  logging-filter:
+    enabled: true
+    max-payload-length: 100
+    exclude-path:
+      starts-with: >
+        /actuator, /swagger, /api-docs
+      contains: >
+        .html, .js, .yaml
+    sensitive-data-mask:
+      mask-value: "***MASKED***"
+      # enter values in lower case
+      headers: >
+        authorization, x-api-key, api-key, apikey, x-auth-token, cookie, set-cookie, x-csrf-token
+      body-json-fields: >
+        password, secret, token, accessToken, access_token, refreshToken, refresh_token, apiKey, api_key, personalIdentificationNumber, email, phoneNumber

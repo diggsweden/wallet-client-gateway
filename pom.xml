@@ -11,13 +11,13 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.6</version>
     <relativePath />
   </parent>
 
   <groupId>se.digg.wallet</groupId>
   <artifactId>wallet-client-gateway</artifactId>
-  <version>0.5.1</version>
+  <version>0.5.2</version>
   <packaging>jar</packaging>
 
   <name>Wallet Client Gateway</name>
@@ -70,6 +70,7 @@
     <openapi-generator-maven-plugin.version>7.21.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
+    <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 
     <wallet-account-spec.repo>diggsweden/wallet-account</wallet-account-spec.repo>
     <wallet-account-spec.ref>78f7591424f8dc17e320dec9c8764514e865da19</wallet-account-spec.ref>
@@ -285,6 +286,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
         <configuration>
           <excludes>
             <exclude>se/digg/wallet/gateway/api/v0/**</exclude>
@@ -484,6 +486,18 @@
             <configuration>
               <sources>
                 <source>${project.basedir}/target/generated-sources/openapi/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/target/generated-sources/openapi/src/test/java</source>
               </sources>
             </configuration>
           </execution>
