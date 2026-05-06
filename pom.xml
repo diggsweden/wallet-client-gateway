@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.6</version>
     <relativePath />
   </parent>
 
@@ -486,6 +486,18 @@
             <configuration>
               <sources>
                 <source>${project.basedir}/target/generated-sources/openapi/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/target/generated-sources/openapi/src/test/java</source>
               </sources>
             </configuration>
           </execution>
