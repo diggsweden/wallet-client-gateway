@@ -13,10 +13,10 @@ properties:
     enabled: true
     max-payload-length: 100
     exclude-path:
-      starts-with: >
-        /actuator, /swagger, /v3/api-docs
+      exact-match: >
+        /
       contains: >
-        .html, .js, .yaml
+        /actuator, /swagger, /v3/api-docs, .html, .js, .yaml
     sensitive-data-mask:
       mask-value: "***MASKED***"
       # enter values in lower case

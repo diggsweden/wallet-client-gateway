@@ -41,10 +41,10 @@ properties:
     enabled: true
     max-payload-length: 10000
     exclude-path:
-      starts-with: >
-        /actuator, /swagger, /v3/api-docs
+      exact-match: >
+        /, /wallet-client-gateway/, /api/
       contains: >
-        .html, .js, .yaml
+        /actuator, /swagger, /v3/api-docs, .html, .png, .gif, .js, .yaml
     sensitive-data-mask:
       mask-value: "***MASKED***"
       # enter values in lower case

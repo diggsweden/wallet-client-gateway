@@ -49,8 +49,8 @@ public class LoggingFilter extends OncePerRequestFilter {
   @Value("${properties.logging-filter.max-payload-length:10000}")
   private int maxPayloadLength;
 
-  @Value("${properties.logging-filter.exclude-path.starts-with:}")
-  private List<String> excludePathStartsWith;
+  @Value("${properties.logging-filter.exclude-path.exact-match:}")
+  private List<String> excludePathExactMatch;
 
   @Value("${properties.logging-filter.exclude-path.contains:}")
   private List<String> excludePathContains;
@@ -233,9 +233,10 @@ public class LoggingFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
+
     String path = request.getRequestURI();
 
-    return excludePathStartsWith.stream().anyMatch(path::startsWith)
+    return excludePathExactMatch.stream().anyMatch(path::equals)
         || excludePathContains.stream().anyMatch(path::contains);
   }
 }
