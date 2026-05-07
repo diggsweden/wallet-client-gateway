@@ -26,7 +26,6 @@ import com.redis.testcontainers.RedisContainer;
 import java.util.Date;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -38,6 +37,8 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
+import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -67,6 +68,9 @@ class AuthControllerIntegrationTest {
   @Autowired
   private RestTestClient restClient;
 
+  @Autowired
+  private ApplicationConfig applicationConfig;
+
   @LocalServerPort
   private int port;
 
@@ -81,6 +85,7 @@ class AuthControllerIntegrationTest {
     var challenge = restClient.get()
         .uri("http://localhost:%s/public/auth/session/challenge?accountId=%s&keyId=%s"
             .formatted(port, ACCOUNT_ID, KEY_ID))
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -100,6 +105,7 @@ class AuthControllerIntegrationTest {
     var challenge = restClient.get()
         .uri("http://localhost:%s/public/auth/session/challenge?accountId=%s&keyId=%s"
             .formatted(port, ACCOUNT_ID, KEY_ID))
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -114,6 +120,7 @@ class AuthControllerIntegrationTest {
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
         .body(postBody)
         .header("content-type", "application/json")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -134,6 +141,7 @@ class AuthControllerIntegrationTest {
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
         .body(postBody)
         .header("content-type", "application/json")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .exchange()
         .expectStatus()
         .isEqualTo(401);

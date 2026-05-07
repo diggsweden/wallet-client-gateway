@@ -11,11 +11,11 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -24,13 +24,13 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
+import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletR2psMock;
-import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.EcPublicJwkDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
@@ -67,6 +67,9 @@ class HsmControllerIntegrationTest {
   @InjectWireMock(WalletR2psMock.NAME)
   private WireMockServer r2psServer;
 
+  @Autowired
+  private ApplicationConfig applicationConfig;
+
   private RestTestClient restClient;
   private boolean authenticated = false;
 
@@ -82,6 +85,9 @@ class HsmControllerIntegrationTest {
           .baseUrl("http://localhost:" + port)
           .build();
       restClient = AuthUtil.login(accountServer, port, restClient, ACCOUNT_ID, generatedKeyPair);
+      restClient = restClient.mutate()
+          .defaultHeader(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
+          .build();
       authenticated = true;
     }
   }
@@ -273,8 +279,17 @@ class HsmControllerIntegrationTest {
     unauthenticated.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false,
-            Optional.of("30d")))
+        .body(se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+            .publicKey(se.digg.wallet.gateway.api.v0.model.EcPublicJwkDto.builder()
+                .kty("EC")
+                .crv("P-256")
+                .x("x")
+                .y("y")
+                .kid("kid")
+                .build())
+            .overwrite(false)
+            .ttl("30d")
+            .build())
         .exchange()
         .expectStatus()
         .isForbidden();

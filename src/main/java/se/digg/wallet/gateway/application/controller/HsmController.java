@@ -11,112 +11,75 @@ import se.digg.wallet.gateway.api.v0.HsmApi;
 import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
+import se.digg.wallet.gateway.application.mapper.hsm.HsmMapper;
 import se.digg.wallet.gateway.domain.service.hsm.HsmService;
 
 @RestController
 public class HsmController implements HsmApi {
 
   private final HsmService hsmService;
+  private final HsmMapper mapper;
 
-  HsmController(HsmService hsmService) {
+  HsmController(HsmService hsmService, HsmMapper mapper) {
     this.hsmService = hsmService;
+    this.mapper = mapper;
   }
 
   @Override
   public ResponseEntity<RegisterStateResponseDto> registerState(
       se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto registerStateRequest) {
-    var registerStateRequestDto = toRegisterStateRequestDto(registerStateRequest);
-    var registerStateResponseDto = hsmService.registerState(registerStateRequestDto);
-    var registerStateResponse = toRegisterStateResponse(registerStateResponseDto);
+    var registerStateResponse = mapper.toResponse(
+        hsmService.registerState(mapper.toDomain(registerStateRequest)));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(registerStateResponse);
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> registerPin(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.registerPin(toHsmRequestDto(hsmRequest));
+    var hsmResponseDto = hsmService.registerPin(mapper.toDomain(hsmRequest));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(toHsmResponse(hsmResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmResponseDto));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> changePin(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.changePin(toHsmRequestDto(hsmRequest));
+    var hsmResponseDto = hsmService.changePin(mapper.toDomain(hsmRequest));
 
-    return ResponseEntity.ok().body(toHsmResponse(hsmResponseDto));
+    return ResponseEntity.ok().body(mapper.toResponse(hsmResponseDto));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> createHsmSession(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.createSession(toHsmRequestDto(hsmRequest));
+    var hsmResponseDto = hsmService.createSession(mapper.toDomain(hsmRequest));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(toHsmResponse(hsmResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmResponseDto));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> createKey(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.createKey(toHsmRequestDto(hsmRequest));
+    var hsmResponseDto = hsmService.createKey(mapper.toDomain(hsmRequest));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(toHsmResponse(hsmResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmResponseDto));
   }
 
   @Override
   public ResponseEntity<Void> deleteKey(HsmRequestDto hsmRequest) {
-    hsmService.deleteKey(toHsmRequestDto(hsmRequest));
+    hsmService.deleteKey(mapper.toDomain(hsmRequest));
 
     return ResponseEntity.noContent().build();
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> listKeys(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.listKeys(toHsmRequestDto(hsmRequest));
+    var hsmResponseDto = hsmService.listKeys(mapper.toDomain(hsmRequest));
 
-    return ResponseEntity.ok(toHsmResponse(hsmResponseDto));
+    return ResponseEntity.ok(mapper.toResponse(hsmResponseDto));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> sign(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.sign(toHsmRequestDto(hsmRequest));
+    var hsmResponseDto = hsmService.sign(mapper.toDomain(hsmRequest));
 
-    return ResponseEntity.ok(toHsmResponse(hsmResponseDto));
-  }
-
-  private static se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto toRegisterStateRequestDto(
-      se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto registerStateRequest) {
-    var publicKeyRequest = registerStateRequest.getPublicKey();
-    var publicKeyDto = new se.digg.wallet.gateway.application.model.hsm.EcPublicJwkDto(
-        publicKeyRequest.getKty(),
-        publicKeyRequest.getCrv(),
-        publicKeyRequest.getX(),
-        publicKeyRequest.getY(),
-        publicKeyRequest.getKid().orElse(""));
-
-    return new se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto(
-        publicKeyDto,
-        registerStateRequest.getOverwrite(),
-        registerStateRequest.getTtl());
-  }
-
-  private static RegisterStateResponseDto toRegisterStateResponse(
-      se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto registerStateResponseDto) {
-    return RegisterStateResponseDto.builder()
-        .status(registerStateResponseDto.status())
-        .clientId(registerStateResponseDto.clientId())
-        .devAuthorizationCode(registerStateResponseDto.devAuthorizationCode())
-        .build();
-  }
-
-  private static se.digg.wallet.gateway.application.model.hsm.HsmRequestDto toHsmRequestDto(
-      HsmRequestDto hsmRequest) {
-    return new se.digg.wallet.gateway.application.model.hsm.HsmRequestDto(
-        hsmRequest.getJwt(),
-        hsmRequest.getClientId());
-  }
-
-  private static HsmResponseDto toHsmResponse(
-      se.digg.wallet.gateway.application.model.hsm.HsmResponseDto hsmResponseDto) {
-    return HsmResponseDto.builder()
-        .jwt(hsmResponseDto.jwt())
-        .build();
+    return ResponseEntity.ok(mapper.toResponse(hsmResponseDto));
   }
 }

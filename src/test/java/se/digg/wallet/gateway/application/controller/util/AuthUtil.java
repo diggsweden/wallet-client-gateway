@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.test.web.servlet.client.RestTestClient;
+import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
@@ -32,6 +33,7 @@ import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeReques
 public class AuthUtil {
   public static String ACCOUNT_ID = UUID.randomUUID().toString();
   public static final String KEY_ID = "123";
+  private static final String TEST_API_KEY = "my_secret_key";
 
 
   public static RestTestClient login(WireMockServer wireMockServer, int port,
@@ -80,6 +82,7 @@ public class AuthUtil {
     var challenge = restClient.get()
         .uri("http://localhost:%s/public/auth/session/challenge?accountId=%s&keyId=%s"
             .formatted(port, accountId, KEY_ID))
+        .header(SecurityConfig.API_KEY_HEADER, TEST_API_KEY)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -95,6 +98,7 @@ public class AuthUtil {
         .uri("http://localhost:%s/public/auth/session/response".formatted(port))
         .body(postBody)
         .header("content-type", "application/json")
+        .header(SecurityConfig.API_KEY_HEADER, TEST_API_KEY)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -103,6 +107,7 @@ public class AuthUtil {
 
     return restClient.mutate()
         .defaultHeader(SessionConfig.SESSION_HEADER, sessionId.get())
+        .defaultHeader(SecurityConfig.API_KEY_HEADER, TEST_API_KEY)
         .build();
   }
 
