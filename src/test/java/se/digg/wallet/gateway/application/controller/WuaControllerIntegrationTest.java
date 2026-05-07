@@ -125,8 +125,7 @@ class WuaControllerIntegrationTest {
     response.expectStatus()
         .isBadRequest();
 
-    // I am reverting the value for AuthUtil.ACCOUNT_ID because other tests like
-    // AttestationControllerIntegrationTest are using it
+    // Revert for other tests using AuthUtil.ACCOUNT_ID.
     AuthUtil.ACCOUNT_ID = ACCOUNT_ID;
   }
 

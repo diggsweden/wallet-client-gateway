@@ -19,12 +19,6 @@ properties:
   walletprovider:
     baseurl: http://
     wua-path: /wallet-unit-attestation
-  attributeattestation:
-    baseurl: http://
-    paths:
-      post: /attestation
-      get-by-id: /attestation
-      get-by-key: /attestation/user
   walletaccount:
     baseurl: http://
     paths:

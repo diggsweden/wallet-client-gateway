@@ -13,6 +13,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @WalletAccountMock
 @WalletProviderMock
-@WalletAttributeAttestationMock
 public @interface AllWiremocks {
 }

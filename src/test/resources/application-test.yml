@@ -21,12 +21,6 @@ properties:
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port:0}
     wua-path: /wallet-provider/wallet-unit-attestation
-  attributeattestation:
-    baseurl: http://localhost:${wiremock.attestation.port:0}
-    paths:
-      post: /attestation
-      get-by-id: /attestation
-      get-by-key: /attestation/user
   walletaccount:
     baseurl: http://localhost:${wiremock.account.port:0}
     paths:
