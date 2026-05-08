@@ -6,5 +6,6 @@ package se.digg.wallet.gateway.application.model.hsm;
 
 import java.util.Optional;
 
-public record RegisterStateRequestDto(EcPublicJwkDto publicKey, boolean overwrite, Optional<String> ttl) {
+public record RegisterStateRequestDto(EcPublicJwkDto publicKey, boolean overwrite,
+    Optional<String> ttl) {
 }
