@@ -9,8 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,17 @@ import org.springframework.boot.test.mock.web.SpringBootMockServletContext;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.mock.web.MockFilterChain;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 @ExtendWith({
     MockitoExtension.class,
@@ -32,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     properties = {
         "properties.logging-filter.enabled=true",
         "properties.logging-filter.exclude-path.exact-match=/,/exclude",
-        "properties.logging-filter.exclude-path.contains=.html,.js,.yaml"
+        "properties.logging-filter.exclude-path.contains=/actuator,.html"
     })
 public class LoggingFilterTest {
 
@@ -42,13 +52,14 @@ public class LoggingFilterTest {
   @Autowired
   private LoggingFilter filter;
 
-  @Mock
+  @MockitoBean
   private SensitiveDataMasker sensitiveDataMasker;
 
-  private final MockFilterChain filterChain = new MockFilterChain();
+  @Mock
+  private MockFilterChain filterChain;
 
   @Test
-  void logRequest(CapturedOutput console) throws IOException, ServletException {
+  void logContainsRequest(CapturedOutput console) throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
         .get("/test")
@@ -63,7 +74,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void logRequestHeaders(CapturedOutput console) throws IOException, ServletException {
+  void logContainsRequestHeaders(CapturedOutput console) throws IOException, ServletException {
 
     var expectedHeaderName = "ExpectedHeaderName";
     var expectedHeaderValue = "ExpectedHeaderValue";
@@ -72,6 +83,9 @@ public class LoggingFilterTest {
         .header(expectedHeaderName, expectedHeaderValue)
         .buildRequest(new SpringBootMockServletContext("/"));
     var httpServletResponse = new MockHttpServletResponse();
+
+    when(sensitiveDataMasker.maskHeaders(any())).thenReturn(
+        Map.of(expectedHeaderName, expectedHeaderValue));
 
     filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
 
@@ -83,7 +97,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void logResponse(CapturedOutput console) throws IOException, ServletException {
+  void logContainsResponse(CapturedOutput console) throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
         .get("/test")
@@ -98,11 +112,118 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void shouldNotLogWhenPathMatchExcludePattern(CapturedOutput console)
+  void shouldGenerateCorrelationIdWhenXCorrelationIdIsEmpty(CapturedOutput console)
       throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
-        .get("/")
+        .get("/test")
+        .header("X-Correlation-ID", "")
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
+
+    var consoleOut = console.getOut();
+    var loggedObject = getLoggedObject(consoleOut);
+
+    assertThat(loggedObject).containsKey("correlationId");
+    assertThat(loggedObject.get("correlationId").toString()).hasSizeGreaterThan(1);
+  }
+
+  @Test
+  void shouldGenerateCorrelationIdWhenXRequestIdIsEmpty(CapturedOutput console)
+      throws IOException, ServletException {
+
+    var httpServletRequest = MockMvcRequestBuilders
+        .get("/test")
+        .header("X-Request-ID", "")
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
+
+    var consoleOut = console.getOut();
+    var loggedObject = getLoggedObject(consoleOut);
+
+    assertThat(loggedObject).containsKey("correlationId");
+    assertThat(loggedObject.get("correlationId").toString()).hasSizeGreaterThan(1);
+  }
+
+  @Test
+  void logGivenXCorrelationId(CapturedOutput console) throws IOException, ServletException {
+
+    var expectedId = randomId();
+    var httpServletRequest = MockMvcRequestBuilders
+        .get("/test")
+        .header("X-Correlation-ID", expectedId)
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
+
+    var consoleOut = console.getOut();
+    var loggedObject = getLoggedObject(consoleOut);
+
+    assertThat(loggedObject).containsKey("correlationId");
+    assertThat(loggedObject.get("correlationId")).isEqualTo(expectedId);
+  }
+
+  @Test
+  void logGivenXRequestId(CapturedOutput console) throws IOException, ServletException {
+
+    var expectedId = randomId();
+    var httpServletRequest = MockMvcRequestBuilders
+        .get("/test")
+        .header("X-Request-ID", expectedId)
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
+
+    var consoleOut = console.getOut();
+    var loggedObject = getLoggedObject(consoleOut);
+
+    assertThat(loggedObject).containsKey("correlationId");
+    assertThat(loggedObject.get("correlationId")).isEqualTo(expectedId);
+  }
+
+  @Test
+  void logErrorOnFilterChainException(CapturedOutput console)
+      throws IOException, ServletException {
+
+    var httpServletRequest = new MockHttpServletRequest();
+    var httpServletResponse = new MockHttpServletResponse();
+
+    doThrow(IOException.class).when(filterChain).doFilter(any(), any());
+    assertThrows(IOException.class,
+        () -> filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain));
+
+    var consoleOut = console.getOut();
+
+    assertThat(getLoggedObject(consoleOut)).containsKey("error");
+  }
+
+  @Test
+  void doNotThrowWhenLogEntryCreationFails(CapturedOutput console) {
+
+    var httpServletRequest = MockMvcRequestBuilders
+        .get("/test")
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    when(sensitiveDataMasker.maskHeaders(any())).thenThrow(RuntimeException.class);
+
+    assertDoesNotThrow(
+        () -> filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"/", "/exclude"})
+  void shouldNotLogWhenPathMatchExcludePattern(String excludePath, CapturedOutput console)
+      throws IOException, ServletException {
+
+    var httpServletRequest = MockMvcRequestBuilders
+        .get(excludePath)
         .buildRequest(new SpringBootMockServletContext("/"));
     var httpServletResponse = new MockHttpServletResponse();
 
@@ -113,13 +234,14 @@ public class LoggingFilterTest {
     assertThat(getLoggedObject(consoleOut)).isEmpty();
   }
 
-  @Test
-  void shouldNotLogWhenPathContainsExcludePattern(CapturedOutput console)
+  @ParameterizedTest
+  @ValueSource(strings = {"/actuator/health", "/docs/index.html"})
+  void shouldNotLogWhenPathContainsExcludePattern(String excludePath, CapturedOutput console)
       throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
-        .get("/the-path/test.js")
-        .buildRequest(new SpringBootMockServletContext("/api"));
+        .get(excludePath)
+        .buildRequest(new SpringBootMockServletContext("/"));
     var httpServletResponse = new MockHttpServletResponse();
 
     filter.doFilter(httpServletRequest, httpServletResponse, filterChain);
@@ -154,5 +276,9 @@ public class LoggingFilterTest {
   private Map getLoggedResponse(String consoleOut) throws JsonProcessingException {
 
     return (Map) getLoggedObject(consoleOut).get("response");
+  }
+
+  private static String randomId() {
+    return UUID.randomUUID().toString();
   }
 }
