@@ -16,7 +16,6 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountResponseDto;
 import se.digg.wallet.gateway.api.v0.model.KeyRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeResponse;
-import se.digg.wallet.gateway.application.auth.ApiKeyVerifier;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
@@ -28,16 +27,13 @@ import se.digg.wallet.gateway.domain.service.account.AccountService;
 @RestController
 public class AccountController implements AccountApi {
   private final AccountService accountService;
-  private final ApiKeyVerifier apiKeyVerifier;
   private final AccountMapper mapper;
   private final CurrentAccount currentAccount;
 
   public AccountController(AccountService accountService,
-      ApiKeyVerifier apiKeyVerifier,
       AccountMapper mapper,
       CurrentAccount currentAccount) {
     this.accountService = accountService;
-    this.apiKeyVerifier = apiKeyVerifier;
     this.mapper = mapper;
     this.currentAccount = currentAccount;
   }
@@ -45,8 +41,6 @@ public class AccountController implements AccountApi {
   @Override
   public ResponseEntity<CreateAccountResponseDto> createAccount(
       @Valid CreateAccountRequestDto createAccountRequest) {
-    apiKeyVerifier.verify();
-
     NewAccount newAccount = mapper.toDomain(createAccountRequest);
     Account account = accountService.createAccountLegacy(newAccount);
     CreateAccountResponseDto createAccountResponse = mapper.toResponse(account);
@@ -59,8 +53,6 @@ public class AccountController implements AccountApi {
   @Override
   public ResponseEntity<CreateAccountResponseDto> createAccounts(
       @Valid CreateAccountRequest createAccountRequest) {
-    apiKeyVerifier.verify();
-
     NewAccount newAccount = mapper.toDomain(createAccountRequest);
     Account account = accountService.createAccount(newAccount);
     CreateAccountResponseDto createAccountResponse = mapper.toResponse(account);
@@ -73,7 +65,6 @@ public class AccountController implements AccountApi {
   @Override
   public ResponseEntity<SecurityEnvelopeResponse> addAccountSecurityEnvelope(
       @Valid SecurityEnvelopeRequest securityEnvelopeRequest) {
-    apiKeyVerifier.verify();
     var accountId = currentAccount.id();
     SecurityEnvelope envelope = mapper.toDomain(securityEnvelopeRequest);
     accountService.addAccountSecurityEnvelope(envelope, accountId);
@@ -86,8 +77,6 @@ public class AccountController implements AccountApi {
 
   @Override
   public ResponseEntity<Void> addAccountWalletKey(@Valid KeyRequest keyRequest) {
-    apiKeyVerifier.verify();
-
     Jwk jwk = mapper.toDomain(keyRequest);
     var accountId = currentAccount.id();
     accountService.addAccountWalletKey(jwk, accountId);

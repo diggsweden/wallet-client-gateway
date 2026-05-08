@@ -6,5 +6,5 @@ package se.digg.wallet.gateway.application.model.hsm;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record HsmRequestDto(@NotBlank String jwt) {
+public record HsmRequestDto(@NotBlank String jwt, @NotBlank String clientId) {
 }

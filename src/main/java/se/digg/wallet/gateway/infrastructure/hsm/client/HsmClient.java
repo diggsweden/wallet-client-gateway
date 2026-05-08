@@ -7,13 +7,13 @@ package se.digg.wallet.gateway.infrastructure.hsm.client;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
+import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
+import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
+import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
+import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
+import se.digg.wallet.gateway.infrastructure.hsm.mapper.HsmClientMapper;
 
 @Component
 public class HsmClient implements HsmPort {
@@ -22,70 +22,71 @@ public class HsmClient implements HsmPort {
   private final String baseUrl;
   private final String postPath;
   private final String newStatePath;
+  private final HsmClientMapper mapper;
 
-  HsmClient(RestClient client, ApplicationConfig applicationConfig) {
+  HsmClient(RestClient client, ApplicationConfig applicationConfig, HsmClientMapper mapper) {
     this.restClient = client.mutate().build();
     this.baseUrl = applicationConfig.walletR2ps().baseurl();
     this.postPath = applicationConfig.walletR2ps().paths().post();
     this.newStatePath = applicationConfig.walletR2ps().paths().newState();
+    this.mapper = mapper;
   }
 
   @Override
-  public RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request) {
-    var r2psRequest = new R2psNewStateRequestDto(
-        request.publicKey(), accountId, request.overwrite(), request.ttl());
-    return restClient
+  public RegisterStateResponse registerState(RegisterStateRequest request) {
+    var response = restClient
         .post()
         .uri(baseUrl + newStatePath)
-        .body(r2psRequest)
+        .body(mapper.toClientRequest(request))
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
-        .body(RegisterStateResponseDto.class);
+        .body(RegisterStateResponse.class);
+    return mapper.toDomainResponse(response);
   }
 
   @Override
-  public HsmResponseDto registerPin(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse registerPin(HsmRequest request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto changePin(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse changePin(HsmRequest request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto createSession(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse createSession(HsmRequest request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto createKey(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse createKey(HsmRequest request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto listKeys(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse listKeys(HsmRequest request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto deleteKey(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse deleteKey(HsmRequest request) {
+    return postRequest(request);
   }
 
   @Override
-  public HsmResponseDto sign(String accountId, HsmRequestDto request) {
-    return postRequest(accountId, request);
+  public HsmResponse sign(HsmRequest request) {
+    return postRequest(request);
   }
 
-  private HsmResponseDto postRequest(String accountId, HsmRequestDto request) {
+  private HsmResponse postRequest(HsmRequest request) {
     String jws = restClient
         .post()
         .uri(baseUrl + postPath)
-        .body(new R2psRequestDto(accountId, request.jwt()))
+        .body(mapper.toClientRequest(request))
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
         .body(String.class);
-    return new HsmResponseDto(jws);
+    return mapper.toDomainResponse(jws);
   }
 }

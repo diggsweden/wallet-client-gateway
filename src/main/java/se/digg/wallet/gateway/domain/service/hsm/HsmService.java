@@ -5,10 +5,10 @@
 package se.digg.wallet.gateway.domain.service.hsm;
 
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
+import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
+import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
+import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
+import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 
 @Service
@@ -21,43 +21,43 @@ public class HsmService {
   }
 
 
-  public RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request) {
-    return hsmPort.registerState(accountId, request);
+  public RegisterStateResponse registerState(RegisterStateRequest request) {
+    return hsmPort.registerState(request);
   }
 
 
-  public HsmResponseDto registerPin(String accountId, HsmRequestDto request) {
-    return hsmPort.registerPin(accountId, request);
+  public HsmResponse registerPin(HsmRequest request) {
+    return hsmPort.registerPin(request);
   }
 
 
-  public HsmResponseDto changePin(String accountId, HsmRequestDto request) {
-    return hsmPort.changePin(accountId, request);
+  public HsmResponse changePin(HsmRequest request) {
+    return hsmPort.changePin(request);
   }
 
 
-  public HsmResponseDto createSession(String accountId, HsmRequestDto request) {
-    return hsmPort.createSession(accountId, request);
+  public HsmResponse createSession(HsmRequest request) {
+    return hsmPort.createSession(request);
   }
 
 
-  public HsmResponseDto createKey(String accountId, HsmRequestDto request) {
-    return hsmPort.createKey(accountId, request);
+  public HsmResponse createKey(HsmRequest request) {
+    return hsmPort.createKey(request);
   }
 
 
-  public HsmResponseDto listKeys(String accountId, HsmRequestDto request) {
-    return hsmPort.listKeys(accountId, request);
+  public HsmResponse listKeys(HsmRequest request) {
+    return hsmPort.listKeys(request);
   }
 
 
-  public HsmResponseDto deleteKey(String accountId, HsmRequestDto request) {
-    return hsmPort.deleteKey(accountId, request);
+  public HsmResponse deleteKey(HsmRequest request) {
+    return hsmPort.deleteKey(request);
   }
 
 
-  public HsmResponseDto sign(String accountId, HsmRequestDto request) {
-    return hsmPort.sign(accountId, request);
+  public HsmResponse sign(HsmRequest request) {
+    return hsmPort.sign(request);
   }
 
 }

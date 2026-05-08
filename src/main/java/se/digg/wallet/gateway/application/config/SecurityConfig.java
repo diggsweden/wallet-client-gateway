@@ -4,7 +4,9 @@
 
 package se.digg.wallet.gateway.application.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.util.AntPathMatcher;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 
 @Configuration
@@ -26,11 +29,15 @@ public class SecurityConfig {
 
   public static final String API_KEY_HEADER = "X-API-KEY";
 
+  private final String apiSecret;
   private final List<String> publicPaths;
+  private final AntPathMatcher pathMatcher;
 
   public SecurityConfig(
       ApplicationConfig applicationConfig) {
+    this.apiSecret = Objects.requireNonNull(applicationConfig.apisecret());
     this.publicPaths = applicationConfig.publicPaths();
+    this.pathMatcher = new AntPathMatcher();
   }
 
   @Bean
@@ -38,9 +45,8 @@ public class SecurityConfig {
     httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers(publicPaths.toArray(String[]::new)).permitAll()
             .anyRequest()
-            .access(challengeResponseAuthorizationMgr()));
+            .access(gatewayAuthorizationMgr()));
 
     return httpSecurity.build();
   }
@@ -60,6 +66,28 @@ public class SecurityConfig {
     return (authentication, context) -> new AuthorizationDecision(
         checkIfGranted(defaultAuthenticationManager.authorize(authentication, context))
             && authentication.get() instanceof ChallengeResponseAuthentication);
+  }
+
+  private AuthorizationManager<RequestAuthorizationContext> gatewayAuthorizationMgr() {
+    var challengeResponseMgr = challengeResponseAuthorizationMgr();
+    return (authentication, context) -> {
+      if (isPublicPath(context.getRequest())) {
+        return new AuthorizationDecision(true);
+      }
+
+      boolean apiKeyGranted = hasValidApiKey(context.getRequest());
+      boolean authGranted = checkIfGranted(challengeResponseMgr.authorize(authentication, context));
+      return new AuthorizationDecision(apiKeyGranted && authGranted);
+    };
+  }
+
+  private boolean hasValidApiKey(HttpServletRequest request) {
+    return apiSecret.equals(request.getHeader(API_KEY_HEADER));
+  }
+
+  boolean isPublicPath(HttpServletRequest request) {
+    var path = request.getServletPath();
+    return publicPaths.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
   }
 
   private boolean checkIfGranted(AuthorizationResult authorizationResult) {

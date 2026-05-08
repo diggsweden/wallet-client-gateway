@@ -4,6 +4,9 @@
 
 package se.digg.wallet.gateway.application.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -13,10 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 
-import java.util.function.Supplier;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ChallengeResponseAuthorizationMgrTest {
 
@@ -25,6 +27,8 @@ class ChallengeResponseAuthorizationMgrTest {
   @BeforeEach
   void setUp() {
     ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
+    when(applicationConfig.apisecret()).thenReturn("my_secret_key");
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
     SecurityConfig securityConfig = new SecurityConfig(applicationConfig);
     authorizationMgr = securityConfig.challengeResponseAuthorizationMgr();
   }
@@ -63,6 +67,20 @@ class ChallengeResponseAuthorizationMgrTest {
 
     assertThat(decision).isNotNull();
     assertThat(decision.isGranted()).isFalse();
+  }
+
+  @Test
+  void matchesPublicPathWithContextPath() {
+    ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
+    when(applicationConfig.apisecret()).thenReturn("my_secret_key");
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/accounts"));
+    var securityConfig = new SecurityConfig(applicationConfig);
+
+    var request = mock(HttpServletRequest.class);
+    when(request.getRequestURI()).thenReturn("/wallet-client-gateway/accounts");
+    when(request.getServletPath()).thenReturn("/accounts");
+
+    assertThat(securityConfig.isPublicPath(request)).isTrue();
   }
 
   private Supplier<Authentication> asSupplier(Authentication auth) {

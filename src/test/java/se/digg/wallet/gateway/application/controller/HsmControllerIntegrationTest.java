@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -23,13 +24,13 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
+import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletR2psMock;
-import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.EcPublicJwkDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WalletAccountMock
@@ -66,6 +67,9 @@ class HsmControllerIntegrationTest {
   @InjectWireMock(WalletR2psMock.NAME)
   private WireMockServer r2psServer;
 
+  @Autowired
+  private ApplicationConfig applicationConfig;
+
   private RestTestClient restClient;
   private boolean authenticated = false;
 
@@ -81,6 +85,9 @@ class HsmControllerIntegrationTest {
           .baseUrl("http://localhost:" + port)
           .build();
       restClient = AuthUtil.login(accountServer, port, restClient, ACCOUNT_ID, generatedKeyPair);
+      restClient = restClient.mutate()
+          .defaultHeader(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
+          .build();
       authenticated = true;
     }
   }
@@ -131,10 +138,14 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(REGISTER_PIN_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
-        .isCreated();
+        .isCreated()
+        .expectBody()
+        .json("""
+            { "jwt": "%s" }
+            """.formatted(TEST_JWT));
   }
 
   @Test
@@ -148,7 +159,7 @@ class HsmControllerIntegrationTest {
     restClient.put()
         .uri(CHANGE_PIN_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isEqualTo(200)
@@ -169,7 +180,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(CREATE_SESSION_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isCreated()
@@ -190,7 +201,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(CREATE_KEY_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isCreated()
@@ -211,7 +222,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(LIST_KEYS_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isOk()
@@ -232,7 +243,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(DELETE_KEY_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -249,7 +260,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(SIGN_URL)
         .header("content-type", "application/json")
-        .body(new HsmRequestDto(TEST_JWT))
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
         .exchange()
         .expectStatus()
         .isOk()
@@ -268,8 +279,17 @@ class HsmControllerIntegrationTest {
     unauthenticated.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(new RegisterStateRequestDto(new EcPublicJwkDto("EC", "P-256", "x", "y", "kid"), false,
-            "30d"))
+        .body(se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+            .publicKey(se.digg.wallet.gateway.api.v0.model.EcPublicJwkDto.builder()
+                .kty("EC")
+                .crv("P-256")
+                .x("x")
+                .y("y")
+                .kid("kid")
+                .build())
+            .overwrite(false)
+            .ttl("30d")
+            .build())
         .exchange()
         .expectStatus()
         .isForbidden();

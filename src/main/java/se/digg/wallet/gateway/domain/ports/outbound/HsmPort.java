@@ -4,27 +4,27 @@
 
 package se.digg.wallet.gateway.domain.ports.outbound;
 
-import se.digg.wallet.gateway.application.model.hsm.HsmRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.HsmResponseDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateRequestDto;
-import se.digg.wallet.gateway.application.model.hsm.RegisterStateResponseDto;
+import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
+import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
+import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
+import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
 
 public interface HsmPort {
 
-  RegisterStateResponseDto registerState(String accountId, RegisterStateRequestDto request);
+  RegisterStateResponse registerState(RegisterStateRequest request);
 
-  HsmResponseDto registerPin(String accountId, HsmRequestDto request);
+  HsmResponse registerPin(HsmRequest request);
 
-  HsmResponseDto changePin(String accountId, HsmRequestDto request);
+  HsmResponse changePin(HsmRequest request);
 
-  HsmResponseDto createSession(String accountId, HsmRequestDto request);
+  HsmResponse createSession(HsmRequest request);
 
-  HsmResponseDto createKey(String accountId, HsmRequestDto request);
+  HsmResponse createKey(HsmRequest request);
 
-  HsmResponseDto listKeys(String accountId, HsmRequestDto request);
+  HsmResponse listKeys(HsmRequest request);
 
-  HsmResponseDto deleteKey(String accountId, HsmRequestDto request);
+  HsmResponse deleteKey(HsmRequest request);
 
-  HsmResponseDto sign(String accountId, HsmRequestDto request);
+  HsmResponse sign(HsmRequest request);
 
 }
