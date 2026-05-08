@@ -13,11 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Merge pull request #142 from diggsweden/fix/remove-test
 - Merge pull request #138 from diggsweden/feat/hsm-include-client-id-in-request
 - Extract mappers and move HSM flow to hexagonal boundaries
 - Include clientId in HSM request DTOs
 - Merge pull request #136 from diggsweden/test/apikeyverifier
 - Attribute attestation cleanup (#140)
+
+### Fixed
+
+- Fix tests
+
 
 ## [0.5.2] - 2026-05-07
 
