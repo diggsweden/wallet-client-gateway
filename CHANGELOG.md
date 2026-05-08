@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Merge pull request #143 from diggsweden/chore/lint-fix
+
 ## [0.5.3] - 2026-05-08
 
 ### Added
@@ -22,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix lint issue
 - Fix tests
 
 
@@ -553,6 +560,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[unreleased]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.3..HEAD
 [0.5.3]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.2..v0.5.3
 [0.5.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.1..v0.5.2
 [0.5.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.0..v0.5.1
