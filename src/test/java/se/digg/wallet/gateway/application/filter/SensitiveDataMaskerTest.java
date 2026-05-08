@@ -9,12 +9,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,11 +53,11 @@ public class SensitiveDataMaskerTest {
   }
 
   @Test
-  void nonSensitiveHeadersShouldReturnOriginValues() {
+  void nonSensitiveHeadersShouldReturnOrigin() {
 
     var expectedHeaders = new HashMap<String, String>();
-    expectedHeaders.put("FirstValue", randomString());
-    expectedHeaders.put("AnotherValue", randomString());
+    expectedHeaders.put("FirstHeader", randomString());
+    expectedHeaders.put("AnotherHeader", randomString());
 
     var actualHeaders = masker.maskHeaders(expectedHeaders);
 
@@ -72,9 +75,7 @@ public class SensitiveDataMaskerTest {
     var unmaskedValue = randomString();
 
     var unmaskedHeaders = new HashMap<String, String>();
-    unmaskedHeaders.put("FirstHeader", randomString());
     unmaskedHeaders.put(sensitiveHeader, unmaskedValue);
-    unmaskedHeaders.put("AnotherHeader", randomString());
 
     var maskedHeaders = masker.maskHeaders(unmaskedHeaders);
 
@@ -83,6 +84,41 @@ public class SensitiveDataMaskerTest {
     var maskedValue = maskedHeaders.get(sensitiveHeader);
     assertThat(unmaskedValue).isNotEqualTo(maskedValue);
     assertThat(maskedValue).contains(MASKED);
+  }
+
+  @Test
+  void shortSensitiveHeaderShouldReturnMaskedValue() {
+
+    var sensitiveHeader = "sensitive";
+    var unmaskedValue = "A";
+
+    var unmaskedHeaders = new HashMap<String, String>();
+    unmaskedHeaders.put(sensitiveHeader, unmaskedValue);
+
+    var maskedHeaders = masker.maskHeaders(unmaskedHeaders);
+
+    assertEquals(unmaskedHeaders.size(), maskedHeaders.size());
+    assertThat(maskedHeaders).containsKey(sensitiveHeader);
+    var maskedValue = maskedHeaders.get(sensitiveHeader);
+    assertThat(unmaskedValue).isNotEqualTo(maskedValue);
+    assertThat(maskedValue).isEqualTo(MASKED);
+  }
+
+  @Test
+  void nullSensitiveHeaderShouldReturnMaskedValue() {
+
+    var sensitiveHeader = "sensitive";
+
+    var unmaskedHeaders = new HashMap<String, String>();
+    unmaskedHeaders.put(sensitiveHeader, null);
+
+    var maskedHeaders = masker.maskHeaders(unmaskedHeaders);
+
+    assertEquals(unmaskedHeaders.size(), maskedHeaders.size());
+    assertThat(maskedHeaders).containsKey(sensitiveHeader);
+    var maskedValue = maskedHeaders.get(sensitiveHeader);
+    assertNotNull(maskedValue);
+    assertThat(maskedValue).isEqualTo(MASKED);
   }
 
   @Test
@@ -98,11 +134,28 @@ public class SensitiveDataMaskerTest {
   }
 
   @Test
-  void nonSensitiveBodyShouldReturnOriginBody() throws JsonProcessingException {
+  void simpleBodyShouldReturnOriginBody() throws JsonProcessingException {
 
     var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("FirstValue", randomString());
-    unmaskedAttributes.put("AnotherValue", randomString());
+    unmaskedAttributes.put("StringValue", randomString());
+    var expectedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
+
+    var actualOriginJsonBody = masker.maskJsonBody(expectedJsonBody);
+
+    assertEquals(expectedJsonBody, actualOriginJsonBody);
+  }
+
+  @Test
+  void complexBodyShouldReturnOriginBody() throws JsonProcessingException {
+
+    var unmaskedAttributes = new HashMap<String, Object>();
+    unmaskedAttributes.put("StringValue", randomString());
+    unmaskedAttributes.put("IntValue", 10);
+    unmaskedAttributes.put("DecimalValue", 10.7869F);
+    unmaskedAttributes.put("DateTimeValue", new Date());
+    unmaskedAttributes.put("StringArrayValue", new String[] {"A", "B", "C"});
+    unmaskedAttributes.put("IntArrayValue", new Integer[] {1, 2, 3});
+    unmaskedAttributes.put("ChildObject", Map.of("Key1", "v1", "key2", "v2"));
     var expectedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
 
     var actualOriginJsonBody = masker.maskJsonBody(expectedJsonBody);
@@ -117,9 +170,7 @@ public class SensitiveDataMaskerTest {
     var unmaskedValue = "this is a sensitive value expected to be masked";
 
     var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("FirstValue", randomString());
     unmaskedAttributes.put(sensitiveAttribute, unmaskedValue);
-    unmaskedAttributes.put("AnotherValue", randomString());
     var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
 
     var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
@@ -132,11 +183,73 @@ public class SensitiveDataMaskerTest {
   }
 
   @Test
+  void nullSensitiveFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+
+    var sensitiveAttribute = "sensitive";
+
+    var unmaskedAttributes = new HashMap<String, Object>();
+    unmaskedAttributes.put(sensitiveAttribute, null);
+    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
+
+    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
+
+    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
+    assertThat(actualBody).containsKey(sensitiveAttribute);
+    var maskedValue = actualBody.get(sensitiveAttribute);
+    assertNotNull(maskedValue);
+    assertThat(maskedValue.toString()).isEqualTo(MASKED);
+  }
+
+  @Test
+  void shortSensitiveFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+
+    var sensitiveAttribute = "sensitive";
+    var unmaskedValue = "A";
+
+    var unmaskedAttributes = new HashMap<String, Object>();
+    unmaskedAttributes.put("FirstValue", randomString());
+    unmaskedAttributes.put(sensitiveAttribute, unmaskedValue);
+    unmaskedAttributes.put("AnotherValue", randomString());
+    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
+
+    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
+
+    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
+    assertThat(actualBody).containsKey(sensitiveAttribute);
+    var maskedValue = actualBody.get(sensitiveAttribute).toString();
+    assertThat(unmaskedValue).isNotEqualTo(maskedValue);
+    assertThat(maskedValue).isEqualTo(MASKED);
+  }
+
+  @Test
   void emailAddressFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
 
     var emailAttribute = "email";
     var expectedEmailDomain = "@test.domain.xx";
     var unmaskedEmail = String.format("test.testsson%s", expectedEmailDomain);
+
+    var unmaskedAttributes = new HashMap<String, Object>();
+    unmaskedAttributes.put("FirstValue", randomString());
+    unmaskedAttributes.put(emailAttribute, unmaskedEmail);
+    unmaskedAttributes.put("AnotherValue", randomString());
+    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
+
+    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
+
+    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
+    assertThat(actualBody).containsKey(emailAttribute);
+    var maskedValue = actualBody.get(emailAttribute).toString();
+    assertThat(unmaskedEmail).isNotEqualTo(maskedValue);
+    assertThat(maskedValue).contains(MASKED);
+    assertThat(maskedValue).contains(expectedEmailDomain);
+  }
+
+  @Test
+  void shortEmailAddressFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+
+    var emailAttribute = "email";
+    var expectedEmailDomain = "@test.domain.xx";
+    var unmaskedEmail = String.format("t%s", expectedEmailDomain);
 
     var unmaskedAttributes = new HashMap<String, Object>();
     unmaskedAttributes.put("FirstValue", randomString());

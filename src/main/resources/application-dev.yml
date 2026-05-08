@@ -11,7 +11,7 @@ spring:
 properties:
   logging-filter:
     enabled: true
-    max-payload-length: 100
+    max-payload-length: 1000
     exclude-path:
       exact-match: >
         /
