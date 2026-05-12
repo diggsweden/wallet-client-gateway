@@ -944,7 +944,7 @@ components:
           description: JWT result from the HSM when the operation is complete
         resultUrl:
           type: string
-          description: URL where the asynchronous operation result can be polled
+          description: Gateway URL where the asynchronous operation result can be polled
         error:
           $ref: '#/components/schemas/AsyncHsmErrorDto'
       required:

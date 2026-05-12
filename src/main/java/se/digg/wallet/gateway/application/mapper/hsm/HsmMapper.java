@@ -5,12 +5,14 @@
 package se.digg.wallet.gateway.application.mapper.hsm;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import se.digg.wallet.gateway.api.v0.model.AsyncHsmErrorDto;
 import se.digg.wallet.gateway.api.v0.model.AsyncHsmResponseDto;
 import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
+import se.digg.wallet.gateway.application.controller.HsmHttpRoutes;
 import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
@@ -59,8 +61,19 @@ public class HsmMapper {
         .correlationId(response.correlationId())
         .status(response.status())
         .result(response.result())
-        .resultUrl(response.resultUrl())
+        .resultUrl(toGatewayResultUrl(response))
         .error(error)
         .build();
+  }
+
+  private String toGatewayResultUrl(AsyncHsmOperationResult response) {
+    if (response.resultUrl() == null || response.correlationId() == null) {
+      return null;
+    }
+
+    return ServletUriComponentsBuilder.fromCurrentContextPath()
+        .path(HsmHttpRoutes.ASYNC_RESULT)
+        .build(response.correlationId())
+        .toString();
   }
 }

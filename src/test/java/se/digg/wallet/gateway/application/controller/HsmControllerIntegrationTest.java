@@ -55,6 +55,7 @@ class HsmControllerIntegrationTest {
   private static final String TEST_CLIENT_ID = UUID.randomUUID().toString();
   private static final String TEST_DEV_AUTH_CODE = "test-dev-auth-code";
   private static final String TEST_CORRELATION_ID = UUID.randomUUID().toString();
+  private static final String BFF_RESULT_URL = "http://wallet-bff/hsm/v1/requests/";
 
   @Container
   @ServiceConnection
@@ -300,9 +301,9 @@ class HsmControllerIntegrationTest {
                 {
                   "correlationId": "%s",
                   "status": "pending",
-                  "resultUrl": "http://localhost/hsm/v1/requests/%s"
+                  "resultUrl": "%s%s"
                 }
-                """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID))));
+                """.formatted(TEST_CORRELATION_ID, BFF_RESULT_URL, TEST_CORRELATION_ID))));
 
     restClient.post()
         .uri(REGISTER_PIN_ASYNC_URL)
@@ -316,9 +317,9 @@ class HsmControllerIntegrationTest {
             {
               "correlationId": "%s",
               "status": "pending",
-              "resultUrl": "http://localhost/hsm/v1/requests/%s"
+              "resultUrl": "http://localhost:%d/v0/hsm/requests/%s"
             }
-            """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID));
+            """.formatted(TEST_CORRELATION_ID, port, TEST_CORRELATION_ID));
   }
 
   @Test
@@ -366,9 +367,9 @@ class HsmControllerIntegrationTest {
                 {
                   "correlationId": "%s",
                   "status": "pending",
-                  "resultUrl": "http://localhost/hsm/v1/requests/%s"
+                  "resultUrl": "%s%s"
                 }
-                """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID))));
+                """.formatted(TEST_CORRELATION_ID, BFF_RESULT_URL, TEST_CORRELATION_ID))));
 
     restClient.post()
         .uri(LIST_KEYS_ASYNC_URL)
@@ -382,9 +383,9 @@ class HsmControllerIntegrationTest {
             {
               "correlationId": "%s",
               "status": "pending",
-              "resultUrl": "http://localhost/hsm/v1/requests/%s"
+              "resultUrl": "http://localhost:%d/v0/hsm/requests/%s"
             }
-            """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID));
+            """.formatted(TEST_CORRELATION_ID, port, TEST_CORRELATION_ID));
   }
 
   @Test
@@ -397,9 +398,9 @@ class HsmControllerIntegrationTest {
                 {
                   "correlationId": "%s",
                   "status": "pending",
-                  "resultUrl": "http://localhost/hsm/v1/requests/%s"
+                  "resultUrl": "%s%s"
                 }
-                """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID))));
+                """.formatted(TEST_CORRELATION_ID, BFF_RESULT_URL, TEST_CORRELATION_ID))));
 
     restClient.get()
         .uri(HSM_REQUESTS_URL + "/" + TEST_CORRELATION_ID)
@@ -411,9 +412,9 @@ class HsmControllerIntegrationTest {
             {
               "correlationId": "%s",
               "status": "pending",
-              "resultUrl": "http://localhost/hsm/v1/requests/%s"
+              "resultUrl": "http://localhost:%d/v0/hsm/requests/%s"
             }
-            """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID));
+            """.formatted(TEST_CORRELATION_ID, port, TEST_CORRELATION_ID));
   }
 
   @Test
