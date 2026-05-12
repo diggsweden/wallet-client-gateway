@@ -8,81 +8,109 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
-import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
+import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 import se.digg.wallet.gateway.infrastructure.hsm.mapper.HsmClientMapper;
+import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSAsyncOperationResponseDto;
 
 @Component
 public class HsmClient implements HsmPort {
 
   private final RestClient restClient;
   private final String baseUrl;
-  private final String postPath;
+  private final String syncOperationPath;
+  private final String asyncRequestPath;
+  private final String asyncPollPath;
   private final String newStatePath;
   private final HsmClientMapper mapper;
 
   HsmClient(RestClient client, ApplicationConfig applicationConfig, HsmClientMapper mapper) {
     this.restClient = client.mutate().build();
     this.baseUrl = applicationConfig.walletR2ps().baseurl();
-    this.postPath = applicationConfig.walletR2ps().paths().post();
+    this.syncOperationPath = applicationConfig.walletR2ps().paths().syncOperation();
+    this.asyncRequestPath = applicationConfig.walletR2ps().paths().asyncRequest();
+    this.asyncPollPath = applicationConfig.walletR2ps().paths().asyncPoll();
     this.newStatePath = applicationConfig.walletR2ps().paths().newState();
     this.mapper = mapper;
   }
 
   @Override
-  public RegisterStateResponse registerState(RegisterStateRequest request) {
+  public DeviceStateRegistrationResult registerState(DeviceStateRegistration request) {
     var response = restClient
         .post()
         .uri(baseUrl + newStatePath)
         .body(mapper.toClientRequest(request))
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
-        .body(RegisterStateResponse.class);
+        .body(DeviceStateRegistrationResult.class);
     return mapper.toDomainResponse(response);
   }
 
   @Override
-  public HsmResponse registerPin(HsmRequest request) {
+  public AsyncHsmOperationResult submitAsync(HsmOperation request) {
+    var response = restClient
+        .post()
+        .uri(baseUrl + asyncRequestPath)
+        .body(mapper.toClientRequest(request))
+        .contentType(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .body(R2PSAsyncOperationResponseDto.class);
+    return mapper.toDomainResponse(response);
+  }
+
+  @Override
+  public AsyncHsmOperationResult getAsyncResult(String correlationId) {
+    var response = restClient
+        .get()
+        .uri(baseUrl + asyncPollPath.replace("{correlationId}", correlationId))
+        .retrieve()
+        .body(R2PSAsyncOperationResponseDto.class);
+    return mapper.toDomainResponse(response);
+  }
+
+  @Override
+  public HsmOperationResult registerPin(HsmOperation request) {
     return postRequest(request);
   }
 
   @Override
-  public HsmResponse changePin(HsmRequest request) {
+  public HsmOperationResult changePin(HsmOperation request) {
     return postRequest(request);
   }
 
   @Override
-  public HsmResponse createSession(HsmRequest request) {
+  public HsmOperationResult createSession(HsmOperation request) {
     return postRequest(request);
   }
 
   @Override
-  public HsmResponse createKey(HsmRequest request) {
+  public HsmOperationResult createKey(HsmOperation request) {
     return postRequest(request);
   }
 
   @Override
-  public HsmResponse listKeys(HsmRequest request) {
+  public HsmOperationResult listKeys(HsmOperation request) {
     return postRequest(request);
   }
 
   @Override
-  public HsmResponse deleteKey(HsmRequest request) {
+  public HsmOperationResult deleteKey(HsmOperation request) {
     return postRequest(request);
   }
 
   @Override
-  public HsmResponse sign(HsmRequest request) {
+  public HsmOperationResult sign(HsmOperation request) {
     return postRequest(request);
   }
 
-  private HsmResponse postRequest(HsmRequest request) {
+  private HsmOperationResult postRequest(HsmOperation request) {
     String jws = restClient
         .post()
-        .uri(baseUrl + postPath)
+        .uri(baseUrl + syncOperationPath)
         .body(mapper.toClientRequest(request))
         .contentType(MediaType.APPLICATION_JSON)
         .retrieve()

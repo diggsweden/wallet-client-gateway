@@ -47,9 +47,14 @@ class HsmControllerIntegrationTest {
   private static final String LIST_KEYS_URL = "/v0/keys/list";
   private static final String DELETE_KEY_URL = "/v0/keys/delete";
   private static final String SIGN_URL = "/v0/keys/sign";
+  private static final String HSM_REQUESTS_URL = "/v0/hsm/requests";
+  private static final String REGISTER_PIN_ASYNC_URL = "/v0/device/pin/requests";
+  private static final String LIST_KEYS_ASYNC_URL = "/v0/keys/list/requests";
+  private static final String SIGN_ASYNC_URL = "/v0/keys/sign/requests";
   private static final String TEST_JWT = "eyJhbGciOiJFUzI1NiJ9.test.signature";
   private static final String TEST_CLIENT_ID = UUID.randomUUID().toString();
   private static final String TEST_DEV_AUTH_CODE = "test-dev-auth-code";
+  private static final String TEST_CORRELATION_ID = UUID.randomUUID().toString();
 
   @Container
   @ServiceConnection
@@ -93,13 +98,24 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void registerState_returnsCreated() {
-    r2psServer.stubFor(WireMock.post("/new_state")
+  void registersDeviceState() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/device-states")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "application/json")
             .withBody("""
-                { "status": "ok", "clientId": "%s", "devAuthorizationCode": "%s" }
+                {
+                  "status": "ok",
+                  "clientId": "%s",
+                  "devAuthorizationCode": "%s",
+                  "serverJwsPublicKey": {
+                    "kty": "EC",
+                    "crv": "P-256",
+                    "x": "x",
+                    "y": "y"
+                  },
+                  "opaqueServerId": "server"
+                }
                 """.formatted(TEST_CLIENT_ID, TEST_DEV_AUTH_CODE))));
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
@@ -128,8 +144,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void registerPin_returnsCreated() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void registersPin() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -149,8 +165,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void changePin_returnsAccepted() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void changesPin() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -170,8 +186,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void createSession_returnsCreated() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void createsSecureSession() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -191,8 +207,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void createKey_returnsCreated() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void createsKey() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -212,8 +228,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void listKeys_returnsOk() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void listsKeys() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -233,8 +249,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void deleteKey_returnsNoContent() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void deletesKey() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -250,8 +266,8 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void sign_returnsOk() {
-    r2psServer.stubFor(WireMock.post("/service")
+  void signsPayload() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/operations")
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "text/plain")
@@ -271,7 +287,166 @@ class HsmControllerIntegrationTest {
   }
 
   @Test
-  void registerState_unauthenticated_returnsForbidden() {
+  void registerPinAsyncAcceptsPendingResponse() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/requests")
+        .withRequestBody(WireMock.matchingJsonPath("$.outerRequestJws",
+            WireMock.equalTo(TEST_JWT)))
+        .withRequestBody(WireMock.matchingJsonPath("$.clientId",
+            WireMock.equalTo(TEST_CLIENT_ID)))
+        .willReturn(aResponse()
+            .withStatus(202)
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "correlationId": "%s",
+                  "status": "pending",
+                  "resultUrl": "http://localhost/hsm/v1/requests/%s"
+                }
+                """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID))));
+
+    restClient.post()
+        .uri(REGISTER_PIN_ASYNC_URL)
+        .header("content-type", "application/json")
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
+        .exchange()
+        .expectStatus()
+        .isAccepted()
+        .expectBody()
+        .json("""
+            {
+              "correlationId": "%s",
+              "status": "pending",
+              "resultUrl": "http://localhost/hsm/v1/requests/%s"
+            }
+            """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID));
+  }
+
+  @Test
+  void signAsyncAcceptsCompletedResponse() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/requests")
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "correlationId": "%s",
+                  "status": "complete",
+                  "result": "%s"
+                }
+                """.formatted(TEST_CORRELATION_ID, TEST_JWT))));
+
+    restClient.post()
+        .uri(SIGN_ASYNC_URL)
+        .header("content-type", "application/json")
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .json("""
+            {
+              "correlationId": "%s",
+              "status": "complete",
+              "result": "%s"
+            }
+            """.formatted(TEST_CORRELATION_ID, TEST_JWT));
+  }
+
+  @Test
+  void listKeysAsyncSendsOuterRequestJwsToBff() {
+    r2psServer.stubFor(WireMock.post("/hsm/v1/requests")
+        .withRequestBody(WireMock.matchingJsonPath("$.outerRequestJws",
+            WireMock.equalTo(TEST_JWT)))
+        .withRequestBody(WireMock.matchingJsonPath("$.clientId",
+            WireMock.equalTo(TEST_CLIENT_ID)))
+        .willReturn(aResponse()
+            .withStatus(202)
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "correlationId": "%s",
+                  "status": "pending",
+                  "resultUrl": "http://localhost/hsm/v1/requests/%s"
+                }
+                """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID))));
+
+    restClient.post()
+        .uri(LIST_KEYS_ASYNC_URL)
+        .header("content-type", "application/json")
+        .body(new HsmRequestDto(TEST_JWT, TEST_CLIENT_ID))
+        .exchange()
+        .expectStatus()
+        .isAccepted()
+        .expectBody()
+        .json("""
+            {
+              "correlationId": "%s",
+              "status": "pending",
+              "resultUrl": "http://localhost/hsm/v1/requests/%s"
+            }
+            """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID));
+  }
+
+  @Test
+  void pollingAcceptsPendingResponse() {
+    r2psServer.stubFor(WireMock.get("/hsm/v1/requests/" + TEST_CORRELATION_ID)
+        .willReturn(aResponse()
+            .withStatus(202)
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "correlationId": "%s",
+                  "status": "pending",
+                  "resultUrl": "http://localhost/hsm/v1/requests/%s"
+                }
+                """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID))));
+
+    restClient.get()
+        .uri(HSM_REQUESTS_URL + "/" + TEST_CORRELATION_ID)
+        .exchange()
+        .expectStatus()
+        .isAccepted()
+        .expectBody()
+        .json("""
+            {
+              "correlationId": "%s",
+              "status": "pending",
+              "resultUrl": "http://localhost/hsm/v1/requests/%s"
+            }
+            """.formatted(TEST_CORRELATION_ID, TEST_CORRELATION_ID));
+  }
+
+  @Test
+  void pollingAcceptsCompletedResponse() {
+    r2psServer.stubFor(WireMock.get("/hsm/v1/requests/" + TEST_CORRELATION_ID)
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "correlationId": "%s",
+                  "status": "complete",
+                  "result": "%s"
+                }
+                """.formatted(TEST_CORRELATION_ID, TEST_JWT))));
+
+    restClient.get()
+        .uri(HSM_REQUESTS_URL + "/" + TEST_CORRELATION_ID)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .json("""
+            {
+              "correlationId": "%s",
+              "status": "complete",
+              "result": "%s"
+            }
+            """.formatted(TEST_CORRELATION_ID, TEST_JWT));
+  }
+
+  @Test
+  void rejectsUnauthenticatedDeviceStateRegistration() {
     RestTestClient unauthenticated = RestTestClient.bindToServer()
         .baseUrl("http://localhost:" + port)
         .build();

@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-public record HsmResponse(String jwt) {
+public record AsyncHsmOperationError(String message, Integer httpStatus) {
 }

@@ -4,7 +4,5 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-import java.util.Optional;
-
-public record RegisterStateRequest(EcPublicJwk publicKey, boolean overwrite, Optional<String> ttl) {
+public record HsmOperationResult(String jwt) {
 }

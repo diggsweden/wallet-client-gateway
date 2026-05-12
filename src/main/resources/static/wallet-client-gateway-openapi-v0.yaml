@@ -41,6 +41,8 @@ tags:
     description: Wallet Unit Attestation operations
   - name: HSM
     description: Hardware Security Module operations
+  - name: HSM Async
+    description: Asynchronous Hardware Security Module operations
   - name: Attestation
     description: Attestation operations (currently not in use)
 
@@ -271,12 +273,45 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
+  /v0/hsm/requests/{correlationId}:
+    get:
+      tags:
+        - HSM Async
+      summary: Get asynchronous HSM operation result
+      description: Gets the result status for a previously submitted asynchronous HSM operation.
+      operationId: getHsmRequest
+      parameters:
+        - name: correlationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation still pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
   /v0/device/pin:
     post:
       tags:
         - HSM
       summary: Register PIN
-      description: Registers a PIN with the HSM
+      description: |
+        Registers a PIN with the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: registerPin
       requestBody:
         content:
@@ -300,7 +335,9 @@ paths:
       tags:
         - HSM
       summary: Change PIN
-      description: Changes the PIN on the HSM
+      description: |
+        Changes the PIN on the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: changePin
       requestBody:
         content:
@@ -325,7 +362,9 @@ paths:
       tags:
         - HSM
       summary: Create secure session
-      description: Creates a secure session with the HSM
+      description: |
+        Creates a secure session with the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: createHsmSession
       requestBody:
         content:
@@ -350,7 +389,9 @@ paths:
       tags:
         - HSM
       summary: Create key
-      description: Creates a new key in the HSM
+      description: |
+        Creates a new key in the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: createKey
       requestBody:
         content:
@@ -375,7 +416,9 @@ paths:
       tags:
         - HSM
       summary: Delete key
-      description: Deletes a key from the HSM
+      description: |
+        Deletes a key from the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: deleteKey
       requestBody:
         content:
@@ -396,7 +439,9 @@ paths:
       tags:
         - HSM
       summary: List keys
-      description: Lists keys in the HSM
+      description: |
+        Lists keys in the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: listKeys
       requestBody:
         content:
@@ -421,7 +466,9 @@ paths:
       tags:
         - HSM
       summary: Sign
-      description: Signs data using a key in the HSM
+      description: |
+        Signs data using a key in the HSM. The endpoint path expresses client intent; the
+        HSM worker dispatches the actual operation encoded inside the JWT payload.
       operationId: sign
       requestBody:
         content:
@@ -436,6 +483,236 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/device/pin/requests:
+    post:
+      tags:
+        - HSM Async
+      summary: Register PIN asynchronously
+      description: |
+        Submits a PIN registration operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: registerPinAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+    put:
+      tags:
+        - HSM Async
+      summary: Change PIN asynchronously
+      description: |
+        Submits a PIN change operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: changePinAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/secure-session/requests:
+    post:
+      tags:
+        - HSM Async
+      summary: Create secure session asynchronously
+      description: |
+        Submits a secure-session operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: createHsmSessionAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/keys/requests:
+    post:
+      tags:
+        - HSM Async
+      summary: Create key asynchronously
+      description: |
+        Submits a key creation operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: createKeyAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/keys/delete/requests:
+    post:
+      tags:
+        - HSM Async
+      summary: Delete key asynchronously
+      description: |
+        Submits a key deletion operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: deleteKeyAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/keys/list/requests:
+    post:
+      tags:
+        - HSM Async
+      summary: List keys asynchronously
+      description: |
+        Submits a key listing operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: listKeysAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/keys/sign/requests:
+    post:
+      tags:
+        - HSM Async
+      summary: Sign asynchronously
+      description: |
+        Submits a signing operation for asynchronous execution. The endpoint path expresses
+        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
+      operationId: signAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HsmRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Operation completed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
+        '202':
+          description: Operation accepted, poll for result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncHsmResponseDto'
         '403':
           $ref: '#/components/responses/Forbidden'
         'default':
@@ -652,6 +929,39 @@ components:
           description: JWT response from the HSM
       required:
         - jwt
+
+    AsyncHsmResponseDto:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Correlation ID for the asynchronous operation
+        status:
+          type: string
+          description: Operation status
+        result:
+          type: string
+          description: JWT result from the HSM when the operation is complete
+        resultUrl:
+          type: string
+          description: URL where the asynchronous operation result can be polled
+        error:
+          $ref: '#/components/schemas/AsyncHsmErrorDto'
+      required:
+        - correlationId
+        - status
+
+    AsyncHsmErrorDto:
+      type: object
+      properties:
+        message:
+          type: string
+        httpStatus:
+          type: integer
+          format: int32
+      required:
+        - message
+        - httpStatus
 
     RegisterStateRequestDto:
       type: object
