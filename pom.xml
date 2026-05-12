@@ -71,6 +71,7 @@
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
     <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+    <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
 
     <wallet-account-spec.repo>diggsweden/wallet-account</wallet-account-spec.repo>
     <wallet-account-spec.ref>78f7591424f8dc17e320dec9c8764514e865da19</wallet-account-spec.ref>
@@ -307,6 +308,13 @@
             <goals><goal>report</goal></goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- SonarQube plugin -->
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>${sonar-maven-plugin.version}</version>
       </plugin>
 
       <!-- Formatter plugin -->
