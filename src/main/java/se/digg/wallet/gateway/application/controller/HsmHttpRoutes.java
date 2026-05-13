@@ -10,6 +10,5 @@ public final class HsmHttpRoutes {
 
   public static final String ASYNC_RESULT = HsmAsyncApi.PATH_GET_HSM_REQUEST;
 
-  private HsmHttpRoutes() {
-  }
+  private HsmHttpRoutes() {}
 }
