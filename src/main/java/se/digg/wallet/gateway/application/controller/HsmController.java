@@ -31,11 +31,14 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<RegisterStateResponseDto> registerState(RegisterStateRequestDto registerStateRequest) {
+  public ResponseEntity<RegisterStateResponseDto> registerState(
+      RegisterStateRequestDto registerStateRequest) {
     DeviceStateRegistration stateRegistration = mapper.toDomain(registerStateRequest);
-    DeviceStateRegistrationResult stateRegistrationResult = hsmService.registerState(stateRegistration);
+    DeviceStateRegistrationResult stateRegistrationResult =
+        hsmService.registerState(stateRegistration);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(stateRegistrationResult));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(mapper.toResponse(stateRegistrationResult));
   }
 
   @Override
