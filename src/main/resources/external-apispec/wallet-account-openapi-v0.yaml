@@ -294,8 +294,6 @@ components:
         deviceKey:
           $ref: '#/components/schemas/KeyRequest'
       required:
-        - personalIdentityNumber
-        - email
         - deviceKey
 
     AccountResponse:
