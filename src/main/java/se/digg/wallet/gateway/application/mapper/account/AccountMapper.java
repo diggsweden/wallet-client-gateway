@@ -18,7 +18,6 @@ import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 @Component
 public class AccountMapper {
 
-
   public CreateAccountResponseDto toResponse(Account account) {
     return CreateAccountResponseDto
         .builder()
@@ -29,7 +28,7 @@ public class AccountMapper {
   public NewAccount toDomain(CreateAccountRequestDto request) {
     return new NewAccount(
         request.getPersonalIdentityNumber().orElse(null),
-        request.getEmailAdress(),
+        request.getEmailAdress().orElse(null),
         request.getTelephoneNumber().orElse(null),
         toDomain(request.getPublicKey()));
   }
@@ -37,7 +36,7 @@ public class AccountMapper {
   public NewAccount toDomain(CreateAccountRequest request) {
     return new NewAccount(
         request.getPersonalIdentityNumber().orElse(null),
-        request.getEmailAdress(),
+        request.getEmailAdress().orElse(null),
         request.getTelephoneNumber().orElse(null),
         toDomain(request.getDeviceKey()));
   }

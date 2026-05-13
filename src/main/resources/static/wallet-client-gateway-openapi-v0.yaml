@@ -541,7 +541,6 @@ components:
         publicKey:
           $ref: '#/components/schemas/KeyRequest'
       required:
-        - emailAdress
         - publicKey
 
     CreateAccountRequest:
@@ -560,7 +559,6 @@ components:
         deviceKey:
           $ref: '#/components/schemas/KeyRequest'
       required:
-        - emailAdress
         - deviceKey
 
     KeyRequest:
