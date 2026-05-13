@@ -5,10 +5,11 @@
 package se.digg.wallet.gateway.domain.service.hsm;
 
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
-import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
+import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 
 @Service
@@ -21,42 +22,49 @@ public class HsmService {
   }
 
 
-  public RegisterStateResponse registerState(RegisterStateRequest request) {
+  public DeviceStateRegistrationResult registerState(DeviceStateRegistration request) {
     return hsmPort.registerState(request);
   }
 
+  public AsyncHsmOperationResult submitAsync(HsmOperation request) {
+    return hsmPort.submitAsync(request);
+  }
 
-  public HsmResponse registerPin(HsmRequest request) {
+  public AsyncHsmOperationResult getAsyncResult(String correlationId) {
+    return hsmPort.getAsyncResult(correlationId);
+  }
+
+  public HsmOperationResult registerPin(HsmOperation request) {
     return hsmPort.registerPin(request);
   }
 
 
-  public HsmResponse changePin(HsmRequest request) {
+  public HsmOperationResult changePin(HsmOperation request) {
     return hsmPort.changePin(request);
   }
 
 
-  public HsmResponse createSession(HsmRequest request) {
+  public HsmOperationResult createSession(HsmOperation request) {
     return hsmPort.createSession(request);
   }
 
 
-  public HsmResponse createKey(HsmRequest request) {
+  public HsmOperationResult createKey(HsmOperation request) {
     return hsmPort.createKey(request);
   }
 
 
-  public HsmResponse listKeys(HsmRequest request) {
+  public HsmOperationResult listKeys(HsmOperation request) {
     return hsmPort.listKeys(request);
   }
 
 
-  public HsmResponse deleteKey(HsmRequest request) {
+  public HsmOperationResult deleteKey(HsmOperation request) {
     return hsmPort.deleteKey(request);
   }
 
 
-  public HsmResponse sign(HsmRequest request) {
+  public HsmOperationResult sign(HsmOperation request) {
     return hsmPort.sign(request);
   }
 

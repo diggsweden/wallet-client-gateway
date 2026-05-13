@@ -5,20 +5,25 @@
 package se.digg.wallet.gateway.application.mapper.hsm;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import se.digg.wallet.gateway.api.v0.model.AsyncHsmErrorDto;
+import se.digg.wallet.gateway.api.v0.model.AsyncHsmResponseDto;
 import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
+import se.digg.wallet.gateway.application.controller.HsmHttpRoutes;
+import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwk;
-import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
-import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 
 @Component
 public class HsmMapper {
 
-  public RegisterStateRequest toDomain(
-      se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto request) {
+  public DeviceStateRegistration toDomain(RegisterStateRequestDto request) {
     var publicKeyRequest = request.getPublicKey();
     var publicKey = new EcPublicJwk(
         publicKeyRequest.getKty(),
@@ -26,14 +31,14 @@ public class HsmMapper {
         publicKeyRequest.getX(),
         publicKeyRequest.getY(),
         publicKeyRequest.getKid().orElse(""));
-    return new RegisterStateRequest(publicKey, request.getOverwrite(), request.getTtl());
+    return new DeviceStateRegistration(publicKey, request.getOverwrite(), request.getTtl());
   }
 
-  public HsmRequest toDomain(HsmRequestDto request) {
-    return new HsmRequest(request.getJwt(), request.getClientId());
+  public HsmOperation toDomain(HsmRequestDto request) {
+    return new HsmOperation(request.getJwt(), request.getClientId());
   }
 
-  public RegisterStateResponseDto toResponse(RegisterStateResponse response) {
+  public RegisterStateResponseDto toResponse(DeviceStateRegistrationResult response) {
     return RegisterStateResponseDto.builder()
         .status(response.status())
         .clientId(response.clientId())
@@ -41,7 +46,34 @@ public class HsmMapper {
         .build();
   }
 
-  public HsmResponseDto toResponse(HsmResponse response) {
+  public HsmResponseDto toResponse(HsmOperationResult response) {
     return HsmResponseDto.builder().jwt(response.jwt()).build();
+  }
+
+  public AsyncHsmResponseDto toResponse(AsyncHsmOperationResult response) {
+    var error = response.error() == null
+        ? null
+        : AsyncHsmErrorDto.builder()
+            .message(response.error().message())
+            .httpStatus(response.error().httpStatus())
+            .build();
+    return AsyncHsmResponseDto.builder()
+        .correlationId(response.correlationId())
+        .status(response.status())
+        .result(response.result())
+        .resultUrl(toGatewayResultUrl(response))
+        .error(error)
+        .build();
+  }
+
+  private String toGatewayResultUrl(AsyncHsmOperationResult response) {
+    if (response.resultUrl() == null || response.correlationId() == null) {
+      return null;
+    }
+
+    return ServletUriComponentsBuilder.fromCurrentContextPath()
+        .path(HsmHttpRoutes.ASYNC_RESULT)
+        .build(response.correlationId())
+        .toString();
   }
 }

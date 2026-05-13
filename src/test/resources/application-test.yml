@@ -29,8 +29,10 @@ properties:
   wallet-r2ps:
     baseurl: http://localhost:${wiremock.r2ps.port:0}
     paths:
-      post: /service
-      new-state: /new_state
+      sync-operation: /hsm/v1/operations
+      async-request: /hsm/v1/requests
+      async-poll: /hsm/v1/requests/{correlationId}
+      new-state: /hsm/v1/device-states
   challenge-cache:
     ttl-seconds: 10
 

@@ -4,5 +4,10 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-public record RegisterStateResponse(String status, String clientId, String devAuthorizationCode) {
+public record AsyncHsmOperationResult(
+    String correlationId,
+    String status,
+    String result,
+    String resultUrl,
+    AsyncHsmOperationError error) {
 }

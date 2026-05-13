@@ -4,27 +4,32 @@
 
 package se.digg.wallet.gateway.domain.ports.outbound;
 
-import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
-import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
+import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 
 public interface HsmPort {
 
-  RegisterStateResponse registerState(RegisterStateRequest request);
+  DeviceStateRegistrationResult registerState(DeviceStateRegistration request);
 
-  HsmResponse registerPin(HsmRequest request);
+  AsyncHsmOperationResult submitAsync(HsmOperation request);
 
-  HsmResponse changePin(HsmRequest request);
+  AsyncHsmOperationResult getAsyncResult(String correlationId);
 
-  HsmResponse createSession(HsmRequest request);
+  HsmOperationResult registerPin(HsmOperation request);
 
-  HsmResponse createKey(HsmRequest request);
+  HsmOperationResult changePin(HsmOperation request);
 
-  HsmResponse listKeys(HsmRequest request);
+  HsmOperationResult createSession(HsmOperation request);
 
-  HsmResponse deleteKey(HsmRequest request);
+  HsmOperationResult createKey(HsmOperation request);
 
-  HsmResponse sign(HsmRequest request);
+  HsmOperationResult listKeys(HsmOperation request);
+
+  HsmOperationResult deleteKey(HsmOperation request);
+
+  HsmOperationResult sign(HsmOperation request);
 
 }

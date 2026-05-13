@@ -10,8 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.HsmApi;
 import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
 import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
 import se.digg.wallet.gateway.application.mapper.hsm.HsmMapper;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.service.hsm.HsmService;
 
 @RestController
@@ -26,60 +31,66 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<RegisterStateResponseDto> registerState(
-      se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto registerStateRequest) {
-    var registerStateResponse = mapper.toResponse(
-        hsmService.registerState(mapper.toDomain(registerStateRequest)));
+  public ResponseEntity<RegisterStateResponseDto> registerState(RegisterStateRequestDto registerStateRequest) {
+    DeviceStateRegistration stateRegistration = mapper.toDomain(registerStateRequest);
+    DeviceStateRegistrationResult stateRegistrationResult = hsmService.registerState(stateRegistration);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(registerStateResponse);
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(stateRegistrationResult));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> registerPin(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.registerPin(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    HsmOperationResult hsmOperationResult = hsmService.registerPin(hsmOperation);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmOperationResult));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> changePin(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.changePin(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    HsmOperationResult hsmOperationResult = hsmService.changePin(hsmOperation);
 
-    return ResponseEntity.ok().body(mapper.toResponse(hsmResponseDto));
+    return ResponseEntity.ok().body(mapper.toResponse(hsmOperationResult));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> createHsmSession(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.createSession(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    HsmOperationResult hsmOperationResult = hsmService.createSession(hsmOperation);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmOperationResult));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> createKey(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.createKey(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    HsmOperationResult hsmOperationResult = hsmService.createKey(hsmOperation);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(hsmOperationResult));
   }
 
   @Override
   public ResponseEntity<Void> deleteKey(HsmRequestDto hsmRequest) {
-    hsmService.deleteKey(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    hsmService.deleteKey(hsmOperation);
 
     return ResponseEntity.noContent().build();
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> listKeys(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.listKeys(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    HsmOperationResult hsmOperationResult = hsmService.listKeys(hsmOperation);
 
-    return ResponseEntity.ok(mapper.toResponse(hsmResponseDto));
+    return ResponseEntity.ok(mapper.toResponse(hsmOperationResult));
   }
 
   @Override
   public ResponseEntity<HsmResponseDto> sign(HsmRequestDto hsmRequest) {
-    var hsmResponseDto = hsmService.sign(mapper.toDomain(hsmRequest));
+    HsmOperation hsmOperation = mapper.toDomain(hsmRequest);
+    HsmOperationResult hsmOperationResult = hsmService.sign(hsmOperation);
 
-    return ResponseEntity.ok(mapper.toResponse(hsmResponseDto));
+    return ResponseEntity.ok(mapper.toResponse(hsmOperationResult));
   }
 }

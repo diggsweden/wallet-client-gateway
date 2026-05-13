@@ -5,36 +5,52 @@
 package se.digg.wallet.gateway.infrastructure.hsm.mapper;
 
 import org.springframework.stereotype.Component;
-import se.digg.wallet.gateway.domain.model.hsm.HsmRequest;
-import se.digg.wallet.gateway.domain.model.hsm.HsmResponse;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateRequest;
-import se.digg.wallet.gateway.domain.model.hsm.RegisterStateResponse;
-import se.digg.wallet.gateway.infrastructure.hsm.client.R2psNewStateRequestDto;
-import se.digg.wallet.gateway.infrastructure.hsm.client.R2psRequestDto;
+import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationError;
+import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
+import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSAsyncOperationResponseDto;
+import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSDeviceStateRequestDto;
+import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSEcPublicJwkDto;
+import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSOperationRequestDto;
 
 @Component
 public class HsmClientMapper {
 
-  public R2psNewStateRequestDto toClientRequest(RegisterStateRequest request) {
+  public R2PSDeviceStateRequestDto toClientRequest(DeviceStateRegistration request) {
     var publicKey = request.publicKey();
-    var clientPublicKey = new R2psNewStateRequestDto.EcPublicJwkDto(
+    var clientPublicKey = new R2PSEcPublicJwkDto(
         publicKey.kty(),
         publicKey.crv(),
         publicKey.x(),
         publicKey.y(),
         publicKey.kid());
-    return new R2psNewStateRequestDto(clientPublicKey, request.overwrite(), request.ttl());
+    return new R2PSDeviceStateRequestDto(clientPublicKey, request.overwrite(), request.ttl());
   }
 
-  public R2psRequestDto toClientRequest(HsmRequest request) {
-    return new R2psRequestDto(request.clientId(), request.jwt());
+  public R2PSOperationRequestDto toClientRequest(HsmOperation request) {
+    return new R2PSOperationRequestDto(request.clientId(), request.jwt());
   }
 
-  public HsmResponse toDomainResponse(String jwt) {
-    return new HsmResponse(jwt);
+  public HsmOperationResult toDomainResponse(String jwt) {
+    return new HsmOperationResult(jwt);
   }
 
-  public RegisterStateResponse toDomainResponse(RegisterStateResponse response) {
+  public AsyncHsmOperationResult toDomainResponse(R2PSAsyncOperationResponseDto response) {
+    var error = response.error() == null
+        ? null
+        : new AsyncHsmOperationError(response.error().message(), response.error().httpStatus());
+    return new AsyncHsmOperationResult(
+        response.correlationId(),
+        response.status(),
+        response.result(),
+        response.resultUrl(),
+        error);
+  }
+
+  public DeviceStateRegistrationResult toDomainResponse(DeviceStateRegistrationResult response) {
     return response;
   }
 }
