@@ -28,8 +28,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeType;
-import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -58,9 +56,6 @@ class AccountControllerAuthenticatedIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
-
-  @Autowired
-  private ApplicationConfig applicationConfig;
 
   private RestTestClient restClient;
   private boolean authenticated = false;
@@ -94,7 +89,6 @@ class AccountControllerAuthenticatedIntegrationTest {
 
     var response = restClient.post()
         .uri("/v0/accounts/wallet-keys")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(KeyRequestTestBuilder.withDefaults().build())
         .exchange();
 
@@ -108,7 +102,6 @@ class AccountControllerAuthenticatedIntegrationTest {
 
     var response = restClient.post()
         .uri("/v0/accounts/wallet-keys")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(KeyRequestTestBuilder.withDefaults().build())
         .exchange();
 
@@ -133,7 +126,6 @@ class AccountControllerAuthenticatedIntegrationTest {
 
     var response = restClient.post()
         .uri("/v0/accounts/security-envelopes")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(SecurityEnvelopeRequest.builder()
             .type(SecurityEnvelopeType.SIGN)
             .content(envelopeContent)
@@ -150,7 +142,6 @@ class AccountControllerAuthenticatedIntegrationTest {
 
     var response = restClient.post()
         .uri("/v0/accounts/security-envelopes")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(SecurityEnvelopeRequest.builder()
             .type(SecurityEnvelopeType.SIGN)
             .content("content")

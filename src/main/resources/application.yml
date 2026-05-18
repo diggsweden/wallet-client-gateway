@@ -14,6 +14,7 @@ properties:
     - "/swagger-ui/**"
     - "/public/**"
     - "/wua"
+  api-key-protected-paths:
     - "/accounts"
     - "/v0/accounts"
   walletprovider:

@@ -24,8 +24,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.application.config.ApplicationConfig;
-import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -73,9 +71,6 @@ class HsmControllerIntegrationTest {
   @InjectWireMock(WalletR2psMock.NAME)
   private WireMockServer r2psServer;
 
-  @Autowired
-  private ApplicationConfig applicationConfig;
-
   private RestTestClient restClient;
   private boolean authenticated = false;
 
@@ -91,9 +86,6 @@ class HsmControllerIntegrationTest {
           .baseUrl("http://localhost:" + port)
           .build();
       restClient = AuthUtil.login(accountServer, port, restClient, ACCOUNT_ID, generatedKeyPair);
-      restClient = restClient.mutate()
-          .defaultHeader(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-          .build();
       authenticated = true;
     }
   }
