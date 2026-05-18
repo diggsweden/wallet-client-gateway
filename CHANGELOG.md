@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.8] - 2026-05-18
+
+### Changed
+
+- Merge pull request #151 from diggsweden/feat/hsm-register-state-response
+- Extend register state response model
+
 ## [0.5.7] - 2026-05-13
 
 ### Fixed
 
 - Fix formatting (#150)
+
 
 ## [0.5.6] - 2026-05-13
 
@@ -586,6 +594,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.5.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.7..v0.5.8
 [0.5.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.6..v0.5.7
 [0.5.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.5..v0.5.6
 [0.5.5]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.4..v0.5.5
