@@ -965,7 +965,7 @@ components:
       type: object
       properties:
         publicKey:
-          $ref: '#/components/schemas/EcPublicJwkDto'
+          $ref: '#/components/schemas/KeyRequest'
         overwrite:
           type: boolean
           description: Whether to overwrite an existing state
@@ -985,6 +985,10 @@ components:
         clientId:
           type: string
         devAuthorizationCode:
+          type: string
+        serverJwsPublicKey:
+          $ref: '#/components/schemas/EcPublicJwkDto'
+        opaqueServerId:
           type: string
       required:
         - status
