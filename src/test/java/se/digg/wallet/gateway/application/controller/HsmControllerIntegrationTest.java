@@ -120,7 +120,7 @@ class HsmControllerIntegrationTest {
                 """.formatted(TEST_CLIENT_ID, TEST_DEV_AUTH_CODE))));
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
-        .publicKey(se.digg.wallet.gateway.api.v0.model.EcPublicJwkDto.builder()
+        .publicKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -140,7 +140,12 @@ class HsmControllerIntegrationTest {
         .isCreated()
         .expectBody()
         .json("""
-            { "clientId": "%s", "devAuthorizationCode": "%s" }
+            {
+              "clientId": "%s",
+              "devAuthorizationCode": "%s",
+              "serverJwsPublicKey": { "kty": "EC", "crv": "P-256", "x": "x", "y": "y" },
+              "opaqueServerId": "server"
+            }
             """.formatted(TEST_CLIENT_ID, TEST_DEV_AUTH_CODE));
   }
 
@@ -456,7 +461,7 @@ class HsmControllerIntegrationTest {
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
         .body(se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
-            .publicKey(se.digg.wallet.gateway.api.v0.model.EcPublicJwkDto.builder()
+            .publicKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
                 .kty("EC")
                 .crv("P-256")
                 .x("x")

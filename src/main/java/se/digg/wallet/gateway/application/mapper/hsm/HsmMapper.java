@@ -30,7 +30,7 @@ public class HsmMapper {
         publicKeyRequest.getCrv(),
         publicKeyRequest.getX(),
         publicKeyRequest.getY(),
-        publicKeyRequest.getKid().orElse(""));
+        publicKeyRequest.getKid());
     return new DeviceStateRegistration(publicKey, request.getOverwrite(), request.getTtl());
   }
 
@@ -43,6 +43,8 @@ public class HsmMapper {
         .status(response.status())
         .clientId(response.clientId())
         .devAuthorizationCode(response.devAuthorizationCode())
+        .serverJwsPublicKey(response.serverJwsPublicKey())
+        .opaqueServerId(response.opaqueServerId())
         .build();
   }
 
