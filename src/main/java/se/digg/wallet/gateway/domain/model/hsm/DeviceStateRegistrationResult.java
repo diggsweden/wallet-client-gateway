@@ -12,5 +12,6 @@ public record DeviceStateRegistrationResult(
     String clientId,
     String devAuthorizationCode,
     EcPublicJwk serverJwsPublicKey,
-    String opaqueServerId) {
+    String opaqueServerId,
+    String stateJws) {
 }

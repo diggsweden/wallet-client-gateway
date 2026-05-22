@@ -31,7 +31,7 @@ public class HsmClientMapper {
   }
 
   public R2PSOperationRequestDto toClientRequest(HsmOperation request) {
-    return new R2PSOperationRequestDto(request.clientId(), request.jwt());
+    return new R2PSOperationRequestDto(request.clientId(), request.jwt(), request.stateJws());
   }
 
   public HsmOperationResult toDomainResponse(String jwt) {
@@ -47,7 +47,8 @@ public class HsmClientMapper {
         response.status(),
         response.result(),
         response.resultUrl(),
-        error);
+        error,
+        response.stateJws());
   }
 
   public DeviceStateRegistrationResult toDomainResponse(DeviceStateRegistrationResult response) {

@@ -9,5 +9,6 @@ public record R2PSAsyncOperationResponseDto(
     String status,
     String result,
     String resultUrl,
-    R2PSAsyncOperationErrorDto error) {
+    R2PSAsyncOperationErrorDto error,
+    String stateJws) {
 }

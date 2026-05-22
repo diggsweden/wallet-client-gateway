@@ -36,7 +36,7 @@ public class HsmMapper {
   }
 
   public HsmOperation toDomain(HsmRequest request) {
-    return new HsmOperation(request.getJwt(), request.getClientId());
+    return new HsmOperation(request.getJwt(), request.getClientId(), request.getStateJws().orElse(null));
   }
 
   public HsmResponse toHsmResponse(AsyncHsmOperationResult result) {
@@ -66,6 +66,7 @@ public class HsmMapper {
         .status(result.status())
         .opaqueServerId(result.opaqueServerId())
         .devAuthorizationCode(result.devAuthorizationCode())
+        .stateJws(response.stateJws())
         .build();
   }
 
