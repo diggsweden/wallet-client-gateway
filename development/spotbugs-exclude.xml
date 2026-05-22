@@ -40,4 +40,9 @@ SPDX-License-Identifier: CC0-1.0
         <Bug pattern="NM_METHOD_NAMING_CONVENTION"/>
         <Class name="~.*Builder"/>
     </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="se.digg.wallet.gateway.domain.model.hsm.*"/>
+    </Match>
 </FindBugsFilter>
