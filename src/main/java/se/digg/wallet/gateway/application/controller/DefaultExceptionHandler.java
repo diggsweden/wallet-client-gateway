@@ -4,9 +4,9 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
 import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
+import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
 import static se.digg.wallet.gateway.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +40,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+  private static final String ABOUT_BLANK = "ABOUT_BLANK";
 
   private final HttpServletRequest httpServletRequest;
 
@@ -76,7 +77,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
       problemResponse.invalidParameters(violations);
 
     } catch (Throwable ex) {
-      LOGGER.warn("Unable to extract invalid parameters from ConstraintViolationException", e);
+      logWarn("Unable to extract invalid parameters from ConstraintViolationException",
+          method, path, ex);
     }
 
     var violations = Map.of(
@@ -85,7 +87,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             violation.getRootBeanClass().getName(),
             violation.getPropertyPath().toString(),
             violation.getMessage())).toList());
-    LOGGER.debug("Request argument not valid: {} {} {}", path, method, violations);
+    logDebug("Request argument not valid", path, method, violations);
     return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
   }
 
@@ -132,7 +134,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
       problemResponse.invalidParameters(allErrors);
 
     } catch (Throwable ex) {
-      LOGGER.warn("Unable to extract invalid parameters from MethodArgumentNotValidException", e);
+      logWarn("Unable to extract invalid parameters from MethodArgumentNotValidException",
+          method, path, ex);
     }
 
     var errors = Map.of(
@@ -140,7 +143,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
           .map(ObjectError::getDefaultMessage).toList(),
       "fieldErrors", e.getBindingResult().getFieldErrors().stream()
         .map(FieldError::getDefaultMessage).toList());
-    LOGGER.debug("Input validation failure: {} {} {}", path, method, errors);
+    logDebug("Input validation failure", method, path, errors);
     return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
   }
 
@@ -158,7 +161,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .instance(path)
         .build();
 
-    LOGGER.error("Remote service failure. {} {}", method, path, e);
+    logError("Remote service failure", method, path, e);
     return createResponseEntity(problemType.getHttpStatus(), problemResponse);
   }
 
@@ -176,7 +179,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .instance(path)
         .build();
 
-    LOGGER.error("Uncaught exception. {} {}", method, path, e);
+    logError("Unexpected exception", method, path, e);
     return createResponseEntity(problemType.getHttpStatus(), problemResponse);
   }
 
@@ -188,6 +191,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
       HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 
     var problemDetailResponse = ProblemResponse.builder()
+        .type(ABOUT_BLANK)
         .status(statusCode.value())
         .instance(request.getContextPath());
 
@@ -219,8 +223,34 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {
 
     return ProblemResponse.builder()
-        .type(problemType.getUri().toASCIIString())
+        .type(Optional.ofNullable(problemType.getUri().toASCIIString())
+          .orElse(ABOUT_BLANK))
         .title(problemType.getTitle())
         .status(problemType.getHttpStatus().value());
+  }
+
+  private void logDebug(String message, String method, String path,
+      @Nullable Map<String, ?> properties) {
+
+    logDebug(message, method, path, properties, null);
+  }
+
+  private void logDebug(String message, String method, String path,
+      @Nullable Map<String, ?> properties, Throwable e) {
+
+    LOGGER.debug("{} {} {} {} transaction-id: {}", method, path, message,
+        Optional.ofNullable(properties).orElse(Map.of()), MDC.get(MDC_TRANSACTION_ID), e);
+  }
+
+  private void logWarn(String message, String method, String path, Throwable e) {
+
+    LOGGER.warn("{} {} {} transaction-id: {}", method, path, message, MDC.get(MDC_TRANSACTION_ID),
+        e);
+  }
+
+  private void logError(String message, String method, String path, Throwable e) {
+
+    LOGGER.error("{} {} {} transaction-id: {}", method, path, message, MDC.get(MDC_TRANSACTION_ID),
+        e);
   }
 }
