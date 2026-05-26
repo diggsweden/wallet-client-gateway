@@ -6,7 +6,7 @@ package se.digg.wallet.gateway.domain.service.wua;
 
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.application.config.WalletRuntimeException;
-import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDto;
+import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -20,11 +20,10 @@ public class WuaMapper {
     this.objectMapper = objectMapper.rebuild().build();
   }
 
-  public WalletProviderCreateWuaDto toWalletProviderCreateWuaDto(WalletAccountAccountDto account,
-      String nonce) {
+  public WalletProviderCreateWuaDto toWalletProviderCreateWuaDto(Jwk walletKey, String nonce) {
     String jwkString;
     try {
-      jwkString = objectMapper.writeValueAsString(account.publicKey());
+      jwkString = objectMapper.writeValueAsString(walletKey);
     } catch (JacksonException e) {
       throw new WalletRuntimeException(e);
     }

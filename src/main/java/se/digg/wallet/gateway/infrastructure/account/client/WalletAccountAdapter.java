@@ -72,4 +72,10 @@ public class WalletAccountAdapter implements AccountPort {
     return accountClientMapper.toDomain(accountApi.getAccountSecurityEnvelopes(id));
   }
 
+  @Override
+  public Jwk getWalletKey(String accountId) {
+    UUID id = UUID.fromString(accountId);
+    return accountClientMapper.toDomainJwk(accountApi.getAccountWalletKey(id, null));
+  }
+
 }

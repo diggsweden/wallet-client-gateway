@@ -17,6 +17,7 @@ import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
 import se.digg.wallet.gateway.client.account.v0.model.KeyResponse;
+import se.digg.wallet.gateway.client.account.v0.model.KeysResponse;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
@@ -101,6 +102,13 @@ public class AccountClientMapper {
         .telephoneNumber(response.getTelephoneNumber())
         .deviceKey(toDomain(response.getPublicKey()))
         .build();
+  }
+
+  public Jwk toDomainJwk(KeysResponse response) {
+    if (response.getItems() == null || response.getItems().isEmpty()) {
+      throw new IllegalStateException("No wallet key found for account");
+    }
+    return toDomain(response.getItems().get(0));
   }
 
   public Jwk toDomain(KeyResponse response) {

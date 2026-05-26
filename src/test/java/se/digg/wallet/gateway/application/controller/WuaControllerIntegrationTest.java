@@ -6,6 +6,7 @@ package se.digg.wallet.gateway.application.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -30,8 +31,7 @@ import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
-import se.digg.wallet.gateway.application.model.KeyRequestTestBuilder;
-import se.digg.wallet.gateway.application.model.common.JwkDto;
+import se.digg.wallet.gateway.domain.model.account.Jwk;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,8 +44,7 @@ class WuaControllerIntegrationTest {
   @Container
   @ServiceConnection
   static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
-  private static JwkDto jwkDto;
-  public static String TEST_JWK_STRING;
+  public static String WALLET_JWK_STRING;
 
   public static final UUID TEST_WALLET_ID = UUID.randomUUID();
   public static final String TEST_NONCE = "nonce";
@@ -57,10 +56,12 @@ class WuaControllerIntegrationTest {
   private RestTestClient restClient;
 
   private static final String WUA_URL = "/wallet-provider/wallet-unit-attestation";
+  private static final String WALLET_KEYS_URL = "/v0/accounts/";
 
   private boolean authenticated = false;
   private static final String ACCOUNT_ID = UUID.randomUUID().toString();
   private static ECKey generatedKeyPair;
+  private static ECKey walletKeyPair;
 
   @LocalServerPort
   private int port;
@@ -74,16 +75,52 @@ class WuaControllerIntegrationTest {
   @BeforeAll
   public static void beforeAll() throws Exception {
     generatedKeyPair = AuthUtil.generateKey();
-    jwkDto = KeyRequestTestBuilder.ofLegacy(generatedKeyPair).build();
-    TEST_JWK_STRING =
-        new ObjectMapper().writeValueAsString(
-            new ObjectMapper().writeValueAsString(jwkDto));
+    walletKeyPair = AuthUtil.generateKey();
+
+    var walletJwk = new Jwk(
+        walletKeyPair.getKeyType().getValue(),
+        walletKeyPair.getKeyID(),
+        walletKeyPair.getAlgorithm().toString(),
+        walletKeyPair.getKeyUse().getValue(),
+        walletKeyPair.getCurve().toString(),
+        walletKeyPair.getX().toString(),
+        walletKeyPair.getY().toString());
+
+    var mapper = new ObjectMapper();
+    WALLET_JWK_STRING = mapper.writeValueAsString(mapper.writeValueAsString(walletJwk));
     // remove wrapped outer quotes
-    TEST_JWK_STRING = TEST_JWK_STRING.substring(1, TEST_JWK_STRING.length() - 1);
+    WALLET_JWK_STRING = WALLET_JWK_STRING.substring(1, WALLET_JWK_STRING.length() - 1);
   }
 
   @BeforeEach
   public void beforeEach() throws Exception {
+    accountServer.stubFor(get(WALLET_KEYS_URL + ACCOUNT_ID + "/wallet-keys")
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("content-type", "application/json")
+            .withBody("""
+                {
+                  "items": [
+                    {
+                      "kid": "%s",
+                      "kty": "%s",
+                      "alg": "%s",
+                      "use": "%s",
+                      "crv": "%s",
+                      "x": "%s",
+                      "y": "%s"
+                    }
+                  ]
+                }
+                """.formatted(
+                walletKeyPair.getKeyID(),
+                walletKeyPair.getKeyType().getValue(),
+                walletKeyPair.getAlgorithm().toString(),
+                walletKeyPair.getKeyUse().getValue(),
+                walletKeyPair.getCurve().toString(),
+                walletKeyPair.getX().toString(),
+                walletKeyPair.getY().toString()))));
+
     if (!authenticated) {
       restClient = RestTestClient.bindToServer()
           .baseUrl("http://localhost:" + port)
@@ -139,7 +176,7 @@ class WuaControllerIntegrationTest {
               "jwk": "%s",
               "nonce": "%s"
             }
-            """.formatted(TEST_JWK_STRING, TEST_NONCE)))
+            """.formatted(WALLET_JWK_STRING, TEST_NONCE)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")
@@ -167,7 +204,7 @@ class WuaControllerIntegrationTest {
               "jwk": "%s",
               "nonce": ""
             }
-            """.formatted(TEST_JWK_STRING)))
+            """.formatted(WALLET_JWK_STRING)))
         .willReturn(aResponse()
             .withStatus(400)));
 
@@ -191,7 +228,7 @@ class WuaControllerIntegrationTest {
               "jwk": "%s",
               "nonce": "%s"
             }
-            """.formatted(TEST_JWK_STRING, "")))
+            """.formatted(WALLET_JWK_STRING, "")))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")
@@ -214,7 +251,7 @@ class WuaControllerIntegrationTest {
               "jwk": "%s",
               "nonce": "%s"
             }
-            """.formatted(TEST_JWK_STRING, null)))
+            """.formatted(WALLET_JWK_STRING, null)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")
@@ -237,7 +274,7 @@ class WuaControllerIntegrationTest {
               "jwk": "%s",
               "nonce": ""
             }
-            """.formatted(TEST_JWK_STRING)))
+            """.formatted(WALLET_JWK_STRING)))
         .willReturn(aResponse()
             .withStatus(201)
             .withHeader("content-type", "text/plain")

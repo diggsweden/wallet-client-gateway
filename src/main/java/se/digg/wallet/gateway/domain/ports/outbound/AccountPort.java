@@ -21,4 +21,6 @@ public interface AccountPort {
   void addSecurityEnvelope(SecurityEnvelope securityEnvelope, String accountId);
 
   SecurityEnvelopes getSecurityEnvelopes(String accountId);
+
+  Jwk getWalletKey(String accountId);
 }

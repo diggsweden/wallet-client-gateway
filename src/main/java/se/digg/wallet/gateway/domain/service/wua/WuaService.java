@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.application.model.wua.WuaDto;
-import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
+import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
 
 @Service
@@ -18,20 +18,19 @@ public class WuaService {
 
   private final WalletProviderClient walletProviderClient;
   private final WuaMapper wuaMapper;
-  private final WalletAccountClient walletAccountClient;
+  private final AccountPort accountPort;
 
-  public WuaService(WalletAccountClient walletAccountClient,
+  public WuaService(AccountPort accountPort,
       WalletProviderClient walletProviderClient, WuaMapper wuaMapper) {
-    this.walletAccountClient = walletAccountClient;
+    this.accountPort = accountPort;
     this.walletProviderClient = walletProviderClient;
     this.wuaMapper = wuaMapper;
   }
 
   public WuaDto createWua(String accountId, String nonce) {
+    var walletKey = accountPort.getWalletKey(accountId);
     var mapped = wuaMapper.toWalletProviderCreateWuaDto(
-        walletAccountClient
-            .getAccount(accountId)
-            .orElseThrow(() -> new IllegalArgumentException("Account not found")),
+        walletKey,
         Optional.ofNullable(nonce).orElse(""));
     var result = walletProviderClient.createWua(mapped);
     if (logger.isDebugEnabled()) {
