@@ -36,6 +36,8 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 public class LoggingFilter extends OncePerRequestFilter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
+  public static final String MDC_TRANSACTION_ID = "transactionId";
+  public static final String MDC_CORRELATION_ID = "correlationId";
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -61,13 +63,13 @@ public class LoggingFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    // Generate correlation ID
+    // Generate Trace IDs
     String correlationId = getOrGenerateCorrelationId(request);
+    String transactionId = UUID.randomUUID().toString();
 
     // Add to Mapped Diagnostic Context - MDC for log correlation
-    MDC.put("correlationId", correlationId);
-    MDC.put("requestPath", request.getRequestURI());
-    MDC.put("requestMethod", request.getMethod());
+    MDC.put(MDC_CORRELATION_ID, correlationId);
+    MDC.put(MDC_TRANSACTION_ID, transactionId);
 
     // Wrap request and response
     ContentCachingRequestWrapper wrappedRequest =

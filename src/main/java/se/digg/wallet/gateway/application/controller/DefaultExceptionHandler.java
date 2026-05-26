@@ -4,30 +4,43 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
+import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
+import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
+import static se.digg.wallet.gateway.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
+import jakarta.validation.ConstraintViolationException;
+import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import se.digg.wallet.gateway.application.controller.exception.ApiKeyNeededException;
-import se.digg.wallet.gateway.application.controller.exception.BadRequestException;
-import se.digg.wallet.gateway.application.model.common.BadRequestDto;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 
-@ControllerAdvice
-public class DefaultExceptionHandler {
+@RestControllerAdvice
+public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+  private static final String ABOUT_BLANK = "about:blank";
 
   private final HttpServletRequest httpServletRequest;
 
@@ -35,63 +48,209 @@ public class DefaultExceptionHandler {
     this.httpServletRequest = httpServletRequest;
   }
 
-  @ResponseStatus(INTERNAL_SERVER_ERROR)
+  /*
+   * Handle Constraint Violation Exception Occurs when validation fails on query parameters, path
+   * variables, or service layer methods. Managed by a class-level @Validated annotation.
+   */
+  @ExceptionHandler({ConstraintViolationException.class})
+  public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException e,
+      WebRequest request) {
+
+    var problemType = REQUEST_ARGUMENT_NOT_VALID;
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+
+    var problemResponse = buildProblemResponse(problemType)
+        .detail(e.getLocalizedMessage())
+        .instance(path);
+
+    try {
+      var violations = e
+          .getConstraintViolations().stream().map(violation -> ProblemParameterResponse.builder()
+              .reason(violation.getMessage())
+              .value(Optional.ofNullable(violation.getInvalidValue()).map(Object::toString)
+                  .orElse(null))
+              .property(violation.getPropertyPath().toString())
+              .build())
+          .toList();
+
+      problemResponse.invalidParameters(violations);
+
+    } catch (Throwable ex) {
+      logWarn("Unable to extract invalid parameters from ConstraintViolationException",
+          method, path, ex);
+    }
+
+    var violations = Map.of(
+        "violations",
+        e.getConstraintViolations().stream().map(violation -> MessageFormat.format("{0} {1} {2}",
+            violation.getRootBeanClass().getName(),
+            violation.getPropertyPath().toString(),
+            violation.getMessage())).toList());
+    logDebug("Request argument not valid", path, method, violations);
+    return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
+  }
+
+  /*
+   * Handle Method Argument Not Valid Exception Occurs when processing the request body, and a field
+   * value does not meet validation criteria. Activated on model class fields annotated with @Valid
+   * (@NotNull, @NotBlank, @Size etc.)
+   */
+  @Override
+  protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status,
+      WebRequest request) {
+
+    var problemType = REQUEST_VALIDATION_FAILURE;
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+
+    var problemResponse = buildProblemResponse(problemType)
+        .detail("Request body field value(s) does not validate.")
+        .instance(path);
+
+    try {
+      var objectErrors = e.getBindingResult().getGlobalErrors().stream()
+          .map(error -> ProblemParameterResponse.builder()
+              .reason(error.getDefaultMessage())
+              .value(null)
+              .property(error.getObjectName())
+              .build())
+          .toList();
+
+      var fieldErrors = e.getBindingResult().getFieldErrors().stream()
+          .map(error -> ProblemParameterResponse.builder()
+              .reason(error.getDefaultMessage())
+              .value(Optional.ofNullable(error.getRejectedValue()).map(Object::toString)
+                  .orElse(null))
+              .property(error.getField())
+              .build())
+          .toList();
+
+      var allErrors = Stream.of(objectErrors, fieldErrors)
+          .flatMap(Collection::stream)
+          .toList();
+
+      problemResponse.invalidParameters(allErrors);
+
+    } catch (Throwable ex) {
+      logWarn("Unable to extract invalid parameters from MethodArgumentNotValidException",
+          method, path, ex);
+    }
+
+    var errors = Map.of(
+        "globalErrors", e.getBindingResult().getGlobalErrors().stream()
+            .map(ObjectError::getDefaultMessage).toList(),
+        "fieldErrors", e.getBindingResult().getFieldErrors().stream()
+            .map(FieldError::getDefaultMessage).toList());
+    logDebug("Input validation failure", method, path, errors);
+    return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
+  }
+
+  /*
+   * Handle RestClientException. Occurs on remote service call failures.
+   */
+  @ExceptionHandler(RestClientException.class)
+  public ResponseEntity<Object> handleRestClientException(RestClientException e) {
+
+    var problemType = INTERNAL;
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+    var problemResponse = buildProblemResponse(problemType)
+        .detail("Remote service failure")
+        .instance(path)
+        .build();
+
+    logError("Remote service failure", method, path, e);
+    return createResponseEntity(problemType.getHttpStatus(), problemResponse);
+  }
+
+  /*
+   * Handle exception not handled elsewhere.
+   */
   @ExceptionHandler(Throwable.class)
-  public ResponseEntity<BadRequestDto> handleAnyException(Throwable e) {
-    var instance = httpServletRequest.getServletPath();
-    var body = new BadRequestDto(
-        null,
-        "Internal server error",
-        INTERNAL_SERVER_ERROR.value(),
-        e.getMessage(),
-        instance);
-    LOGGER.warn("Uncaught exception, responding with 500", e);
-    return ResponseEntity.internalServerError().body(body);
+  public ResponseEntity<Object> handleAnyException(Throwable e) {
+
+    var problemType = INTERNAL;
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+    var problemResponse = buildProblemResponse(problemType)
+        .detail(e.getLocalizedMessage())
+        .instance(path)
+        .build();
+
+    logError("Unexpected exception", method, path, e);
+    return createResponseEntity(problemType.getHttpStatus(), problemResponse);
   }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(BAD_REQUEST)
-  public ResponseEntity<BadRequestDto> handleInputValidationException(
-      MethodArgumentNotValidException e) {
+  /*
+   * For exceptions handled by the super class, map to the problem response defined by the API.
+   */
+  @Override
+  protected ResponseEntity<Object> createResponseEntity(@Nullable Object body,
+      HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 
-    var instance = httpServletRequest.getServletPath();
-    var body = new BadRequestDto(
-        null,
-        "Validation error",
-        BAD_REQUEST.value(),
-        getErrorsMap(e).toString(),
-        instance);
-    LOGGER.debug("Validation error, not able to parse input {}", getErrorsMap(e));
-    return ResponseEntity.badRequest().body(body);
+    var problemDetailResponse = ProblemResponse.builder()
+        .type(ABOUT_BLANK)
+        .status(statusCode.value())
+        .instance(request.getContextPath());
+
+    if (body instanceof ProblemDetail problemDetail) {
+      problemDetailResponse
+          .title(problemDetail.getTitle())
+          .detail(problemDetail.getDetail());
+
+    } else {
+      var title = statusCode.is4xxClientError() ? HttpStatus.BAD_REQUEST.getReasonPhrase()
+          : HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+
+      problemDetailResponse
+          .title(title)
+          .detail("unknown")
+          .build();
+    }
+
+    return createResponseEntity(statusCode, problemDetailResponse.build());
   }
 
-  @ExceptionHandler(BadRequestException.class)
-  @ResponseStatus(BAD_REQUEST)
-  public ResponseEntity<BadRequestDto> handleBadRequestException(
-      BadRequestException e) {
-    var instance = httpServletRequest.getServletPath();
-    var body = new BadRequestDto(
-        null,
-        "Validation error",
-        BAD_REQUEST.value(),
-        e.detail(),
-        instance);
-    LOGGER.debug("Validation error", e);
-    return ResponseEntity.badRequest().body(body);
+  private ResponseEntity<Object> createResponseEntity(HttpStatusCode statusCode,
+      ProblemResponse problemResponse) {
+
+    problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
+    return ResponseEntity.status(statusCode).body(problemResponse);
   }
 
-  @ExceptionHandler(ApiKeyNeededException.class)
-  @ResponseStatus(UNAUTHORIZED)
-  public void handleApiKeyNeededException(
-      ApiKeyNeededException e) {
-    LOGGER.debug("Api key needed error", e);
+  private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {
+
+    return ProblemResponse.builder()
+        .type(Optional.ofNullable(problemType.getUri().toASCIIString())
+            .orElse(ABOUT_BLANK))
+        .title(problemType.getTitle())
+        .status(problemType.getHttpStatus().value());
   }
 
-  private Map<String, List<String>> getErrorsMap(MethodArgumentNotValidException e) {
+  private void logDebug(String message, String method, String path,
+      @Nullable Map<String, ?> properties) {
 
-    Map<String, List<String>> errorResponse = new HashMap<>();
-    errorResponse.put("errors", e.getBindingResult().getFieldErrors()
-        .stream().map(FieldError::getDefaultMessage).toList());
-    return errorResponse;
+    logDebug(message, method, path, properties, null);
+  }
+
+  private void logDebug(String message, String method, String path,
+      @Nullable Map<String, ?> properties, Throwable e) {
+
+    LOGGER.debug("{} {} {} {} transaction-id: {}", method, path, message,
+        Optional.ofNullable(properties).orElse(Map.of()), MDC.get(MDC_TRANSACTION_ID), e);
+  }
+
+  private void logWarn(String message, String method, String path, Throwable e) {
+
+    LOGGER.warn("{} {} {} transaction-id: {}", method, path, message, MDC.get(MDC_TRANSACTION_ID),
+        e);
+  }
+
+  private void logError(String message, String method, String path, Throwable e) {
+
+    LOGGER.error("{} {} {} transaction-id: {}", method, path, message, MDC.get(MDC_TRANSACTION_ID),
+        e);
   }
 }
