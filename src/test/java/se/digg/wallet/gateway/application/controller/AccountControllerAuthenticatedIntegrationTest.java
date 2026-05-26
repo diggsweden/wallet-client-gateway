@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.controller;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
@@ -102,7 +103,31 @@ class AccountControllerAuthenticatedIntegrationTest {
   }
 
   @Test
-  void testAddWalletKeyReturns500IfDownstreamFails() {
+  void returnProblemWithStatus400WhenCreateWalletKeyLacksRequiredKid() throws Exception {
+
+    var emptyKeyRequest = KeyRequest.builder()
+        .kid(null)
+        .build();
+
+    var response = restClient.post()
+        .uri("/v0/accounts/wallet-keys")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
+        .body(emptyKeyRequest)
+        .exchange();
+
+    var expectedStatus = 400;
+    response.expectStatus().isEqualTo(expectedStatus)
+        .expectBody()
+        .jsonPath("$.status").isEqualTo(expectedStatus)
+        .jsonPath("$.type").isNotEmpty()
+        .jsonPath("$.title").exists()
+        .jsonPath("$.detail").exists()
+        .jsonPath("$.instance").exists()
+        .jsonPath("$.invalid-parameters").isNotEmpty();
+  }
+
+  @Test
+  void returnsProblemWithStatus500WhenSaveWalletKeyDownstreamFails() {
     accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/wallet-keys")
         .willReturn(aResponse().withStatus(404)));
 
@@ -112,11 +137,18 @@ class AccountControllerAuthenticatedIntegrationTest {
         .body(KeyRequestTestBuilder.withDefaults().build())
         .exchange();
 
-    response.expectStatus().isEqualTo(500);
+    var expectedStatus = 500;
+    response.expectStatus().isEqualTo(expectedStatus)
+        .expectBody()
+        .jsonPath("$.status").isEqualTo(expectedStatus)
+        .jsonPath("$.type").exists()
+        .jsonPath("$.title").exists()
+        .jsonPath("$.detail").exists()
+        .jsonPath("$.instance").exists();
   }
 
   @Test
-  void testAddSecurityEnvelope() throws Exception {
+  void testAddSecurityEnvelope() {
     var envelopeContent = "envelope-content";
 
     var expectedDownstreamRequest =
@@ -144,7 +176,7 @@ class AccountControllerAuthenticatedIntegrationTest {
   }
 
   @Test
-  void testAddSecurityEnvelopeReturns500IfDownstreamFails() {
+  void returnsProblemWithStatus500WhenSaveSecurityEnvelopeDownstreamFails() {
     accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
         .willReturn(aResponse().withStatus(404)));
 
@@ -157,6 +189,13 @@ class AccountControllerAuthenticatedIntegrationTest {
             .build())
         .exchange();
 
-    response.expectStatus().isEqualTo(500);
+    var expectedStatus = 500;
+    response.expectStatus().isEqualTo(expectedStatus)
+        .expectBody()
+        .jsonPath("$.status").isEqualTo(expectedStatus)
+        .jsonPath("$.type").exists()
+        .jsonPath("$.title").exists()
+        .jsonPath("$.detail").exists()
+        .jsonPath("$.instance").exists();
   }
 }
