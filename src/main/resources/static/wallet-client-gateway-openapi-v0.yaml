@@ -763,8 +763,10 @@ components:
       properties:
         type:
           type: string
-          description: >
-            A URI that identifies the problem type. When this member is null, blank or not present, its value is assumed to be "about:blank". It indicates that the problem has no additional semantics beyond that of the HTTP status code.
+          description: |
+            A URI that identifies the problem type. When this member is null, blank or not present,
+            its value is assumed to be "about:blank". It indicates that the problem has no additional
+            semantics beyond that of the HTTP status code.
           example: /problem-details/device-key-duplicate
         status:
           type: integer
@@ -775,23 +777,25 @@ components:
         title:
           type: string
           description: A short, human-readable summary of the problem type.
-          example: Device Key Duplicate
+          example: Field validation failure
         detail:
           type: string
           description: A human-readable explanation specific to this occurrence of the problem.
-          example: The request does not meet validation rules.
+          example: Request body field value(s) does not validate.
         instance:
           type: string
-          description: >
-            A URI reference that identifies the specific occurrence of the problem. Typically the relative path of the request.
+          description: |
+            A URI reference that identifies the specific occurrence of the problem.
+            Typically the relative path of the request.
           example: /v0/accounts
         transaction-id:
           type: string
           description: A unique request identifier to be used for debug or troubleshooting.
         invalid-parameters:
           type: array
-          description: >
-            A list of invalid request (header, query or body) parameters. Depending on the problem type, this property might be null, empty or not present.
+          description: |
+            A list of invalid request (header, query or body) parameters. Depending on the problem type,
+            this property might be null, empty or not present.
           items:
             $ref: "#/components/schemas/ProblemParameterResponse"
 

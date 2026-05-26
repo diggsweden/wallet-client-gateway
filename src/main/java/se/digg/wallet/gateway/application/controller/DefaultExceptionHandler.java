@@ -40,7 +40,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionHandler.class);
-  private static final String ABOUT_BLANK = "ABOUT_BLANK";
+  private static final String ABOUT_BLANK = "about:blank";
 
   private final HttpServletRequest httpServletRequest;
 
@@ -82,8 +82,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     var violations = Map.of(
-        "violations", e.getConstraintViolations().stream().map(violation ->
-        MessageFormat.format("{0} {1} {2}",
+        "violations",
+        e.getConstraintViolations().stream().map(violation -> MessageFormat.format("{0} {1} {2}",
             violation.getRootBeanClass().getName(),
             violation.getPropertyPath().toString(),
             violation.getMessage())).toList());
@@ -139,10 +139,10 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     var errors = Map.of(
-      "globalErrors", e.getBindingResult().getGlobalErrors().stream()
-          .map(ObjectError::getDefaultMessage).toList(),
-      "fieldErrors", e.getBindingResult().getFieldErrors().stream()
-        .map(FieldError::getDefaultMessage).toList());
+        "globalErrors", e.getBindingResult().getGlobalErrors().stream()
+            .map(ObjectError::getDefaultMessage).toList(),
+        "fieldErrors", e.getBindingResult().getFieldErrors().stream()
+            .map(FieldError::getDefaultMessage).toList());
     logDebug("Input validation failure", method, path, errors);
     return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
   }
@@ -224,7 +224,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     return ProblemResponse.builder()
         .type(Optional.ofNullable(problemType.getUri().toASCIIString())
-          .orElse(ABOUT_BLANK))
+            .orElse(ABOUT_BLANK))
         .title(problemType.getTitle())
         .status(problemType.getHttpStatus().value());
   }
