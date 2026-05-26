@@ -129,6 +129,24 @@ paths:
           $ref: '#/components/responses/default'
 
   /v0/accounts/security-envelopes:
+    get:
+      tags:
+        - Account
+      summary: Get security envelopes
+      description: Returns the security envelopes associated with the authenticated account.
+      operationId: getAccountSecurityEnvelopes
+      responses:
+        '200':
+          description: Security envelopes retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEnvelopesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        'default':
+          $ref: '#/components/responses/default'
+
     post:
       tags:
         - Account
@@ -557,8 +575,14 @@ components:
         - content
 
     SecurityEnvelopeResponse:
-      allOf:
-        - $ref: '#/components/schemas/SecurityEnvelopeRequest'
+      type: object
+      properties:
+        content:
+          type: string
+          description: The security envelope content. Typically encrypted opaque materials.
+          minLength: 1
+      required:
+        - content
 
     SecurityEnvelopeType:
       type: string
@@ -566,6 +590,14 @@ components:
       enum:
         - SIGN
         - OTHER
+
+    SecurityEnvelopesResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityEnvelopeResponse'
 
     CreateAccountResponseDto:
       type: object
