@@ -1,0 +1,445 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "wallet-bff",
+    "description": "",
+    "license": {
+      "name": ""
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/hsm/v1/device-states": {
+      "post": {
+        "tags": [
+          "handlers"
+        ],
+        "summary": "POST /hsm/v1/device-states",
+        "operationId": "create_state",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewStateRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "State initialized successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewStateResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hsm/v1/operations": {
+      "post": {
+        "tags": [
+          "handlers"
+        ],
+        "summary": "POST /hsm/v1/operations (synchronous endpoint)",
+        "operationId": "legacy_service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BffRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Worker result (plain JWS string)"
+          },
+          "408": {
+            "description": "Request timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hsm/v1/requests": {
+      "post": {
+        "tags": [
+          "handlers"
+        ],
+        "summary": "POST /hsm/requests",
+        "operationId": "service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BffRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Request completed synchronously",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponseDto"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Request accepted, poll for result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Device state not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hsm/v1/requests/{correlationId}": {
+      "get": {
+        "tags": [
+          "handlers"
+        ],
+        "summary": "GET /hsm/requests/{correlationId}",
+        "operationId": "task_response",
+        "parameters": [
+          {
+            "name": "correlationId",
+            "in": "path",
+            "description": "Correlation ID returned by a prior POST /hsm/requests",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponseDto"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Request still pending",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AsyncResponseDto": {
+        "type": "object",
+        "description": "Generic async response envelope matching the Java AsyncResponseDto.\nFields are omitted when absent to match Java's @JsonInclude(NON_EMPTY).",
+        "required": [
+          "correlationId",
+          "status"
+        ],
+        "properties": {
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "error": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AsyncResponseError"
+              }
+            ]
+          },
+          "result": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resultUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/AsyncResponseStatus"
+          }
+        }
+      },
+      "AsyncResponseError": {
+        "type": "object",
+        "description": "Error detail embedded in AsyncResponseDto.",
+        "required": [
+          "message",
+          "httpStatus"
+        ],
+        "properties": {
+          "httpStatus": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "AsyncResponseStatus": {
+        "type": "string",
+        "description": "Status of an async operation.",
+        "enum": [
+          "complete",
+          "pending",
+          "error"
+        ]
+      },
+      "BffRequest": {
+        "type": "object",
+        "description": "Inbound request body for POST / and POST /service.",
+        "required": [
+          "clientId",
+          "outerRequestJws"
+        ],
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "outerRequestJws": {
+            "type": "string"
+          }
+        }
+      },
+      "Curve": {
+        "type": "string",
+        "description": "Elliptic curve identifier for key generation.",
+        "enum": [
+          "P-256",
+          "P-384",
+          "P-521"
+        ]
+      },
+      "EcPublicJwk": {
+        "type": "object",
+        "description": "EC public key in JWK format.",
+        "required": [
+          "kty",
+          "crv",
+          "x",
+          "y"
+        ],
+        "properties": {
+          "crv": {
+            "type": "string"
+          },
+          "kid": {
+            "type": "string"
+          },
+          "kty": {
+            "type": "string"
+          },
+          "x": {
+            "type": "string"
+          },
+          "y": {
+            "type": "string"
+          }
+        }
+      },
+      "NewStateRequestDto": {
+        "type": "object",
+        "description": "Inbound request body for POST /new_state.",
+        "required": [
+          "publicKey"
+        ],
+        "properties": {
+          "clientId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "initialKeyCurve": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Curve"
+              }
+            ]
+          },
+          "overwrite": {
+            "type": "boolean"
+          },
+          "publicKey": {
+            "$ref": "#/components/schemas/EcPublicJwk"
+          },
+          "ttl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "NewStateResponseDto": {
+        "type": "object",
+        "description": "Response body for POST /new_state.",
+        "required": [
+          "status",
+          "clientId"
+        ],
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "devAuthorizationCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "opaqueServerId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serverJwsPublicKey": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EcPublicJwk"
+              }
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ProblemDetail": {
+        "type": "object",
+        "description": "RFC 9457 Problem Details for HTTP APIs.\nSwedish Dataportal profile: https://www.dataportal.se/rest-api-profil/felhantering",
+        "required": [
+          "title",
+          "status"
+        ],
+        "properties": {
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "instance": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
