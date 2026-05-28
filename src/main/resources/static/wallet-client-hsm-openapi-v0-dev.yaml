@@ -57,11 +57,20 @@ paths:
     post:
       tags:
         - HSM
-      summary: Request a key signature
+      summary: Create an HSM operation request
       description: |
-        Submits a signing operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: sign
+        Submits an HSM key operation request arranged by the client. This process may be completed quickly and returned 
+        in the response with status 200 OK. On heavy load, when process takes longer than 3 seconds, the response
+        will be 202 Accepted. In this case the process is running in the background. The result must be fetched by
+        polling the getResult endpoint using the corresponding request id until completed.
+      operationId: createRequest
+      parameters:
+        - name: type
+          in: query
+          description: Optional. Apply the intended HSM operation type. Only used for traceability.
+          required: false
+          schema:
+            $ref: '#/components/schemas/HsmRequestType'
       requestBody:
         content:
           application/json:
@@ -88,26 +97,26 @@ paths:
     get:
       tags:
         - HSM
-      summary: Get a requested a key signature
+      summary: Get the HSM operation result
       description: |
-        Get the hsm-result asynchronously.
-      operationId: getSign
+        Get the processed HSM key operation result. Use this operation to poll a pending request until completed.
+      operationId: getResult
       parameters:
         - name: id
           in: path
           required: true
-          description: The hsm-request id returned by the prior request.
+          description: The HSM request id.
           schema:
             type: string
       responses:
         '200':
-          description: Request completed
+          description: Request completed.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HsmResponse'
         '202':
-          description: Request still pending
+          description: Request still pending.
           content:
             application/json:
               schema:
@@ -122,8 +131,7 @@ paths:
       tags:
         - HSM
       summary: Save the device state
-      description: |
-        Save the latest device state.
+      description: Save the latest device state.
       operationId: saveState
       requestBody:
         content:
@@ -249,6 +257,7 @@ components:
         - REGISTER_PIN
         - CHANGE_PIN
         - SIGN
+        - OTHER
 
     HsmRequest:
       type: object
@@ -261,28 +270,34 @@ components:
           type: string
           minLength: 1
           description: Client identifier
-        type:
-          $ref: '#/components/schemas/HsmRequestType'
       required:
         - jwt
         - clientId
         - type
 
+    HsmRequestStatus:
+      type: string
+      description: HSM Request operation status.
+      enum:
+        - COMPLETE
+        - PENDING
+        - ERROR
+
     HsmResponse:
       type: object
+      description: The HSM-operation response.
       properties:
-        correlationId:
+        id:
           type: string
-          description: Correlation ID for the asynchronous operation
+          description: Identification of the asynchronous HSM-operation.
         status:
-          type: string
-          description: Operation status
+          $ref: '#/components/schemas/HsmRequestStatus'
         result:
           type: string
-          description: JWT result from the HSM when the operation is complete
+          description: The JWT result from the HSM if completed, else empty.
         resultUrl:
           type: string
-          description: Gateway URL where the asynchronous operation result can be polled
+          description: Gateway URL where the asynchronous operation result can be polled.
       required:
         - correlationId
         - status
@@ -290,6 +305,9 @@ components:
     RegisterStateRequest:
       type: object
       properties:
+        clientId:
+          type: string
+          description: The unique client identification
         publicKey:
           $ref: '#/components/schemas/KeyRequest'
         overwrite:
@@ -300,6 +318,7 @@ components:
           description: Time-to-live for the state (e.g. 30d)
           example: 30d
       required:
+        - clientId
         - publicKey
         - overwrite
 
@@ -370,6 +389,7 @@ components:
             encoding of the coordinate's big endian representation.
           example: '5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40'
       required:
+        - kid
         - kty
         - crv
         - x
