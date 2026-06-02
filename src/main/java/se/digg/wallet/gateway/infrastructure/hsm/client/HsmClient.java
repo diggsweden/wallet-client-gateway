@@ -12,7 +12,6 @@ import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
-import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 import se.digg.wallet.gateway.infrastructure.hsm.mapper.HsmClientMapper;
 import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSAsyncOperationResponseDto;
@@ -22,7 +21,6 @@ public class HsmClient implements HsmPort {
 
   private final RestClient restClient;
   private final String baseUrl;
-  private final String syncOperationPath;
   private final String asyncRequestPath;
   private final String asyncPollPath;
   private final String newStatePath;
@@ -31,7 +29,6 @@ public class HsmClient implements HsmPort {
   HsmClient(RestClient client, ApplicationConfig applicationConfig, HsmClientMapper mapper) {
     this.restClient = client.mutate().build();
     this.baseUrl = applicationConfig.walletR2ps().baseurl();
-    this.syncOperationPath = applicationConfig.walletR2ps().paths().syncOperation();
     this.asyncRequestPath = applicationConfig.walletR2ps().paths().asyncRequest();
     this.asyncPollPath = applicationConfig.walletR2ps().paths().asyncPoll();
     this.newStatePath = applicationConfig.walletR2ps().paths().newState();
@@ -63,58 +60,12 @@ public class HsmClient implements HsmPort {
   }
 
   @Override
-  public AsyncHsmOperationResult getAsyncResult(String correlationId) {
+  public AsyncHsmOperationResult getAsyncResult(String id) {
     var response = restClient
         .get()
-        .uri(baseUrl + asyncPollPath.replace("{correlationId}", correlationId))
+        .uri(baseUrl + asyncPollPath.replace("{correlationId}", id))
         .retrieve()
         .body(R2PSAsyncOperationResponseDto.class);
     return mapper.toDomainResponse(response);
-  }
-
-  @Override
-  public HsmOperationResult registerPin(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  @Override
-  public HsmOperationResult changePin(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  @Override
-  public HsmOperationResult createSession(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  @Override
-  public HsmOperationResult createKey(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  @Override
-  public HsmOperationResult listKeys(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  @Override
-  public HsmOperationResult deleteKey(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  @Override
-  public HsmOperationResult sign(HsmOperation request) {
-    return postRequest(request);
-  }
-
-  private HsmOperationResult postRequest(HsmOperation request) {
-    String jws = restClient
-        .post()
-        .uri(baseUrl + syncOperationPath)
-        .body(mapper.toClientRequest(request))
-        .contentType(MediaType.APPLICATION_JSON)
-        .retrieve()
-        .body(String.class);
-    return mapper.toDomainResponse(jws);
   }
 }

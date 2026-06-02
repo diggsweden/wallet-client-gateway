@@ -19,11 +19,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
+import se.digg.wallet.gateway.api.v0.model.WuaDto;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -162,14 +164,19 @@ class WuaControllerIntegrationTest {
     providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
-              "jwk": "%s"
+              "jwk": "%s",
+              "nonce": ""
             }
             """.formatted(TEST_JWK_STRING)))
         .willReturn(aResponse()
-            .withStatus(404)));
+            .withStatus(400)));
 
     var response = restClient.post()
         .uri("/wua")
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(WuaDto.builder()
+            .jwt(TEST_JWK_STRING)
+            .build())
         .exchange();
 
     response.expectStatus()
