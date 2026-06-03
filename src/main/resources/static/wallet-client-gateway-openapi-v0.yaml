@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.1
+  version: 0.0.2
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -78,11 +78,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateAccountResponseDto'
+                $ref: '#/components/schemas/CreateAccountResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
           $ref: '#/components/responses/default'
+
   /v0/accounts:
     post:
       tags:
@@ -102,11 +103,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateAccountResponseDto'
+                $ref: '#/components/schemas/CreateAccountResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
           $ref: '#/components/responses/default'
+
   /v0/accounts/wallet-keys:
     post:
       tags:
@@ -153,7 +155,7 @@ paths:
       summary: Add a security envelope to an account
       description: |
         This operation will add a security envelope (typically used with the HSM) to the associated account.
-        An account can only have one security envelope for each type. Any existing envelope with the reqeusted
+        An account can only have one security envelope for each type. Any existing envelope with the requested
         type will be replaced.
       operationId: addAccountSecurityEnvelope
       requestBody:
@@ -512,18 +514,38 @@ components:
       properties:
         personalIdentityNumber:
           type: string
+          description: Optional. Personal identity number.
           example: '191010101010'
-        emailAdress:
+        email:
           type: string
+          format: email
+          description: Optional. Contact e-mail address.
           example: first.last@example.xx
-          minLength: 1
+        emailAdress:
+          deprecated: true
+          type: string
+          format: email
+          description: Optional. Contact e-mail address. Misspelled attribute, will be removed.
+          example: first.last@example.xx
         telephoneNumber:
           type: string
+          description: Optional. Contact phone number.
           example: '0701234567'
         deviceKey:
           $ref: '#/components/schemas/KeyRequest'
       required:
         - deviceKey
+
+    CreateAccountResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          description: Account ID
+          example: 3685BCB1-4AA4-4C81-8806-43FBD31A0957
+      required:
+        - accountId
 
     KeyRequest:
       type: object
@@ -562,6 +584,13 @@ components:
       allOf:
         - $ref: '#/components/schemas/KeyRequest'
 
+    SecurityEnvelopeType:
+      type: string
+      description: 'Security envelope type enum constants.'
+      enum:
+        - SIGN
+        - OTHER
+
     SecurityEnvelopeRequest:
       properties:
         type:
@@ -584,13 +613,6 @@ components:
       required:
         - content
 
-    SecurityEnvelopeType:
-      type: string
-      description: 'Security envelope type enum constants.'
-      enum:
-        - SIGN
-        - OTHER
-
     SecurityEnvelopesResponse:
       type: object
       properties:
@@ -598,17 +620,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SecurityEnvelopeResponse'
-
-    CreateAccountResponseDto:
-      type: object
-      properties:
-        accountId:
-          type: string
-          format: uuid
-          description: Account ID
-          example: 3685BCB1-4AA4-4C81-8806-43FBD31A0957
-      required:
-        - accountId
 
     HsmRequestType:
       type: string

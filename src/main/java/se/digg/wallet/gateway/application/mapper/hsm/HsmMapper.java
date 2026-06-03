@@ -66,7 +66,7 @@ public class HsmMapper {
         .status(result.status())
         .opaqueServerId(result.opaqueServerId())
         .devAuthorizationCode(result.devAuthorizationCode())
-        .stateJws(response.stateJws())
+        .stateJws(result.stateJws())
         .build();
   }
 

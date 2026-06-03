@@ -212,7 +212,7 @@ class WuaControllerIntegrationTest {
         .uri("/wua")
         .contentType(MediaType.APPLICATION_JSON)
         .body(WuaDto.builder()
-            .jwt(TEST_JWK_STRING)
+            .jwt(WALLET_JWK_STRING)
             .build())
         .exchange();
 

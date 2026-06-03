@@ -209,7 +209,7 @@ class AccountControllerAuthenticatedIntegrationTest {
   @Test
   void testGetSecurityEnvelopesReturns500IfDownstreamFails() {
     accountServer.stubFor(get("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse().withStatus(404)));
+        .willReturn(aResponse().withStatus(400)));
 
     var response = restClient.get()
         .uri("/v0/accounts/security-envelopes")

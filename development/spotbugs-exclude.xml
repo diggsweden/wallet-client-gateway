@@ -19,6 +19,10 @@ SPDX-License-Identifier: CC0-1.0
     </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
+        <Class name="se.digg.wallet.gateway.domain.service.wua.WuaService"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
         <Class name="se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter"/>
     </Match>
 
@@ -41,6 +45,10 @@ SPDX-License-Identifier: CC0-1.0
         <Class name="~.*Builder"/>
     </Match>
 
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="se.digg.wallet.gateway.domain.model.account.*"/>
+    </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
         <Package name="se.digg.wallet.gateway.domain.model.hsm.*"/>
