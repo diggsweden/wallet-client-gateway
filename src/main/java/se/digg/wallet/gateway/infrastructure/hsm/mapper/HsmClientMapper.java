@@ -20,7 +20,7 @@ import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSOperationRequestDto;
 public class HsmClientMapper {
 
   public R2PSDeviceStateRequestDto toClientRequest(DeviceStateRegistration request) {
-    var publicKey = request.publicKey();
+    var publicKey = request.walletKey();
     var clientPublicKey = new R2PSEcPublicJwkDto(
         publicKey.kty(),
         publicKey.crv(),

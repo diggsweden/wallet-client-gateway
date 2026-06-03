@@ -10,7 +10,10 @@ spring:
 properties:
   apisecret: my_secret_key
   public-paths:
+    - "/"
     - "/actuator/**"
+    - "/api-info"
+    - "/wallet-client-gateway-openapi-*.yaml"
     - "/v3/api-docs/**"
     - "/swagger-ui.html"
     - "/swagger-ui/**"

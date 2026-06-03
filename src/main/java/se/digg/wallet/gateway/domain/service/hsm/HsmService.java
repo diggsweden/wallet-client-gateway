@@ -9,7 +9,6 @@ import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
-import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 
 @Service
@@ -21,7 +20,6 @@ public class HsmService {
     this.hsmPort = hsmPort;
   }
 
-
   public DeviceStateRegistrationResult registerState(DeviceStateRegistration request) {
     return hsmPort.registerState(request);
   }
@@ -30,42 +28,7 @@ public class HsmService {
     return hsmPort.submitAsync(request);
   }
 
-  public AsyncHsmOperationResult getAsyncResult(String correlationId) {
-    return hsmPort.getAsyncResult(correlationId);
+  public AsyncHsmOperationResult getAsyncResult(String id) {
+    return hsmPort.getAsyncResult(id);
   }
-
-  public HsmOperationResult registerPin(HsmOperation request) {
-    return hsmPort.registerPin(request);
-  }
-
-
-  public HsmOperationResult changePin(HsmOperation request) {
-    return hsmPort.changePin(request);
-  }
-
-
-  public HsmOperationResult createSession(HsmOperation request) {
-    return hsmPort.createSession(request);
-  }
-
-
-  public HsmOperationResult createKey(HsmOperation request) {
-    return hsmPort.createKey(request);
-  }
-
-
-  public HsmOperationResult listKeys(HsmOperation request) {
-    return hsmPort.listKeys(request);
-  }
-
-
-  public HsmOperationResult deleteKey(HsmOperation request) {
-    return hsmPort.deleteKey(request);
-  }
-
-
-  public HsmOperationResult sign(HsmOperation request) {
-    return hsmPort.sign(request);
-  }
-
 }

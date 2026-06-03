@@ -7,7 +7,7 @@ package se.digg.wallet.gateway.domain.model.hsm;
 import java.util.Optional;
 
 public record DeviceStateRegistration(
-    EcPublicJwk publicKey,
+    EcPublicJwk walletKey,
     boolean overwrite,
     Optional<String> ttl) {
 }

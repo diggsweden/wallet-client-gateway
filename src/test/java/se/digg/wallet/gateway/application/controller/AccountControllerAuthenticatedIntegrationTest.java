@@ -129,7 +129,7 @@ class AccountControllerAuthenticatedIntegrationTest {
   @Test
   void returnsProblemWithStatus500WhenSaveWalletKeyDownstreamFails() {
     accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/wallet-keys")
-        .willReturn(aResponse().withStatus(404)));
+        .willReturn(aResponse().withStatus(400)));
 
     var response = restClient.post()
         .uri("/v0/accounts/wallet-keys")
@@ -178,7 +178,7 @@ class AccountControllerAuthenticatedIntegrationTest {
   @Test
   void returnsProblemWithStatus500WhenSaveSecurityEnvelopeDownstreamFails() {
     accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse().withStatus(404)));
+        .willReturn(aResponse().withStatus(400)));
 
     var response = restClient.post()
         .uri("/v0/accounts/security-envelopes")

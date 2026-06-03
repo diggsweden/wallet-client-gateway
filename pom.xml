@@ -482,7 +482,6 @@
               </configOptions>
             </configuration>
           </execution>
-
         </executions>
       </plugin>
 

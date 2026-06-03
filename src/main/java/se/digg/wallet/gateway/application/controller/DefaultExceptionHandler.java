@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.controller;
 import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
+import static se.digg.wallet.gateway.application.controller.ProblemType.RESOURCE_NOT_FOUND;
 import static se.digg.wallet.gateway.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -56,11 +58,10 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException e,
       WebRequest request) {
 
-    var problemType = REQUEST_ARGUMENT_NOT_VALID;
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
 
-    var problemResponse = buildProblemResponse(problemType)
+    var problemResponse = buildProblemResponse(REQUEST_ARGUMENT_NOT_VALID)
         .detail(e.getLocalizedMessage())
         .instance(path);
 
@@ -88,7 +89,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             violation.getPropertyPath().toString(),
             violation.getMessage())).toList());
     logDebug("Request argument not valid", path, method, violations);
-    return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
+
+    return createResponseEntity(problemResponse.build());
   }
 
   /*
@@ -101,11 +103,10 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
       MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status,
       WebRequest request) {
 
-    var problemType = REQUEST_VALIDATION_FAILURE;
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
 
-    var problemResponse = buildProblemResponse(problemType)
+    var problemResponse = buildProblemResponse(REQUEST_VALIDATION_FAILURE)
         .detail("Request body field value(s) does not validate.")
         .instance(path);
 
@@ -144,7 +145,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         "fieldErrors", e.getBindingResult().getFieldErrors().stream()
             .map(FieldError::getDefaultMessage).toList());
     logDebug("Input validation failure", method, path, errors);
-    return createResponseEntity(problemType.getHttpStatus(), problemResponse.build());
+
+    return createResponseEntity(problemResponse.build());
   }
 
   /*
@@ -153,16 +155,41 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(RestClientException.class)
   public ResponseEntity<Object> handleRestClientException(RestClientException e) {
 
-    var problemType = INTERNAL;
+    ProblemResponse problemResponse = null;
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
-    var problemResponse = buildProblemResponse(problemType)
-        .detail("Remote service failure")
-        .instance(path)
-        .build();
 
-    logError("Remote service failure", method, path, e);
-    return createResponseEntity(problemType.getHttpStatus(), problemResponse);
+    if (e instanceof HttpClientErrorException httpClientError) {
+
+      if (HttpStatus.NOT_FOUND.equals(httpClientError.getStatusCode())) {
+        problemResponse = buildProblemResponse(RESOURCE_NOT_FOUND)
+            .detail("The requested resource could not be found in remote service")
+            .instance(path)
+            .build();
+
+        logDebug("The requested resource could not be found in remote service",
+            method, path, Map.of());
+
+      } else {
+        problemResponse = buildProblemResponse(INTERNAL)
+            .detail("Remote service failure")
+            .instance(path)
+            .build();
+
+        logWarn("Remote service failure", method, path, httpClientError);
+      }
+
+    } else {
+
+      problemResponse = buildProblemResponse(INTERNAL)
+          .detail("Remote service failure")
+          .instance(path)
+          .build();
+
+      logError("Remote service failure", method, path, e);
+    }
+
+    return createResponseEntity(problemResponse);
   }
 
   /*
@@ -171,16 +198,15 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<Object> handleAnyException(Throwable e) {
 
-    var problemType = INTERNAL;
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
-    var problemResponse = buildProblemResponse(problemType)
+    var problemResponse = buildProblemResponse(INTERNAL)
         .detail(e.getLocalizedMessage())
         .instance(path)
         .build();
 
     logError("Unexpected exception", method, path, e);
-    return createResponseEntity(problemType.getHttpStatus(), problemResponse);
+    return createResponseEntity(problemResponse);
   }
 
   /*
@@ -210,14 +236,13 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
           .build();
     }
 
-    return createResponseEntity(statusCode, problemDetailResponse.build());
+    return createResponseEntity(problemDetailResponse.build());
   }
 
-  private ResponseEntity<Object> createResponseEntity(HttpStatusCode statusCode,
-      ProblemResponse problemResponse) {
+  private ResponseEntity<Object> createResponseEntity(ProblemResponse problemResponse) {
 
     problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
-    return ResponseEntity.status(statusCode).body(problemResponse);
+    return ResponseEntity.status(problemResponse.getStatus()).body(problemResponse);
   }
 
   private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {

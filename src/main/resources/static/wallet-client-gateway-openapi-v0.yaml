@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.1
+  version: 0.0.2
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -41,10 +41,6 @@ tags:
     description: Wallet Unit Attestation operations
   - name: HSM
     description: Hardware Security Module operations
-  - name: HSM Async
-    description: Asynchronous Hardware Security Module operations
-  - name: Attestation
-    description: Attestation operations (currently not in use)
 
 paths:
   /api-info:
@@ -248,473 +244,95 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
-  /v0/device/state:
+  /hsm/v0/requests:
     post:
       tags:
         - HSM
-      summary: Register device state
-      description: Registers the device public key state with the HSM
-      operationId: registerState
+      summary: Submit an HSM operation request
+      description: "Submit an HSM key operation request arranged by the client. This process may be completed quickly and returned \nin the response with status 200 OK. On heavy load, when process takes longer than 3 seconds, the response\nwill be 202 Accepted. In this case the process is running in the background. The result must be fetched by\npolling the getResult endpoint using the corresponding request id until completed.\n"
+      operationId: createRequest
+      parameters:
+        - name: type
+          in: query
+          description: Optional. Apply the intended HSM operation type. Only used for traceability.
+          required: false
+          schema:
+            $ref: '#/components/schemas/HsmRequestType'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterStateRequestDto'
+              $ref: '#/components/schemas/HsmRequest'
         required: true
       responses:
-        '201':
-          description: State registered
+        '200':
+          description: Request completed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RegisterStateResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                $ref: '#/components/schemas/HsmResponse'
+        '202':
+          description: Request is pending, poll for result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HsmResponse'
         'default':
           $ref: '#/components/responses/default'
 
-  /v0/hsm/requests/{correlationId}:
+  /hsm/v0/requests/{id}:
     get:
       tags:
-        - HSM Async
-      summary: Get asynchronous HSM operation result
-      description: Gets the result status for a previously submitted asynchronous HSM operation.
-      operationId: getHsmRequest
+        - HSM
+      summary: Get the HSM operation result
+      description: |
+        Get the processed HSM key operation result. Use this operation to poll a pending request until completed.
+      operationId: getResult
       parameters:
-        - name: correlationId
+        - name: id
           in: path
           required: true
+          description: The HSM request id.
           schema:
             type: string
       responses:
         '200':
-          description: Operation completed
+          description: Request completed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
+                $ref: '#/components/schemas/HsmResponse'
         '202':
-          description: Operation still pending
+          description: Request still pending.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                $ref: '#/components/schemas/HsmResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
         'default':
           $ref: '#/components/responses/default'
 
-  /v0/device/pin:
+  /hsm/v0/device-states:
     post:
       tags:
         - HSM
-      summary: Register PIN
-      description: |
-        Registers a PIN with the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: registerPin
+      summary: Save the device state
+      description: Save the latest state using the device key.
+      operationId: saveState
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '201':
-          description: PIN registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-    put:
-      tags:
-        - HSM
-      summary: Change PIN
-      description: |
-        Changes the PIN on the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: changePin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
+              $ref: '#/components/schemas/RegisterStateRequest'
         required: true
       responses:
         '200':
-          description: PIN change accepted
+          description: The registered state.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/secure-session:
-    post:
-      tags:
-        - HSM
-      summary: Create secure session
-      description: |
-        Creates a secure session with the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: createHsmSession
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '201':
-          description: Session created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys:
-    post:
-      tags:
-        - HSM
-      summary: Create key
-      description: |
-        Creates a new key in the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: createKey
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '201':
-          description: Key created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/delete:
-    post:
-      tags:
-        - HSM
-      summary: Delete key
-      description: |
-        Deletes a key from the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: deleteKey
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '204':
-          description: Key deletion accepted
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/list:
-    post:
-      tags:
-        - HSM
-      summary: List keys
-      description: |
-        Lists keys in the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: listKeys
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Keys listed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/sign:
-    post:
-      tags:
-        - HSM
-      summary: Sign
-      description: |
-        Signs data using a key in the HSM. The endpoint path expresses client intent; the
-        HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: sign
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Signature produced
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/device/pin/requests:
-    post:
-      tags:
-        - HSM Async
-      summary: Register PIN asynchronously
-      description: |
-        Submits a PIN registration operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: registerPinAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-    put:
-      tags:
-        - HSM Async
-      summary: Change PIN asynchronously
-      description: |
-        Submits a PIN change operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: changePinAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/secure-session/requests:
-    post:
-      tags:
-        - HSM Async
-      summary: Create secure session asynchronously
-      description: |
-        Submits a secure-session operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: createHsmSessionAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/requests:
-    post:
-      tags:
-        - HSM Async
-      summary: Create key asynchronously
-      description: |
-        Submits a key creation operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: createKeyAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/delete/requests:
-    post:
-      tags:
-        - HSM Async
-      summary: Delete key asynchronously
-      description: |
-        Submits a key deletion operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: deleteKeyAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/list/requests:
-    post:
-      tags:
-        - HSM Async
-      summary: List keys asynchronously
-      description: |
-        Submits a key listing operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: listKeysAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/keys/sign/requests:
-    post:
-      tags:
-        - HSM Async
-      summary: Sign asynchronously
-      description: |
-        Submits a signing operation for asynchronous execution. The endpoint path expresses
-        client intent; the HSM worker dispatches the actual operation encoded inside the JWT payload.
-      operationId: signAsync
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HsmRequestDto'
-        required: true
-      responses:
-        '200':
-          description: Operation completed synchronously
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '202':
-          description: Operation accepted, poll for result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncHsmResponseDto'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                $ref: '#/components/schemas/RegisterStateResponse'
         'default':
           $ref: '#/components/responses/default'
 
@@ -753,9 +371,15 @@ components:
           example: 'active'
         links:
           type: array
+          minItems: 0
           items:
             type: string
             example: 'https://docs.serverhost.xx/subfolder/infopage.html'
+      required:
+        - name
+        - version
+        - releaseDate
+        - status
 
     ProblemResponse:
       type: object
@@ -798,6 +422,9 @@ components:
             this property might be null, empty or not present.
           items:
             $ref: "#/components/schemas/ProblemParameterResponse"
+      required:
+        - status
+        - title
 
     ProblemParameterResponse:
       type: object
@@ -913,6 +540,10 @@ components:
         - x
         - y
 
+    KeyResponse:
+      allOf:
+        - $ref: '#/components/schemas/KeyRequest'
+
     SecurityEnvelopeRequest:
       properties:
         type:
@@ -947,79 +578,85 @@ components:
       required:
         - accountId
 
-    HsmRequestDto:
+    HsmRequestType:
+      type: string
+      description: The HSM Request type.
+      enum:
+        - CREATE_SESSION
+        - CREATE_KEY
+        - LIST_KEYS
+        - DELETE_KEY
+        - REGISTER_PIN
+        - CHANGE_PIN
+        - SIGN
+        - OTHER
+
+    HsmRequest:
       type: object
       properties:
         jwt:
           type: string
           minLength: 1
-          description: JWT payload for the HSM operation
+          description: JWT payload for the HSM operation.
         clientId:
           type: string
-          description: Client identifier
+          minLength: 1
+          description: Client identifier.
       required:
         - jwt
         - clientId
 
-    HsmResponseDto:
-      type: object
-      properties:
-        jwt:
-          type: string
-          description: JWT response from the HSM
-      required:
-        - jwt
+    HsmRequestStatus:
+      type: string
+      description: HSM Request operation status.
+      enum:
+        - COMPLETE
+        - PENDING
+        - ERROR
 
-    AsyncHsmResponseDto:
+    HsmResponse:
       type: object
+      description: The HSM-operation response.
       properties:
-        correlationId:
+        id:
           type: string
-          description: Correlation ID for the asynchronous operation
+          description: Identification of the asynchronous HSM-operation.
         status:
-          type: string
-          description: Operation status
+          $ref: '#/components/schemas/HsmRequestStatus'
         result:
           type: string
-          description: JWT result from the HSM when the operation is complete
+          description: The JWT result from the HSM if completed, else empty.
         resultUrl:
           type: string
-          description: Gateway URL where the asynchronous operation result can be polled
-        error:
-          $ref: '#/components/schemas/AsyncHsmErrorDto'
+          description: Gateway URL where the asynchronous operation result can be polled.
       required:
         - correlationId
         - status
 
-    AsyncHsmErrorDto:
+    RegisterStateRequest:
       type: object
       properties:
-        message:
+        clientId:
           type: string
-        httpStatus:
-          type: integer
-          format: int32
-      required:
-        - message
-        - httpStatus
-
-    RegisterStateRequestDto:
-      type: object
-      properties:
-        publicKey:
-          $ref: '#/components/schemas/KeyRequest'
+          description: The unique client identification
+        deviceKey:
+          allOf:
+            - $ref: '#/components/schemas/KeyRequest'
+          description: Device public key
         overwrite:
           type: boolean
           description: Whether to overwrite an existing state
         ttl:
           type: string
-          description: Time-to-live for the state (e.g. 30d)
-          example: 30d
+          description: Optional. Time-to-live for the state. Use ISO 8601 duration format.
+          pattern: '^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$'
+          example: P30D
       required:
-        - publicKey
+        - clientId
+        - deviceKey
         - overwrite
 
-    RegisterStateResponseDto:
+    RegisterStateResponse:
       type: object
       properties:
         status:
@@ -1028,38 +665,15 @@ components:
           type: string
         devAuthorizationCode:
           type: string
-        serverJwsPublicKey:
-          $ref: '#/components/schemas/EcPublicJwkDto'
+        walletKey:
+          allOf:
+            - $ref: '#/components/schemas/KeyResponse'
+          description: The public key generated by the HSM.
         opaqueServerId:
           type: string
       required:
         - status
         - clientId
-
-    EcPublicJwkDto:
-      type: object
-      properties:
-        kty:
-          type: string
-          minLength: 1
-          example: EC
-        crv:
-          type: string
-          minLength: 1
-          example: P-256
-        x:
-          type: string
-          minLength: 1
-        y:
-          type: string
-          minLength: 1
-        kid:
-          type: string
-      required:
-        - kty
-        - crv
-        - x
-        - y
 
     AuthChallengeDto:
       type: object

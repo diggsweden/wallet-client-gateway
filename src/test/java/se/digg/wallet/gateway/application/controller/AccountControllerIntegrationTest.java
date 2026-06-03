@@ -106,10 +106,10 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
-  void testAccountReturns500IfAccountServiceRespondsWith404() {
+  void remoteServiceFailure() {
     server.stubFor(post("/account")
         .willReturn(aResponse()
-            .withStatus(404)));
+            .withStatus(400)));
 
     var response = restClient.post()
         .uri("accounts")
