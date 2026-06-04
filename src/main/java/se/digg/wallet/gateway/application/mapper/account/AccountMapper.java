@@ -32,10 +32,10 @@ public class AccountMapper {
 
   public NewAccount toNewAccountDomain(CreateAccountRequestDto request) {
     return new NewAccount(
-      request.getPersonalIdentityNumber().orElse(null),
-      request.getEmailAdress().orElse(null),
-      request.getTelephoneNumber().orElse(null),
-      toDomain(request.getPublicKey()));
+        request.getPersonalIdentityNumber().orElse(null),
+        request.getEmailAdress().orElse(null),
+        request.getTelephoneNumber().orElse(null),
+        toDomain(request.getPublicKey()));
   }
 
   public NewAccount toDomain(CreateAccountRequest request) {

@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
+import se.digg.wallet.gateway.application.controller.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
@@ -65,6 +66,10 @@ public class HsmClient implements HsmPort {
         .get()
         .uri(baseUrl + asyncPollPath.replace("{correlationId}", id))
         .retrieve()
+        .onStatus(status -> status.value() == 404, (req, res) -> {
+          throw new RemoteResourceNotFoundException(
+              "HSM Request entry was not found in remote service. id: %s".formatted(id));
+        })
         .body(R2PSAsyncOperationResponseDto.class);
     return mapper.toDomainResponse(response);
   }

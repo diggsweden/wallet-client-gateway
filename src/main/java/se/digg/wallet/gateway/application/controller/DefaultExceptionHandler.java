@@ -7,7 +7,6 @@ package se.digg.wallet.gateway.application.controller;
 import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
-import static se.digg.wallet.gateway.application.controller.ProblemType.RESOURCE_NOT_FOUND;
 import static se.digg.wallet.gateway.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +36,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.exception.RemoteResourceNotFoundException;
 
 @RestControllerAdvice
 public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
@@ -150,6 +150,32 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   /*
+   * Handle RemoteResourceNotFoundException. Occurs when this service acts like a proxy and a remote
+   * service responds with 404 Not found.
+   */
+  @ExceptionHandler(RemoteResourceNotFoundException.class)
+  public ResponseEntity<Object> handleRemoteResourceNotFoundException(
+      RemoteResourceNotFoundException e) {
+
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+
+    var statusCode = HttpStatus.NOT_FOUND;
+    var problemDetailResponse = ProblemResponse.builder()
+        .type(ABOUT_BLANK)
+        .title(statusCode.getReasonPhrase())
+        .status(statusCode.value())
+        .detail(e.getMessage())
+        .instance(httpServletRequest.getContextPath())
+        .build();
+
+    logDebug("A requested resource was not found in remote service",
+        method, path, Map.of());
+
+    return createResponseEntity(problemDetailResponse);
+  }
+
+  /*
    * Handle RestClientException. Occurs on remote service call failures.
    */
   @ExceptionHandler(RestClientException.class)
@@ -162,12 +188,12 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     if (e instanceof HttpClientErrorException httpClientError) {
 
       if (HttpStatus.NOT_FOUND.equals(httpClientError.getStatusCode())) {
-        problemResponse = buildProblemResponse(RESOURCE_NOT_FOUND)
-            .detail("The requested resource could not be found in remote service")
+        problemResponse = buildProblemResponse(INTERNAL)
+            .detail("A requested resource was not found in remote service")
             .instance(path)
             .build();
 
-        logDebug("The requested resource could not be found in remote service",
+        logDebug("A requested resource was not found in remote service",
             method, path, Map.of());
 
       } else {
