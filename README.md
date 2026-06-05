@@ -24,7 +24,7 @@ HTML. To view the report, open the generated `./target/site/jacoco/index.html` i
 
 *Additional output for machine reading is created in CSV and XML format. The tool will also create a coverage report in
 binary format `target/jacoco.exec`. Obviously we can’t interpret the output single-handedly, but other tools and plugins
-can, e.g. SonarQube.*
+can.
 
 [JaCoCo Maven plugin documentation](https://www.jacoco.org/jacoco/trunk/doc/maven.html)
 
