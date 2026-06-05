@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-public record HsmOperation(String jwt, String clientId, String stateJws) {
+public record HsmOperation(String outerRequestJws, String clientId, String stateJws) {
 }
