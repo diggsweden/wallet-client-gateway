@@ -347,7 +347,7 @@ paths:
               $ref: '#/components/schemas/RegisterStateRequest'
         required: true
       responses:
-        '200':
+        '201':
           description: The registered state.
           content:
             application/json:
@@ -685,25 +685,17 @@ components:
     RegisterStateRequest:
       type: object
       properties:
-        clientId:
-          type: string
-          description: The unique client identification
         deviceKey:
           allOf:
             - $ref: '#/components/schemas/KeyRequest'
           description: Device public key
-        overwrite:
-          type: boolean
-          description: Whether to overwrite an existing state
         ttl:
           type: string
           description: Optional. Time-to-live for the state. Use ISO 8601 duration format.
           pattern: '^(-?)P(?=\d|T\d)(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)([DW]))?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$'
           example: P30D
       required:
-        - clientId
         - deviceKey
-        - overwrite
 
     RegisterStateResponse:
       type: object
