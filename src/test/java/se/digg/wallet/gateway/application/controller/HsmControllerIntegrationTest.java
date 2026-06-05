@@ -173,7 +173,7 @@ class HsmControllerIntegrationTest {
                   "clientId":"%s",
                   "devAuthorizationCode":"%s",
                   "opaqueServerId":"server",
-                  "walletKey":{"kty":"EC","kid":"kid","crv":"P-256","x":"x","y":"y","alg":null,"use":null}
+                  "serverJwsPublicKey":{"kty":"EC","kid":"kid","crv":"P-256","x":"x","y":"y","alg":null,"use":null}
                 }
                 """
                 .formatted(clientId, TEST_DEV_AUTH_CODE));
@@ -188,7 +188,7 @@ class HsmControllerIntegrationTest {
         .uri(HSM_REQUESTS_URL + "?" + paramType + "=" + unknownType)
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
-            .jwt(TEST_JWT)
+            .outerRequestJws(TEST_JWT)
             .clientId(clientId)
             .build())
         .exchange()
@@ -310,7 +310,7 @@ class HsmControllerIntegrationTest {
         .uri(HSM_REQUESTS_URL)
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
-            .jwt(TEST_JWT)
+            .outerRequestJws(TEST_JWT)
             .clientId(clientId)
             .build())
         .exchange()
@@ -349,7 +349,7 @@ class HsmControllerIntegrationTest {
         .uri(HSM_REQUESTS_URL)
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
-            .jwt(TEST_JWT)
+            .outerRequestJws(TEST_JWT)
             .clientId(clientId)
             .build())
         .exchange()
@@ -395,7 +395,7 @@ class HsmControllerIntegrationTest {
         .uri(HSM_REQUESTS_URL)
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
-            .jwt(TEST_JWT)
+            .outerRequestJws(TEST_JWT)
             .clientId(clientId)
             .build())
         .exchange()

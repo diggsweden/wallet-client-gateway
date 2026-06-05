@@ -3,29 +3,34 @@
 // SPDX-License-Identifier: EUPL-1.2
 package se.digg.wallet.gateway.application.mapper.account;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountResponseDto;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.KeyRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
+import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeResponse;
+import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
+import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 
 @Component
 public class AccountMapper {
 
-  public CreateAccountResponseDto toResponse(Account account) {
-    return CreateAccountResponseDto
+  public CreateAccountResponse toResponse(Account account) {
+    return CreateAccountResponse
         .builder()
         .accountId(account.id())
         .build();
   }
 
-  public NewAccount toDomain(CreateAccountRequestDto request) {
+  public NewAccount toNewAccountDomain(CreateAccountRequestDto request) {
     return new NewAccount(
         request.getPersonalIdentityNumber().orElse(null),
         request.getEmailAdress().orElse(null),
@@ -36,7 +41,7 @@ public class AccountMapper {
   public NewAccount toDomain(CreateAccountRequest request) {
     return new NewAccount(
         request.getPersonalIdentityNumber().orElse(null),
-        request.getEmailAdress().orElse(null),
+        request.getEmail().orElse(request.getEmailAdress().orElse(null)),
         request.getTelephoneNumber().orElse(null),
         toDomain(request.getDeviceKey()));
   }
@@ -54,6 +59,13 @@ public class AccountMapper {
 
   public SecurityEnvelope toDomain(SecurityEnvelopeRequest request) {
     return new SecurityEnvelope(request.getContent());
+  }
+
+  public SecurityEnvelopesResponse toResponse(SecurityEnvelopes envelopes) {
+    List<SecurityEnvelopeResponse> items = envelopes.items().stream()
+        .map(e -> SecurityEnvelopeResponse.builder().content(e.content()).build())
+        .toList();
+    return SecurityEnvelopesResponse.builder().items(items).build();
   }
 
 }

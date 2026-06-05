@@ -18,6 +18,7 @@ import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
+import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper;
 
@@ -63,6 +64,18 @@ public class WalletAccountAdapter implements AccountPort {
     UUID id = UUID.fromString(accountId);
     SecurityEnvelopeRequest request = accountClientMapper.toClientRequest(securityEnvelope);
     accountApi.addAccountSecurityEnvelope(id, request);
+  }
+
+  @Override
+  public SecurityEnvelopes getSecurityEnvelopes(String accountId) {
+    UUID id = UUID.fromString(accountId);
+    return accountClientMapper.toDomain(accountApi.getAccountSecurityEnvelopes(id));
+  }
+
+  @Override
+  public Jwk getWalletKey(String accountId) {
+    UUID id = UUID.fromString(accountId);
+    return accountClientMapper.toDomainJwk(accountApi.getAccountWalletKey(id, null));
   }
 
 }

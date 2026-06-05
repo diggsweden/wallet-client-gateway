@@ -10,6 +10,7 @@ import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
+import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 
 @Service
@@ -37,5 +38,8 @@ public class AccountService {
     accountPort.addSecurityEnvelope(securityEnvelope, accountId);
   }
 
+  public SecurityEnvelopes getSecurityEnvelopes(String accountId) {
+    return accountPort.getSecurityEnvelopes(accountId);
+  }
 
 }

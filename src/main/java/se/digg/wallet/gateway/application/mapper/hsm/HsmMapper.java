@@ -36,7 +36,8 @@ public class HsmMapper {
   }
 
   public HsmOperation toDomain(HsmRequest request) {
-    return new HsmOperation(request.getJwt(), request.getClientId());
+    return new HsmOperation(request.getOuterRequestJws(), request.getClientId(),
+        request.getStateJws().orElse(null));
   }
 
   public HsmResponse toHsmResponse(AsyncHsmOperationResult result) {
@@ -49,23 +50,24 @@ public class HsmMapper {
   }
 
   public RegisterStateResponse toRegisterStateResponse(DeviceStateRegistrationResult result) {
-    var walletKey = result.serverJwsPublicKey();
-    var walletKeyResponse = KeyResponse.builder()
+    var serverJwsPublicKey = result.serverJwsPublicKey();
+    var serverJwsPublicKeyResponse = KeyResponse.builder()
         .alg(null)
-        .crv(walletKey.crv())
-        .kid(walletKey.kid())
-        .kty(walletKey.kty())
+        .crv(serverJwsPublicKey.crv())
+        .kid(serverJwsPublicKey.kid())
+        .kty(serverJwsPublicKey.kty())
         .use(null)
-        .x(walletKey.x())
-        .y(walletKey.y())
+        .x(serverJwsPublicKey.x())
+        .y(serverJwsPublicKey.y())
         .build();
 
     return RegisterStateResponse.builder()
         .clientId(result.clientId())
-        .walletKey(walletKeyResponse)
+        .serverJwsPublicKey(serverJwsPublicKeyResponse)
         .status(result.status())
         .opaqueServerId(result.opaqueServerId())
         .devAuthorizationCode(result.devAuthorizationCode())
+        .stateJws(result.stateJws())
         .build();
   }
 

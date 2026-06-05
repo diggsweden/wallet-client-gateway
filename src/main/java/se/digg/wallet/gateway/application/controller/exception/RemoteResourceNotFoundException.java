@@ -4,5 +4,9 @@
 
 package se.digg.wallet.gateway.application.controller.exception;
 
-public class ApiKeyNeededException extends RuntimeException {
+public class RemoteResourceNotFoundException extends RuntimeException {
+
+  public RemoteResourceNotFoundException(String message) {
+    super(message);
+  }
 }

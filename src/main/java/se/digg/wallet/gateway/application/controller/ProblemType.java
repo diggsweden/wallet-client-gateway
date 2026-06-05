@@ -6,7 +6,6 @@ package se.digg.wallet.gateway.application.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.net.URI;
 import org.springframework.http.HttpStatus;
@@ -24,12 +23,6 @@ public enum ProblemType {
       "Field value not valid",
       URI.create("/problem-details/field-validation-failure"),
       "Validation fails when processing the request body."),
-
-  RESOURCE_NOT_FOUND(
-      NOT_FOUND,
-      "Not found",
-      URI.create("/problem-details/resource-not-found"),
-      "The requested resource could not be found."),
 
   INTERNAL(
       INTERNAL_SERVER_ERROR,

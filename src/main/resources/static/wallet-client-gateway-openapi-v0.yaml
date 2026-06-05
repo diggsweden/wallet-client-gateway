@@ -78,11 +78,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateAccountResponseDto'
+                $ref: '#/components/schemas/CreateAccountResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
           $ref: '#/components/responses/default'
+
   /v0/accounts:
     post:
       tags:
@@ -102,11 +103,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateAccountResponseDto'
+                $ref: '#/components/schemas/CreateAccountResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
           $ref: '#/components/responses/default'
+
   /v0/accounts/wallet-keys:
     post:
       tags:
@@ -129,13 +131,31 @@ paths:
           $ref: '#/components/responses/default'
 
   /v0/accounts/security-envelopes:
+    get:
+      tags:
+        - Account
+      summary: Get security envelopes
+      description: Returns the security envelopes associated with the authenticated account.
+      operationId: getAccountSecurityEnvelopes
+      responses:
+        '200':
+          description: Security envelopes retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityEnvelopesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        'default':
+          $ref: '#/components/responses/default'
+
     post:
       tags:
         - Account
       summary: Add a security envelope to an account
       description: |
         This operation will add a security envelope (typically used with the HSM) to the associated account.
-        An account can only have one security envelope for each type. Any existing envelope with the reqeusted
+        An account can only have one security envelope for each type. Any existing envelope with the requested
         type will be replaced.
       operationId: addAccountSecurityEnvelope
       requestBody:
@@ -494,18 +514,38 @@ components:
       properties:
         personalIdentityNumber:
           type: string
+          description: Optional. Personal identity number.
           example: '191010101010'
-        emailAdress:
+        email:
           type: string
+          format: email
+          description: Optional. Contact e-mail address.
           example: first.last@example.xx
-          minLength: 1
+        emailAdress:
+          deprecated: true
+          type: string
+          format: email
+          description: Optional. Contact e-mail address. Misspelled attribute, will be removed.
+          example: first.last@example.xx
         telephoneNumber:
           type: string
+          description: Optional. Contact phone number.
           example: '0701234567'
         deviceKey:
           $ref: '#/components/schemas/KeyRequest'
       required:
         - deviceKey
+
+    CreateAccountResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          description: Account ID
+          example: 3685BCB1-4AA4-4C81-8806-43FBD31A0957
+      required:
+        - accountId
 
     KeyRequest:
       type: object
@@ -544,6 +584,13 @@ components:
       allOf:
         - $ref: '#/components/schemas/KeyRequest'
 
+    SecurityEnvelopeType:
+      type: string
+      description: 'Security envelope type enum constants.'
+      enum:
+        - SIGN
+        - OTHER
+
     SecurityEnvelopeRequest:
       properties:
         type:
@@ -557,26 +604,22 @@ components:
         - content
 
     SecurityEnvelopeResponse:
-      allOf:
-        - $ref: '#/components/schemas/SecurityEnvelopeRequest'
-
-    SecurityEnvelopeType:
-      type: string
-      description: 'Security envelope type enum constants.'
-      enum:
-        - SIGN
-        - OTHER
-
-    CreateAccountResponseDto:
       type: object
       properties:
-        accountId:
+        content:
           type: string
-          format: uuid
-          description: Account ID
-          example: 3685BCB1-4AA4-4C81-8806-43FBD31A0957
+          description: The security envelope content. Typically encrypted opaque materials.
+          minLength: 1
       required:
-        - accountId
+        - content
+
+    SecurityEnvelopesResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityEnvelopeResponse'
 
     HsmRequestType:
       type: string
@@ -594,16 +637,19 @@ components:
     HsmRequest:
       type: object
       properties:
-        jwt:
+        outerRequestJws:
           type: string
           minLength: 1
-          description: JWT payload for the HSM operation.
+          description: Outer request JWS payload for the HSM operation.
         clientId:
           type: string
           minLength: 1
-          description: Client identifier.
+          description: Client identifier
+        stateJws:
+          type: string
+          description: Optional. Encoded device-state token. When present the BFF skips the Valkey lookup.
       required:
-        - jwt
+        - outerRequestJws
         - clientId
 
     HsmRequestStatus:
@@ -629,6 +675,9 @@ components:
         resultUrl:
           type: string
           description: Gateway URL where the asynchronous operation result can be polled.
+        stateJws:
+          type: string
+          description: Updated device-state token. Present when status=complete. Persist and send as stateJws on the next request.
       required:
         - correlationId
         - status
@@ -665,12 +714,15 @@ components:
           type: string
         devAuthorizationCode:
           type: string
-        walletKey:
+        serverJwsPublicKey:
           allOf:
             - $ref: '#/components/schemas/KeyResponse'
-          description: The public key generated by the HSM.
+          description: The server JWS public key.
         opaqueServerId:
           type: string
+        stateJws:
+          type: string
+          description: JWS-encoded device state. Store alongside clientId and send as stateJws on subsequent requests.
       required:
         - status
         - clientId

@@ -9,5 +9,6 @@ public record AsyncHsmOperationResult(
     String status,
     String result,
     String resultUrl,
-    AsyncHsmOperationError error) {
+    AsyncHsmOperationError error,
+    String stateJws) {
 }

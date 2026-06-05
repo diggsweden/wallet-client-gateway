@@ -4,5 +4,5 @@
 
 package se.digg.wallet.gateway.infrastructure.hsm.model;
 
-public record R2PSOperationRequestDto(String clientId, String outerRequestJws) {
+public record R2PSOperationRequestDto(String clientId, String outerRequestJws, String stateJws) {
 }

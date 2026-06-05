@@ -12,16 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.AccountApi;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountResponseDto;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.KeyRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeResponse;
+import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
+import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
 @RestController
@@ -39,11 +41,11 @@ public class AccountController implements AccountApi {
   }
 
   @Override
-  public ResponseEntity<CreateAccountResponseDto> createAccount(
+  public ResponseEntity<CreateAccountResponse> createAccount(
       @Valid CreateAccountRequestDto createAccountRequest) {
-    NewAccount newAccount = mapper.toDomain(createAccountRequest);
+    NewAccount newAccount = mapper.toNewAccountDomain(createAccountRequest);
     Account account = accountService.createAccountLegacy(newAccount);
-    CreateAccountResponseDto createAccountResponse = mapper.toResponse(account);
+    CreateAccountResponse createAccountResponse = mapper.toResponse(account);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -51,15 +53,22 @@ public class AccountController implements AccountApi {
   }
 
   @Override
-  public ResponseEntity<CreateAccountResponseDto> createAccounts(
+  public ResponseEntity<CreateAccountResponse> createAccounts(
       @Valid CreateAccountRequest createAccountRequest) {
     NewAccount newAccount = mapper.toDomain(createAccountRequest);
     Account account = accountService.createAccount(newAccount);
-    CreateAccountResponseDto createAccountResponse = mapper.toResponse(account);
+    CreateAccountResponse createAccountResponse = mapper.toResponse(account);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createAccountResponse);
+  }
+
+  @Override
+  public ResponseEntity<SecurityEnvelopesResponse> getAccountSecurityEnvelopes() {
+    var accountId = currentAccount.id();
+    SecurityEnvelopes envelopes = accountService.getSecurityEnvelopes(accountId);
+    return ResponseEntity.ok(mapper.toResponse(envelopes));
   }
 
   @Override
@@ -71,7 +80,7 @@ public class AccountController implements AccountApi {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(null);
+        .build();
 
   }
 
