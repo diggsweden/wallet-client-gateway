@@ -23,6 +23,7 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -268,7 +269,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   private ResponseEntity<Object> createResponseEntity(ProblemResponse problemResponse) {
 
     problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
-    return ResponseEntity.status(problemResponse.getStatus()).body(problemResponse);
+    return ResponseEntity.status(problemResponse.getStatus())
+        .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+        .body(problemResponse);
   }
 
   private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {

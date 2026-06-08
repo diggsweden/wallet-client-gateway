@@ -27,7 +27,7 @@ public class HsmClientMapper {
         publicKey.x(),
         publicKey.y(),
         publicKey.kid());
-    return new R2PSDeviceStateRequestDto(clientPublicKey, request.overwrite(), request.ttl());
+    return new R2PSDeviceStateRequestDto(clientPublicKey, false, request.ttl());
   }
 
   public R2PSOperationRequestDto toClientRequest(HsmOperation request) {

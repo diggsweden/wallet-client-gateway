@@ -115,7 +115,6 @@ class HsmControllerIntegrationTest {
                 .y("y")
                 .kid("kid")
                 .build())
-            .overwrite(false)
             .ttl(ISO_8601_DURATION_30_DAYS)
             .build())
         .exchange()
@@ -146,7 +145,6 @@ class HsmControllerIntegrationTest {
                 """.formatted(clientId, TEST_DEV_AUTH_CODE))));
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .clientId(clientId)
         .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
             .kty("EC")
             .crv("P-256")
@@ -154,7 +152,6 @@ class HsmControllerIntegrationTest {
             .y("y")
             .kid("kid")
             .build())
-        .overwrite(false)
         .ttl(ISO_8601_DURATION_30_DAYS)
         .build();
 
@@ -224,7 +221,6 @@ class HsmControllerIntegrationTest {
                 """)));
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .clientId(clientId)
         .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
             .kty("EC")
             .crv("P-256")
@@ -232,7 +228,6 @@ class HsmControllerIntegrationTest {
             .y("y")
             .kid("kid")
             .build())
-        .overwrite(false)
         .ttl(ISO_8601_DURATION_30_DAYS)
         .build();
 
@@ -258,7 +253,6 @@ class HsmControllerIntegrationTest {
   void validationFailureWithBadTtlFormat(String ttl) {
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .clientId(clientId)
         .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
             .kty("EC")
             .crv("P-256")
@@ -266,7 +260,6 @@ class HsmControllerIntegrationTest {
             .y("y")
             .kid("kid")
             .build())
-        .overwrite(false)
         .ttl(ttl)
         .build();
 
@@ -302,9 +295,10 @@ class HsmControllerIntegrationTest {
                   "opaqueServerId": "another-string",
                   "status": "complete",
                   "result": "%s",
-                  "resultUrl": null
+                  "resultUrl": null,
+                  "stateJws": "%s"
                 }
-                """.formatted(requestId, TEST_JWT))));
+                """.formatted(requestId, TEST_JWT, TEST_JWT))));
 
     restClient.post()
         .uri(HSM_REQUESTS_URL)
@@ -322,9 +316,10 @@ class HsmControllerIntegrationTest {
               "status": "COMPLETE",
               "id": "%s",
               "result": "%s",
-              "resultUrl": null
+              "resultUrl": null,
+              "stateJws": "%s"
             }
-            """.formatted(requestId, TEST_JWT));
+            """.formatted(requestId, TEST_JWT, TEST_JWT));
   }
 
   @Test

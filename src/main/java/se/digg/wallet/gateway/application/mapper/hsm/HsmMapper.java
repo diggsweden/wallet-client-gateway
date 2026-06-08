@@ -32,7 +32,7 @@ public class HsmMapper {
         deviceKeyRequest.getX(),
         deviceKeyRequest.getY(),
         deviceKeyRequest.getKid());
-    return new DeviceStateRegistration(publicKey, request.getOverwrite(), request.getTtl());
+    return new DeviceStateRegistration(publicKey, request.getTtl());
   }
 
   public HsmOperation toDomain(HsmRequest request) {
@@ -46,6 +46,7 @@ public class HsmMapper {
         .status(toHsmRequestStatus(result.status()))
         .result(result.result())
         .resultUrl(toGatewayResultUrl(result))
+        .stateJws(result.stateJws())
         .build();
   }
 

@@ -8,6 +8,5 @@ import java.util.Optional;
 
 public record DeviceStateRegistration(
     EcPublicJwk walletKey,
-    boolean overwrite,
     Optional<String> ttl) {
 }
