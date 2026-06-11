@@ -284,8 +284,7 @@ class HsmControllerIntegrationTest {
 
   @Test
   void completeHsmRequestCreated() {
-    var stateJws =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+    var testStateJws = "abKh65uhs.test.signature";
     r2psServer.stubFor(WireMock.post("/hsm/v1/requests")
         .willReturn(aResponse()
             .withStatus(200)
@@ -300,7 +299,7 @@ class HsmControllerIntegrationTest {
                   "resultUrl": null,
                   "stateJws": "%s"
                 }
-                """.formatted(requestId, TEST_JWT, stateJws))));
+                """.formatted(requestId, TEST_JWT, testStateJws))));
 
     restClient.post()
         .uri(HSM_REQUESTS_URL)
@@ -321,7 +320,7 @@ class HsmControllerIntegrationTest {
               "resultUrl": null,
               "stateJws": "%s"
             }
-            """.formatted(requestId, TEST_JWT, stateJws));
+            """.formatted(requestId, TEST_JWT, testStateJws));
   }
 
   @Test
