@@ -6,8 +6,8 @@ package se.digg.wallet.gateway.application.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.digg.wallet.gateway.api.v0.model.HsmRequestStatus.COMPLETE;
-import static se.digg.wallet.gateway.api.v0.model.HsmRequestStatus.PENDING;
+import static se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.COMPLETE;
+import static se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.PENDING;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -74,7 +74,7 @@ class HsmControllerIntegrationTest {
 
   private RestTestClient restClient;
   private boolean authenticated = false;
-  private String requestId = null;
+  private UUID requestId = null;
   private String clientId = null;
 
   @BeforeAll
@@ -93,7 +93,7 @@ class HsmControllerIntegrationTest {
           .defaultHeader(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
           .build();
       authenticated = true;
-      requestId = UUID.randomUUID().toString();
+      requestId = UUID.randomUUID();
       clientId = UUID.randomUUID().toString();
     }
   }
@@ -108,7 +108,7 @@ class HsmControllerIntegrationTest {
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
         .body(se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-            .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
+            .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
                 .kty("EC")
                 .crv("P-256")
                 .x("x")
@@ -145,7 +145,7 @@ class HsmControllerIntegrationTest {
                 """.formatted(clientId, TEST_DEV_AUTH_CODE))));
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
+        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -221,7 +221,7 @@ class HsmControllerIntegrationTest {
                 """)));
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
+        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -253,7 +253,7 @@ class HsmControllerIntegrationTest {
   void validationFailureWithBadTtlFormat(String ttl) {
 
     var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .deviceKey(se.digg.wallet.gateway.api.v0.model.KeyRequest.builder()
+        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -284,6 +284,8 @@ class HsmControllerIntegrationTest {
 
   @Test
   void completeHsmRequestCreated() {
+    var stateJws =
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
     r2psServer.stubFor(WireMock.post("/hsm/v1/requests")
         .willReturn(aResponse()
             .withStatus(200)
@@ -298,7 +300,7 @@ class HsmControllerIntegrationTest {
                   "resultUrl": null,
                   "stateJws": "%s"
                 }
-                """.formatted(requestId, TEST_JWT, TEST_JWT))));
+                """.formatted(requestId, TEST_JWT, stateJws))));
 
     restClient.post()
         .uri(HSM_REQUESTS_URL)
@@ -319,7 +321,7 @@ class HsmControllerIntegrationTest {
               "resultUrl": null,
               "stateJws": "%s"
             }
-            """.formatted(requestId, TEST_JWT, TEST_JWT));
+            """.formatted(requestId, TEST_JWT, stateJws));
   }
 
   @Test
@@ -336,7 +338,8 @@ class HsmControllerIntegrationTest {
                   "opaqueServerId": "another-string",
                   "status": "pending",
                   "result": null,
-                  "resultUrl": "/the/result/url"
+                  "resultUrl": "/the/result/url",
+                  "stateJws": null
                 }
                 """.formatted(requestId))));
 
@@ -354,7 +357,7 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    assertThat(hsmResponse.getId()).isNotEmpty().get().isEqualTo(requestId);
+    assertThat(hsmResponse.getId()).isEqualTo(requestId);
     assertThat(hsmResponse.getStatus()).isEqualTo(PENDING);
     assertThat(hsmResponse.getResult()).isEmpty();
     assertThat(hsmResponse.getResultUrl()).hasValueSatisfying(url -> {
@@ -372,7 +375,8 @@ class HsmControllerIntegrationTest {
           "opaqueServerId": "another-string",
           "status": "pending",
           "result": null,
-          "resultUrl": "/the/result/url"
+          "resultUrl": "/the/result/url",
+          "stateJws": null
         }
         """.formatted(requestId);
     r2psServer.stubFor(WireMock.post("/hsm/v1/requests")
@@ -410,7 +414,7 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    assertThat(resultUrlHsmResponse.getId()).isNotEmpty().get().isEqualTo(requestId);
+    assertThat(resultUrlHsmResponse.getId()).isEqualTo(requestId);
     assertThat(resultUrlHsmResponse.getStatus()).isEqualTo(PENDING);
     assertThat(resultUrlHsmResponse.getResult()).isEmpty();
   }
@@ -438,7 +442,7 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    assertThat(hsmResponse.getId()).isNotEmpty().get().isEqualTo(requestId);
+    assertThat(hsmResponse.getId()).isEqualTo(requestId);
     assertThat(hsmResponse.getStatus()).isEqualTo(PENDING);
     assertThat(hsmResponse.getResult()).isEmpty();
     assertThat(hsmResponse.getResultUrl())
@@ -471,7 +475,7 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    assertThat(hsmResponse.getId()).isNotEmpty().get().isEqualTo(requestId);
+    assertThat(hsmResponse.getId()).isEqualTo(requestId);
     assertThat(hsmResponse.getStatus()).isEqualTo(COMPLETE);
     assertThat(hsmResponse.getResult()).isNotEmpty();
   }

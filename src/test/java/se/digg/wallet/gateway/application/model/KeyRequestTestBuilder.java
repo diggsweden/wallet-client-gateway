@@ -6,14 +6,14 @@ package se.digg.wallet.gateway.application.model;
 
 import com.nimbusds.jose.jwk.ECKey;
 
-import se.digg.wallet.gateway.api.v0.model.KeyRequest;
+import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.application.model.common.JwkDtoBuilder;
 
 public class KeyRequestTestBuilder {
 
 
-  public static KeyRequest.Builder withDefaults() {
-    return KeyRequest.builder()
+  public static EcJwkRequest.Builder withDefaults() {
+    return EcJwkRequest.builder()
         .alg("ALG")
         .kty("KTY")
         .kid("KID")
@@ -23,8 +23,8 @@ public class KeyRequestTestBuilder {
         .use("USE");
   }
 
-  public static KeyRequest.Builder of(ECKey key) {
-    return KeyRequest.builder()
+  public static EcJwkRequest.Builder of(ECKey key) {
+    return EcJwkRequest.builder()
         .alg(key.getAlgorithm().toString())
         .kty(key.getKeyType().getValue())
         .kid(key.getKeyID())

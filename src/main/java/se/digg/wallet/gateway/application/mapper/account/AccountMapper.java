@@ -8,9 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.KeyRequest;
+import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeResponse;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopesResponse;
@@ -30,12 +29,11 @@ public class AccountMapper {
         .build();
   }
 
-  public NewAccount toNewAccountDomain(CreateAccountRequestDto request) {
-    return new NewAccount(
-        request.getPersonalIdentityNumber().orElse(null),
-        request.getEmailAdress().orElse(null),
-        request.getTelephoneNumber().orElse(null),
-        toDomain(request.getPublicKey()));
+  public SecurityEnvelopesResponse toResponse(SecurityEnvelopes envelopes) {
+    List<SecurityEnvelopeResponse> items = envelopes.items().stream()
+        .map(e -> SecurityEnvelopeResponse.builder().content(e.content()).build())
+        .toList();
+    return SecurityEnvelopesResponse.builder().items(items).build();
   }
 
   public NewAccount toDomain(CreateAccountRequest request) {
@@ -46,7 +44,7 @@ public class AccountMapper {
         toDomain(request.getDeviceKey()));
   }
 
-  public Jwk toDomain(KeyRequest request) {
+  public Jwk toDomain(EcJwkRequest request) {
     return new Jwk(
         request.getKty(),
         request.getKid(),
@@ -60,12 +58,4 @@ public class AccountMapper {
   public SecurityEnvelope toDomain(SecurityEnvelopeRequest request) {
     return new SecurityEnvelope(request.getContent());
   }
-
-  public SecurityEnvelopesResponse toResponse(SecurityEnvelopes envelopes) {
-    List<SecurityEnvelopeResponse> items = envelopes.items().stream()
-        .map(e -> SecurityEnvelopeResponse.builder().content(e.content()).build())
-        .toList();
-    return SecurityEnvelopesResponse.builder().items(items).build();
-  }
-
 }

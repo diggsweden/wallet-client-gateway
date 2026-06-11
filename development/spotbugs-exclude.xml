@@ -38,6 +38,9 @@ SPDX-License-Identifier: CC0-1.0
     <Match>
         <Package name="~se\.digg\.wallet\.gateway\.client\.account\.origin.*"/>
     </Match>
+    <Match>
+        <Package name="~se\.digg\.wallet\.gateway\.client\.hsm\.v1.*"/>
+    </Match>
 
     <!-- Accepting generated builders to have unusual namings -->
     <Match>
