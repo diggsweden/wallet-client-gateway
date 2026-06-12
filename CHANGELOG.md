@@ -5,12 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-06-12
+
+### Changed
+
+- Replace with generated hsm-api-client (#158)
+- Merge pull request #157 from diggsweden/feat/forward-state-jws-from-r2ps
+- Forward stateJws from R2PS async operation response
+- Aligned hsm-operations
+- Merge pull request #156 from diggsweden/chore/remove-sonarqube
+- Hsm api-operations improvements (#154)
+- Problem response (#153)
+
+### Removed
+
+- Remove sonarqube integration
+
 ## [0.5.8] - 2026-05-18
 
 ### Changed
 
 - Merge pull request #151 from diggsweden/feat/hsm-register-state-response
 - Extend register state response model
+
 
 ## [0.5.7] - 2026-05-13
 
@@ -594,6 +611,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.8..v0.6.0
 [0.5.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.7..v0.5.8
 [0.5.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.6..v0.5.7
 [0.5.6]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.5..v0.5.6
