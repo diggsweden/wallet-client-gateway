@@ -4,5 +4,14 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-public record HsmOperationResult(String jwt) {
+import io.soabase.recordbuilder.core.RecordBuilder;
+import java.util.UUID;
+
+@RecordBuilder
+public record HsmOperationResult(
+    UUID id,
+    HsmAsyncStatus status,
+    String result,
+    String resultUrl,
+    String stateJws) {
 }

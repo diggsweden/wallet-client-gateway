@@ -8,42 +8,51 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
+import se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus;
 import se.digg.wallet.gateway.api.v0.model.HsmRequest;
-import se.digg.wallet.gateway.api.v0.model.HsmRequestStatus;
 import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.KeyResponse;
+import se.digg.wallet.gateway.api.v0.model.EcJwkResponse;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
 import se.digg.wallet.gateway.application.controller.HsmController;
-import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
-import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwk;
+import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationBuilder;
 
 @Component
 public class HsmMapper {
 
   public DeviceStateRegistration toDomain(RegisterStateRequest request) {
     var deviceKeyRequest = request.getDeviceKey();
-    var publicKey = new EcPublicJwk(
-        deviceKeyRequest.getKty(),
-        deviceKeyRequest.getCrv(),
-        deviceKeyRequest.getX(),
-        deviceKeyRequest.getY(),
-        deviceKeyRequest.getKid());
-    return new DeviceStateRegistration(publicKey, request.getTtl());
+    var publicKey = EcPublicJwkBuilder.builder()
+        .kty(deviceKeyRequest.getKty())
+        .crv(deviceKeyRequest.getCrv())
+        .x(deviceKeyRequest.getX())
+        .y(deviceKeyRequest.getY())
+        .kid(deviceKeyRequest.getKid())
+        .build();
+    return DeviceStateRegistrationBuilder.builder()
+        .walletKey(publicKey)
+        .ttl(request.getTtl())
+        .build();
   }
 
   public HsmOperation toDomain(HsmRequest request) {
-    return new HsmOperation(request.getOuterRequestJws(), request.getClientId(),
-        request.getStateJws().orElse(null));
+    return HsmOperationBuilder.builder()
+        .outerRequestJws(request.getOuterRequestJws())
+        .clientId(request.getClientId())
+        .stateJws(request.getStateJws().orElse(null))
+        .build();
   }
 
-  public HsmResponse toHsmResponse(AsyncHsmOperationResult result) {
+  public HsmResponse toHsmResponse(HsmOperationResult result) {
     return HsmResponse.builder()
-        .id(result.correlationId())
-        .status(toHsmRequestStatus(result.status()))
+        .id(result.id())
+        .status(HsmAsyncStatus.fromValue(result.status().name()))
         .result(result.result())
         .resultUrl(toGatewayResultUrl(result))
         .stateJws(result.stateJws())
@@ -52,7 +61,7 @@ public class HsmMapper {
 
   public RegisterStateResponse toRegisterStateResponse(DeviceStateRegistrationResult result) {
     var serverJwsPublicKey = result.serverJwsPublicKey();
-    var serverJwsPublicKeyResponse = KeyResponse.builder()
+    var serverJwsPublicKeyResponse = EcJwkResponse.builder()
         .alg(null)
         .crv(serverJwsPublicKey.crv())
         .kid(serverJwsPublicKey.kid())
@@ -72,27 +81,19 @@ public class HsmMapper {
         .build();
   }
 
-  private String toGatewayResultUrl(AsyncHsmOperationResult response) {
-    if (response.resultUrl() == null || response.correlationId() == null) {
+  private String toGatewayResultUrl(HsmOperationResult response) {
+    if (response.resultUrl() == null || response.id() == null) {
       return null;
     }
 
     UriComponents uriComponents = MvcUriComponentsBuilder
-        .fromMethodName(HsmController.class, "getResult", response.correlationId())
+        .fromMethodName(HsmController.class, "getResult", response.id())
         .build();
     String path = uriComponents.getPath();
     return ServletUriComponentsBuilder.fromCurrentContextPath()
         // .path(HsmHttpRoutes.ASYNC_RESULT)
         .path(path)
-        .build(response.correlationId())
+        .build(response.id())
         .toString();
-  }
-
-  private HsmRequestStatus toHsmRequestStatus(String status) {
-    return switch (status) {
-      case "pending" -> HsmRequestStatus.PENDING;
-      case "complete" -> HsmRequestStatus.COMPLETE;
-      default -> HsmRequestStatus.ERROR;
-    };
   }
 }

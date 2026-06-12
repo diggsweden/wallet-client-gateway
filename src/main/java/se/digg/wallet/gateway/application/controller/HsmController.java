@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +44,7 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<HsmResponse> getResult(String id) {
+  public ResponseEntity<HsmResponse> getResult(UUID id) {
 
     var result = hsmService.getAsyncResult(id);
     var hsmResponse = mapper.toHsmResponse(result);

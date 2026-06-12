@@ -4,16 +4,18 @@
 
 package se.digg.wallet.gateway.domain.ports.outbound;
 
-import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import java.util.UUID;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+
 
 public interface HsmPort {
 
   DeviceStateRegistrationResult registerState(DeviceStateRegistration request);
 
-  AsyncHsmOperationResult submitAsync(HsmOperation request);
+  HsmOperationResult submitAsync(HsmOperation request);
 
-  AsyncHsmOperationResult getAsyncResult(String id);
+  HsmOperationResult getAsyncResult(UUID id);
 }

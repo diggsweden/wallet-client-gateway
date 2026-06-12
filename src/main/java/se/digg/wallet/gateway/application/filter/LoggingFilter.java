@@ -37,7 +37,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
   public static final String MDC_TRANSACTION_ID = "transactionId";
-  public static final String MDC_CORRELATION_ID = "correlationId";
+  public static final String MDC_CORRELATION_ID = "id";
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -139,7 +139,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 
       // Basic request info
       logEntry.put("timestamp", Instant.now().toString());
-      logEntry.put("correlationId", correlationId);
+      logEntry.put("id", correlationId);
       logEntry.put("type", "http_request");
 
       // Request details

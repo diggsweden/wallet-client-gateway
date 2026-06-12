@@ -4,5 +4,11 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-public record HsmOperation(String outerRequestJws, String clientId, String stateJws) {
+import io.soabase.recordbuilder.core.RecordBuilder;
+
+@RecordBuilder
+public record HsmOperation(
+    String outerRequestJws,
+    String clientId,
+    String stateJws) {
 }

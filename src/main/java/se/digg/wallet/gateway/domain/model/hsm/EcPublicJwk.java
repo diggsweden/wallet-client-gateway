@@ -4,5 +4,13 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-public record EcPublicJwk(String kty, String crv, String x, String y, String kid) {
+import io.soabase.recordbuilder.core.RecordBuilder;
+
+@RecordBuilder
+public record EcPublicJwk(
+    String kty,
+    String crv,
+    String x,
+    String y,
+    String kid) {
 }

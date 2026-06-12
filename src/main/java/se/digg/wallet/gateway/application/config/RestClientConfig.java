@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.client.account.origin.api.AccountControllerApi;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
+import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
 
 @Configuration
 public class RestClientConfig {
@@ -46,6 +47,22 @@ public class RestClientConfig {
 
     var api = new AccountControllerApi();
     api.getApiClient().setBasePath(basePath);
+
+    return api;
+  }
+
+  /**
+   * Creates a client bean to be used for remote calls to the Wallet HSM API. (aka
+   * wallet-r2ps/wallet-bff).
+   *
+   * @return an HsmAPI instance.
+   */
+  @Bean
+  public HandlersApi hsmApi(@Value("${properties.wallet-r2ps.baseurl}") String basePath) {
+
+    var api = new HandlersApi();
+    api.getApiClient()
+        .setBasePath(basePath);
 
     return api;
   }

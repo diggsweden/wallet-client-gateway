@@ -65,19 +65,6 @@ class AccountControllerIntegrationTest {
   private WireMockServer server;
 
   @Test
-  void testCreateAccountLegacy() throws Exception {
-    var generatedAccountId = stubLegacyAccountCreation();
-
-    var response = restClient.post()
-        .uri("accounts")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(CreateAccountRequestDtoTestBuilder.withDefaults().build())
-        .exchange();
-
-    expectCreatedWithAccountId(response, generatedAccountId);
-  }
-
-  @Test
   void testCreateAccount() throws Exception {
     var generatedAccountId = stubAccountCreation();
 
@@ -112,7 +99,7 @@ class AccountControllerIntegrationTest {
             .withStatus(400)));
 
     var response = restClient.post()
-        .uri("accounts")
+        .uri("v0/accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(CreateAccountRequestDtoTestBuilder.withDefaults().build())
         .exchange();
@@ -124,10 +111,10 @@ class AccountControllerIntegrationTest {
   @Test
   void testValidation() {
     var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults()
-        .publicKey(null)
+        .deviceKey(null)
         .build();
     var response = restClient.post()
-        .uri("accounts")
+        .uri("v0/accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();

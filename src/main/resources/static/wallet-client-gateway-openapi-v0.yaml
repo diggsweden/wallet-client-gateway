@@ -58,39 +58,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiInfoResponse'
 
-  /accounts:
-    post:
-      tags:
-        - Account
-      summary: Create account
-      deprecated: true
-      description: Creates a new account
-      operationId: createAccount
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateAccountRequestDto'
-        required: true
-      responses:
-        '201':
-          description: Account created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateAccountResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        'default':
-          $ref: '#/components/responses/default'
-
   /v0/accounts:
     post:
       tags:
         - Account
       summary: Create account
       description: Creates a new account
-      operationId: createAccounts
+      operationId: createAccount
       requestBody:
         content:
           application/json:
@@ -122,7 +96,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/KeyRequest'
+              $ref: '#/components/schemas/EcJwkRequest'
         required: true
       responses:
         '201':
@@ -166,11 +140,7 @@ paths:
         required: true
       responses:
         '201':
-          description: The account security envelope being added
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SecurityEnvelopeResponse'
+          description: The security envelope has been added to the account
         'default':
           $ref: '#/components/responses/default'
 
@@ -315,6 +285,9 @@ paths:
           description: The HSM request id.
           schema:
             type: string
+            format: uuid
+            description: HSM operation identity.
+            example: b66dca70-0908-4b07-a1af-29d0c18b89b6
       responses:
         '200':
           description: Request completed.
@@ -491,24 +464,6 @@ components:
       required:
         - sessionId
 
-    CreateAccountRequestDto:
-      type: object
-      properties:
-        personalIdentityNumber:
-          type: string
-          example: '191010101010'
-        emailAdress:
-          type: string
-          example: first.last@example.xx
-          minLength: 1
-        telephoneNumber:
-          type: string
-          example: '0701234567'
-        publicKey:
-          $ref: '#/components/schemas/KeyRequest'
-      required:
-        - publicKey
-
     CreateAccountRequest:
       type: object
       properties:
@@ -532,7 +487,7 @@ components:
           description: Optional. Contact phone number.
           example: '0701234567'
         deviceKey:
-          $ref: '#/components/schemas/KeyRequest'
+          $ref: '#/components/schemas/EcJwkRequest'
       required:
         - deviceKey
 
@@ -547,8 +502,9 @@ components:
       required:
         - accountId
 
-    KeyRequest:
+    EcJwkRequest:
       type: object
+      description: Elliptic Curve JSON Web Key
       properties:
         kty:
           type: string
@@ -580,9 +536,9 @@ components:
         - x
         - y
 
-    KeyResponse:
+    EcJwkResponse:
       allOf:
-        - $ref: '#/components/schemas/KeyRequest'
+        - $ref: '#/components/schemas/EcJwkRequest'
 
     SecurityEnvelopeType:
       type: string
@@ -652,9 +608,10 @@ components:
         - outerRequestJws
         - clientId
 
-    HsmRequestStatus:
+    HsmAsyncStatus:
       type: string
-      description: HSM Request operation status.
+      description: |
+        Asynchronous workflow status of the HSM Request.
       enum:
         - COMPLETE
         - PENDING
@@ -666,9 +623,11 @@ components:
       properties:
         id:
           type: string
+          format: uuid
           description: Identification of the asynchronous HSM-operation.
+          example: b66dca70-0908-4b07-a1af-29d0c18b89b6
         status:
-          $ref: '#/components/schemas/HsmRequestStatus'
+          $ref: '#/components/schemas/HsmAsyncStatus'
         result:
           type: string
           description: The JWT result from the HSM if completed, else empty.
@@ -679,16 +638,14 @@ components:
           type: string
           description: Updated device-state token. Present when status=complete. Persist and send as stateJws on the next request.
       required:
-        - correlationId
+        - id
         - status
 
     RegisterStateRequest:
       type: object
       properties:
         deviceKey:
-          allOf:
-            - $ref: '#/components/schemas/KeyRequest'
-          description: Device public key
+          $ref: '#/components/schemas/EcJwkRequest'
         ttl:
           type: string
           description: Optional. Time-to-live for the state. Use ISO 8601 duration format.
@@ -707,9 +664,7 @@ components:
         devAuthorizationCode:
           type: string
         serverJwsPublicKey:
-          allOf:
-            - $ref: '#/components/schemas/KeyResponse'
-          description: The server JWS public key.
+          $ref: '#/components/schemas/EcJwkResponse'
         opaqueServerId:
           type: string
         stateJws:

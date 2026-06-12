@@ -4,8 +4,10 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
+import io.soabase.recordbuilder.core.RecordBuilder;
 import java.util.Optional;
 
+@RecordBuilder
 public record DeviceStateRegistration(
     EcPublicJwk walletKey,
     Optional<String> ttl) {

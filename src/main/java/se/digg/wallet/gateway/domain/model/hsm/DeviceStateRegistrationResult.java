@@ -4,9 +4,9 @@
 
 package se.digg.wallet.gateway.domain.model.hsm;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.soabase.recordbuilder.core.RecordBuilder;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@RecordBuilder
 public record DeviceStateRegistrationResult(
     String status,
     String clientId,

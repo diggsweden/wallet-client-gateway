@@ -4,8 +4,7 @@
     "title": "wallet-bff",
     "description": "",
     "license": {
-      "name": "EUPL-1.2 license",
-      "url": "https://to.be.decided.xx"
+      "name": ""
     },
     "version": "0.1.0"
   },
@@ -47,6 +46,16 @@
                 }
               }
             }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -70,7 +79,20 @@
         },
         "responses": {
           "200": {
-            "description": "Worker result (plain JWS string)"
+            "description": "Worker result (plain JWS string)",
+            "content": {
+              "text/plain": {}
+            }
+          },
+          "404": {
+            "description": "Device state not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           },
           "408": {
             "description": "Request timeout",
@@ -82,8 +104,28 @@
               }
             }
           },
+          "409": {
+            "description": "Duplicate nonce — generate a new nonce and retry",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -125,6 +167,14 @@
           },
           "202": {
             "description": "Request accepted, poll for result",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL to poll for the result"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -143,8 +193,28 @@
               }
             }
           },
+          "409": {
+            "description": "Duplicate nonce — generate a new nonce and retry",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -188,6 +258,14 @@
           },
           "202": {
             "description": "Request still pending",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL to poll for the result"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -198,6 +276,16 @@
           },
           "500": {
             "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -224,16 +312,6 @@
             "type": "string",
             "format": "uuid"
           },
-          "error": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/AsyncResponseError"
-              }
-            ]
-          },
           "result": {
             "type": [
               "string",
@@ -246,26 +324,14 @@
               "null"
             ]
           },
+          "stateJws": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "$ref": "#/components/schemas/AsyncResponseStatus"
-          }
-        }
-      },
-      "AsyncResponseError": {
-        "type": "object",
-        "description": "Error detail embedded in AsyncResponseDto.",
-        "required": [
-          "message",
-          "httpStatus"
-        ],
-        "properties": {
-          "httpStatus": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "message": {
-            "type": "string"
           }
         }
       },
@@ -274,8 +340,7 @@
         "description": "Status of an async operation.",
         "enum": [
           "complete",
-          "pending",
-          "error"
+          "pending"
         ]
       },
       "BffRequest": {
@@ -290,7 +355,14 @@
             "type": "string"
           },
           "outerRequestJws": {
-            "type": "string"
+            "type": "string",
+            "description": "Compact JWS (ES256). The decoded payload must contain a `nonce` UUID field\nfor replay protection — duplicate nonces are rejected with 409."
+          },
+          "stateJws": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -354,7 +426,8 @@
             ]
           },
           "overwrite": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "When `true`, overwrites any existing device state for the supplied `clientId`.\nWhen `false` (default), a fresh `clientId` is always generated."
           },
           "publicKey": {
             "$ref": "#/components/schemas/EcPublicJwk"
@@ -363,7 +436,8 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Session TTL as an ISO 8601 duration string, e.g. `PT10M` for 10 minutes.\nDefaults to 10 minutes when omitted."
           }
         }
       },
@@ -400,6 +474,12 @@
               }
             ]
           },
+          "stateJws": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "type": "string"
           }
@@ -420,6 +500,12 @@
             ]
           },
           "instance": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "request_id": {
             "type": [
               "string",
               "null"

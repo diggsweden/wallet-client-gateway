@@ -29,7 +29,7 @@ properties:
     paths:
       sync-operation: /hsm/v1/operations
       async-request: /hsm/v1/requests
-      async-poll: /hsm/v1/requests/{correlationId}
+      async-poll: /hsm/v1/requests/{id}
       new-state: /hsm/v1/device-states
   challenge-cache:
     ttl-seconds: 30

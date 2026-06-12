@@ -4,11 +4,12 @@
 
 package se.digg.wallet.gateway.domain.service.hsm;
 
+import java.util.UUID;
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
 
 @Service
@@ -24,11 +25,11 @@ public class HsmService {
     return hsmPort.registerState(request);
   }
 
-  public AsyncHsmOperationResult submitAsync(HsmOperation request) {
+  public HsmOperationResult submitAsync(HsmOperation request) {
     return hsmPort.submitAsync(request);
   }
 
-  public AsyncHsmOperationResult getAsyncResult(String id) {
+  public HsmOperationResult getAsyncResult(UUID id) {
     return hsmPort.getAsyncResult(id);
   }
 }

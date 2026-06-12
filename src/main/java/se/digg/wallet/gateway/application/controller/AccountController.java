@@ -11,11 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.AccountApi;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.KeyRequest;
+import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
-import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeResponse;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
@@ -42,18 +40,6 @@ public class AccountController implements AccountApi {
 
   @Override
   public ResponseEntity<CreateAccountResponse> createAccount(
-      @Valid CreateAccountRequestDto createAccountRequest) {
-    NewAccount newAccount = mapper.toNewAccountDomain(createAccountRequest);
-    Account account = accountService.createAccountLegacy(newAccount);
-    CreateAccountResponse createAccountResponse = mapper.toResponse(account);
-
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createAccountResponse);
-  }
-
-  @Override
-  public ResponseEntity<CreateAccountResponse> createAccounts(
       @Valid CreateAccountRequest createAccountRequest) {
     NewAccount newAccount = mapper.toDomain(createAccountRequest);
     Account account = accountService.createAccount(newAccount);
@@ -72,7 +58,7 @@ public class AccountController implements AccountApi {
   }
 
   @Override
-  public ResponseEntity<SecurityEnvelopeResponse> addAccountSecurityEnvelope(
+  public ResponseEntity<Void> addAccountSecurityEnvelope(
       @Valid SecurityEnvelopeRequest securityEnvelopeRequest) {
     var accountId = currentAccount.id();
     SecurityEnvelope envelope = mapper.toDomain(securityEnvelopeRequest);
@@ -85,14 +71,13 @@ public class AccountController implements AccountApi {
   }
 
   @Override
-  public ResponseEntity<Void> addAccountWalletKey(@Valid KeyRequest keyRequest) {
+  public ResponseEntity<Void> addAccountWalletKey(@Valid EcJwkRequest keyRequest) {
     Jwk jwk = mapper.toDomain(keyRequest);
     var accountId = currentAccount.id();
     accountService.addAccountWalletKey(jwk, accountId);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(null);
-
+        .build();
   }
 }

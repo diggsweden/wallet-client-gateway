@@ -126,8 +126,8 @@ public class LoggingFilterTest {
     var consoleOut = console.getOut();
     var loggedObject = getLoggedObject(consoleOut);
 
-    assertThat(loggedObject).containsKey("correlationId");
-    assertThat(loggedObject.get("correlationId").toString()).hasSizeGreaterThan(1);
+    assertThat(loggedObject).containsKey("id");
+    assertThat(loggedObject.get("id").toString()).hasSizeGreaterThan(1);
   }
 
   @Test
@@ -145,8 +145,8 @@ public class LoggingFilterTest {
     var consoleOut = console.getOut();
     var loggedObject = getLoggedObject(consoleOut);
 
-    assertThat(loggedObject).containsKey("correlationId");
-    assertThat(loggedObject.get("correlationId").toString()).hasSizeGreaterThan(1);
+    assertThat(loggedObject).containsKey("id");
+    assertThat(loggedObject.get("id").toString()).hasSizeGreaterThan(1);
   }
 
   @Test
@@ -164,8 +164,8 @@ public class LoggingFilterTest {
     var consoleOut = console.getOut();
     var loggedObject = getLoggedObject(consoleOut);
 
-    assertThat(loggedObject).containsKey("correlationId");
-    assertThat(loggedObject.get("correlationId")).isEqualTo(expectedId);
+    assertThat(loggedObject).containsKey("id");
+    assertThat(loggedObject.get("id")).isEqualTo(expectedId);
   }
 
   @Test
@@ -183,8 +183,8 @@ public class LoggingFilterTest {
     var consoleOut = console.getOut();
     var loggedObject = getLoggedObject(consoleOut);
 
-    assertThat(loggedObject).containsKey("correlationId");
-    assertThat(loggedObject.get("correlationId")).isEqualTo(expectedId);
+    assertThat(loggedObject).containsKey("id");
+    assertThat(loggedObject.get("id")).isEqualTo(expectedId);
   }
 
   @Test

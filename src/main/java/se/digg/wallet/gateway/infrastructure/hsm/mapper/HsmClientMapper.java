@@ -4,54 +4,81 @@
 
 package se.digg.wallet.gateway.infrastructure.hsm.mapper;
 
+import java.util.Optional;
 import org.springframework.stereotype.Component;
-import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationError;
-import se.digg.wallet.gateway.domain.model.hsm.AsyncHsmOperationResult;
+import org.springframework.util.Assert;
+import se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseDto;
+import se.digg.wallet.gateway.client.hsm.v1.model.BffRequest;
+import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwk;
+import se.digg.wallet.gateway.client.hsm.v1.model.NewStateRequestDto;
+import se.digg.wallet.gateway.client.hsm.v1.model.NewStateResponseDto;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
+import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResultBuilder;
+import se.digg.wallet.gateway.domain.model.hsm.HsmAsyncStatus;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
-import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSAsyncOperationResponseDto;
-import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSDeviceStateRequestDto;
-import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSEcPublicJwkDto;
-import se.digg.wallet.gateway.infrastructure.hsm.model.R2PSOperationRequestDto;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResultBuilder;
 
 @Component
 public class HsmClientMapper {
 
-  public R2PSDeviceStateRequestDto toClientRequest(DeviceStateRegistration request) {
+  public NewStateRequestDto toClientRequest(DeviceStateRegistration request) {
     var publicKey = request.walletKey();
-    var clientPublicKey = new R2PSEcPublicJwkDto(
-        publicKey.kty(),
-        publicKey.crv(),
-        publicKey.x(),
-        publicKey.y(),
-        publicKey.kid());
-    return new R2PSDeviceStateRequestDto(clientPublicKey, false, request.ttl());
+    Assert.notNull(publicKey, "WalletKey must not be null");
+
+    var clientPublicKey = EcPublicJwk.builder()
+        .kid(publicKey.kid())
+        .kty(publicKey.kty())
+        .crv(publicKey.crv())
+        .x(publicKey.x())
+        .y(publicKey.y())
+        .build();
+    return NewStateRequestDto.builder()
+        .publicKey(clientPublicKey)
+        .overwrite(true)
+        .ttl(request.ttl().orElse(null))
+        .build();
   }
 
-  public R2PSOperationRequestDto toClientRequest(HsmOperation request) {
-    return new R2PSOperationRequestDto(request.clientId(), request.outerRequestJws(), request.stateJws());
+  public BffRequest toClientRequest(HsmOperation request) {
+    return BffRequest.builder()
+        .clientId(request.clientId())
+        .outerRequestJws(request.outerRequestJws())
+        .stateJws(request.stateJws())
+        .build();
   }
 
-  public HsmOperationResult toDomainResponse(String jwt) {
-    return new HsmOperationResult(jwt);
+  public DeviceStateRegistrationResult toDomainResponse(NewStateResponseDto response) {
+    var responseKey = response.getServerJwsPublicKey();
+
+    var publicKey = Optional.ofNullable(responseKey)
+        .map(key -> se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder.builder()
+            .kty(key.getKty())
+            .crv(key.getCrv())
+            .x(key.getX())
+            .y(key.getY())
+            .kid(key.getKid())
+            .build())
+        .orElse(null);
+
+    return DeviceStateRegistrationResultBuilder.builder()
+        .status(response.getStatus())
+        .clientId(response.getClientId())
+        .devAuthorizationCode(response.getDevAuthorizationCode())
+        .serverJwsPublicKey(publicKey)
+        .opaqueServerId(response.getOpaqueServerId())
+        .stateJws(response.getStateJws())
+        .build();
   }
 
-  public AsyncHsmOperationResult toDomainResponse(R2PSAsyncOperationResponseDto response) {
-    var error = response.error() == null
-        ? null
-        : new AsyncHsmOperationError(response.error().message(), response.error().httpStatus());
-    return new AsyncHsmOperationResult(
-        response.correlationId(),
-        response.status(),
-        response.result(),
-        response.resultUrl(),
-        error,
-        response.stateJws());
-  }
-
-  public DeviceStateRegistrationResult toDomainResponse(DeviceStateRegistrationResult response) {
-    return response;
+  public HsmOperationResult toDomainResponse(AsyncResponseDto response) {
+    return HsmOperationResultBuilder.builder()
+        .id(response.getCorrelationId())
+        .status(HsmAsyncStatus.valueOf(response.getStatus().name()))
+        .result(response.getResult())
+        .resultUrl(response.getResultUrl())
+        .stateJws(response.getStateJws())
+        .build();
   }
 }
