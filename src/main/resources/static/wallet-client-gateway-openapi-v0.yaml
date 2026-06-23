@@ -597,16 +597,8 @@ components:
           type: string
           minLength: 1
           description: Outer request JWS payload for the HSM operation.
-        clientId:
-          type: string
-          minLength: 1
-          description: Client identifier
-        stateJws:
-          type: string
-          description: Optional. Encoded device-state token. When present the BFF skips the Valkey lookup.
       required:
         - outerRequestJws
-        - clientId
 
     HsmAsyncStatus:
       type: string

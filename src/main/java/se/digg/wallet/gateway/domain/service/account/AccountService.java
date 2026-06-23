@@ -42,4 +42,12 @@ public class AccountService {
     return accountPort.getSecurityEnvelopes(accountId);
   }
 
+  public String getHsmClientId(String accountId) {
+    return accountPort.getHsmClientId(accountId);
+  }
+
+  public void saveHsmClientId(String clientId, String accountId) {
+    accountPort.saveHsmClientId(clientId, accountId);
+  }
+
 }

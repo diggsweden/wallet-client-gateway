@@ -44,8 +44,6 @@ public class HsmMapper {
   public HsmOperation toDomain(HsmRequest request) {
     return HsmOperationBuilder.builder()
         .outerRequestJws(request.getOuterRequestJws())
-        .clientId(request.getClientId())
-        .stateJws(request.getStateJws().orElse(null))
         .build();
   }
 
