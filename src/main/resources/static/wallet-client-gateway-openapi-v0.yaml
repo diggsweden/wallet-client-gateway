@@ -123,27 +123,6 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
-    post:
-      tags:
-        - Account
-      summary: Add a security envelope to an account
-      description: |
-        This operation will add a security envelope (typically used with the HSM) to the associated account.
-        An account can only have one security envelope for each type. Any existing envelope with the requested
-        type will be replaced.
-      operationId: addAccountSecurityEnvelope
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SecurityEnvelopeRequest'
-        required: true
-      responses:
-        '201':
-          description: The security envelope has been added to the account
-        'default':
-          $ref: '#/components/responses/default'
-
   /public/auth/session/challenge:
     get:
       tags:
@@ -539,25 +518,6 @@ components:
     EcJwkResponse:
       allOf:
         - $ref: '#/components/schemas/EcJwkRequest'
-
-    SecurityEnvelopeType:
-      type: string
-      description: 'Security envelope type enum constants.'
-      enum:
-        - SIGN
-        - OTHER
-
-    SecurityEnvelopeRequest:
-      properties:
-        type:
-          $ref: '#/components/schemas/SecurityEnvelopeType'
-        content:
-          type: string
-          description: The security envelope content. Typically encrypted opaque materials.
-          minLength: 1
-      required:
-        - type
-        - content
 
     SecurityEnvelopeResponse:
       type: object

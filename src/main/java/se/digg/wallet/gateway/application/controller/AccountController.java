@@ -13,14 +13,12 @@ import se.digg.wallet.gateway.api.v0.AccountApi;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
-import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
 
@@ -55,19 +53,6 @@ public class AccountController implements AccountApi {
     var accountId = currentAccount.id();
     SecurityEnvelopes envelopes = accountService.getSecurityEnvelopes(accountId);
     return ResponseEntity.ok(mapper.toResponse(envelopes));
-  }
-
-  @Override
-  public ResponseEntity<Void> addAccountSecurityEnvelope(
-      @Valid SecurityEnvelopeRequest securityEnvelopeRequest) {
-    var accountId = currentAccount.id();
-    SecurityEnvelope envelope = mapper.toDomain(securityEnvelopeRequest);
-    accountService.addAccountSecurityEnvelope(envelope, accountId);
-
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .build();
-
   }
 
   @Override

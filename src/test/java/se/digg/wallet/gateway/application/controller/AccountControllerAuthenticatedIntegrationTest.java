@@ -28,8 +28,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
-import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeType;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
@@ -151,34 +149,6 @@ class AccountControllerAuthenticatedIntegrationTest {
   }
 
   @Test
-  void testAddSecurityEnvelope() throws Exception {
-    var envelopeContent = "envelope-content";
-
-    var expectedDownstreamRequest =
-        se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest.builder()
-            .content(envelopeContent)
-            .build();
-
-    accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedDownstreamRequest)))
-        .willReturn(aResponse()
-            .withStatus(201)
-            .withHeader("content-type", "application/json")
-            .withBody("{}")));
-
-    var response = restClient.post()
-        .uri("/v0/accounts/security-envelopes")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(SecurityEnvelopeRequest.builder()
-            .type(SecurityEnvelopeType.SIGN)
-            .content(envelopeContent)
-            .build())
-        .exchange();
-
-    response.expectStatus().isCreated();
-  }
-
-  @Test
   void testGetSecurityEnvelopes() throws Exception {
     var envelopeContent = "opaque-envelope-content";
 
@@ -218,27 +188,4 @@ class AccountControllerAuthenticatedIntegrationTest {
     response.expectStatus().isEqualTo(500);
   }
 
-  @Test
-  void returnsProblemWithStatus500WhenSaveSecurityEnvelopeDownstreamFails() {
-    accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse().withStatus(400)));
-
-    var response = restClient.post()
-        .uri("/v0/accounts/security-envelopes")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(SecurityEnvelopeRequest.builder()
-            .type(SecurityEnvelopeType.SIGN)
-            .content("content")
-            .build())
-        .exchange();
-
-    var expectedStatus = 500;
-    response.expectStatus().isEqualTo(expectedStatus)
-        .expectBody()
-        .jsonPath("$.status").isEqualTo(expectedStatus)
-        .jsonPath("$.type").exists()
-        .jsonPath("$.title").exists()
-        .jsonPath("$.detail").exists()
-        .jsonPath("$.instance").exists();
-  }
 }
