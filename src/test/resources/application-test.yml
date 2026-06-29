@@ -26,16 +26,8 @@ properties:
     wua-path: /wallet-provider/wallet-unit-attestation
   walletaccount:
     baseurl: http://localhost:${wiremock.account.port:0}
-    paths:
-      post: /account
-      get: /account
   wallet-r2ps:
     baseurl: http://localhost:${wiremock.r2ps.port:0}
-    paths:
-      sync-operation: /hsm/v1/operations
-      async-request: /hsm/v1/requests
-      async-poll: /hsm/v1/requests/{id}
-      new-state: /hsm/v1/device-states
   challenge-cache:
     ttl-seconds: 10
 

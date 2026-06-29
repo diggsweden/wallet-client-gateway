@@ -8,20 +8,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
+import se.digg.wallet.gateway.api.v0.model.EcJwkResponse;
 import se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus;
 import se.digg.wallet.gateway.api.v0.model.HsmRequest;
 import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.EcJwkResponse;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
 import se.digg.wallet.gateway.application.controller.HsmController;
-import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperationBuilder;
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 
 @Component
 public class HsmMapper {

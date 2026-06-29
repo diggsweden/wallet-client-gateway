@@ -148,7 +148,7 @@ class AuthControllerIntegrationTest {
   }
 
   private void stubAccount(ECKey ecKey) {
-    server.stubFor(get("/account/" + ACCOUNT_ID)
+    server.stubFor(get("/v0/accounts/" + ACCOUNT_ID)
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "application/json")
@@ -156,9 +156,9 @@ class AuthControllerIntegrationTest {
                 {
                   "id": "%s",
                   "personalIdentityNumber": "%s",
-                  "emailAdress": "%s",
-                  "telephoneNumber": "%s",
-                  "publicKey": {
+                  "email": "%s",
+                  "phoneNumber": "%s",
+                  "deviceKey": {
                     "kty": "%s",
                     "kid": "%s",
                     "alg": "%s",

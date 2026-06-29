@@ -4,9 +4,8 @@
 
 package se.digg.wallet.gateway.domain.model.account;
 
-import java.util.UUID;
-
 import io.soabase.recordbuilder.core.RecordBuilder;
+import java.util.UUID;
 
 @RecordBuilder
 public record Account(

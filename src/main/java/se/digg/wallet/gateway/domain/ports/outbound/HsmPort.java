@@ -5,11 +5,10 @@
 package se.digg.wallet.gateway.domain.ports.outbound;
 
 import java.util.UUID;
-import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
-
+import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 
 public interface HsmPort {
 

@@ -5,7 +5,6 @@
 package se.digg.wallet.gateway.domain.service.account;
 
 import org.springframework.stereotype.Service;
-
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
@@ -24,10 +23,6 @@ public class AccountService {
 
   public Account createAccount(NewAccount request) {
     return accountPort.createAccount(request);
-  }
-
-  public Account createAccountLegacy(NewAccount request) {
-    return accountPort.createAccountLegacy(request);
   }
 
   public void addAccountWalletKey(Jwk jwk, String accountId) {

@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.domain.ports.outbound;
 
+import java.util.UUID;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
@@ -12,9 +13,9 @@ import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 
 public interface AccountPort {
 
-  Account createAccount(NewAccount account);
+  Account getAccount(UUID accountId);
 
-  Account createAccountLegacy(NewAccount account);
+  Account createAccount(NewAccount account);
 
   void addWalletKey(Jwk walletKey, String accountId);
 

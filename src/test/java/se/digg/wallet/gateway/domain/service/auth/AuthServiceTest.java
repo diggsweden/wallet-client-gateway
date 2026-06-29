@@ -6,7 +6,6 @@ package se.digg.wallet.gateway.domain.service.auth;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,9 +30,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.application.model.WalletAccountAccountDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
-import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
+import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
 
@@ -44,7 +44,7 @@ class AuthServiceTest {
   ChallengeCache challengeCache;
 
   @Mock
-  WalletAccountClient walletAccountClient;
+  WalletAccountAdapter walletAccountAdapter;
 
   @InjectMocks
   AuthService authService;
@@ -60,12 +60,11 @@ class AuthServiceTest {
         .generate();
     var ecPublicJwk = ecJwk.toPublicJWK();
 
-    var walletAccountAccountDto =
-        WalletAccountAccountDtoTestBuilder.generateWalletAccount(ecPublicJwk)
-            .personalIdentityNumber(accountId).build();
+    var account = WalletAccountAccountDtoTestBuilder.generateAccount(ecJwk).build();
+      //  WalletAccountAccountDtoTestBuilder.generateWalletAccount(ecPublicJwk)
+      //      .personalIdentityNumber(accountId).build();
 
-    when(walletAccountClient.getAccount(anyString()))
-        .thenReturn(Optional.of(walletAccountAccountDto));
+    when(walletAccountAdapter.getAccount(any())).thenReturn(account);
 
     var challenge = authService.initChallenge(accountId, keyId);
 
@@ -77,8 +76,15 @@ class AuthServiceTest {
   void accountNotFoundResultsInNothingCached() {
     var keyId = "kid";
 
-    when(walletAccountClient.getAccount(anyString()))
-        .thenReturn(Optional.empty());
+    var restClientResponseException = new RestClientResponseException(
+      "Requested resource not found",
+      404,
+      "Not Found",
+      null,
+      null,
+      null
+    );
+    when(walletAccountAdapter.getAccount(any())).thenThrow(restClientResponseException);
 
     var challenge = authService.initChallenge(accountId, keyId);
 
@@ -96,12 +102,12 @@ class AuthServiceTest {
         .generate();
     var ecPublicJwk = ecJwk.toPublicJWK();
 
-    var walletAccountAccountDto =
-        WalletAccountAccountDtoTestBuilder.generateWalletAccount(ecPublicJwk)
-            .personalIdentityNumber(accountId).build();
+    var account = WalletAccountAccountDtoTestBuilder.generateAccount(ecJwk)
+      .personalIdentityNumber(accountId)
+      .build();
 
-    when(walletAccountClient.getAccount(anyString()))
-        .thenReturn(Optional.of(walletAccountAccountDto));
+    when(walletAccountAdapter.getAccount(any()))
+        .thenReturn(account);
 
     var challenge = authService.initChallenge(accountId, "WRONG_KID");
 
