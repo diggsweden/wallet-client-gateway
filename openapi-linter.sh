@@ -6,7 +6,7 @@
 
 # Preferences
 raplpImage="ghcr.io/diggsweden/rest-api-profil-lint-processor"
-raplpVersion="v1.1.1"
+raplpVersion="v2.0.0"
 scriptDir=$(dirname "$(readlink -f "$0")")
 openapiSourceFolder="$scriptDir/src/main/resources/static"
 openapiFileFilter="*openapi*.yaml"
