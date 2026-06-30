@@ -8,24 +8,8 @@ import com.nimbusds.jose.jwk.ECKey;
 import java.util.UUID;
 import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
-import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDtoBuilder;
-import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountJwkDtoBuilder;
 
 public class WalletAccountAccountDtoTestBuilder {
-  public static WalletAccountAccountDtoBuilder generateWalletAccount(ECKey publicEcKey) {
-    return WalletAccountAccountDtoBuilder.builder()
-        .emailAdress("dummy@dummy.se")
-        .id(UUID.randomUUID())
-        .personalIdentityNumber("19770701-1234")
-        .publicKey(WalletAccountJwkDtoBuilder.builder()
-            .kty(publicEcKey.getKeyType().getValue())
-            .crv(publicEcKey.getCurve().toString())
-            .x(publicEcKey.getX().toString())
-            .y(publicEcKey.getY().toString())
-            .alg(publicEcKey.getAlgorithm().toString())
-            .use(publicEcKey.getKeyUse().getValue())
-            .kid(publicEcKey.getKeyID()).build());
-  }
 
   public static AccountBuilder generateAccount(ECKey ecKey) {
     return AccountBuilder.builder()
@@ -42,5 +26,4 @@ public class WalletAccountAccountDtoTestBuilder {
             .kid(ecKey.getKeyID())
             .build());
   }
-
 }
