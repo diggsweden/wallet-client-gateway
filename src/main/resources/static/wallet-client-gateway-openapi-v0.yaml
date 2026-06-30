@@ -146,7 +146,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ValidateAuthChallengeRequestDto'
+              $ref: '#/components/schemas/AuthChallengeRequest'
             example:
               signedJwt: insert.signed.jwt
         required: true
@@ -163,7 +163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidateAuthChallengeResponseDto'
+                $ref: '#/components/schemas/AuthChallengeResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -405,7 +405,7 @@ components:
       required:
         - jwt
 
-    ValidateAuthChallengeRequestDto:
+    AuthChallengeRequest:
       type: object
       properties:
         signedJwt:
@@ -414,7 +414,7 @@ components:
       required:
         - signedJwt
 
-    ValidateAuthChallengeResponseDto:
+    AuthChallengeResponse:
       type: object
       properties:
         sessionId:
