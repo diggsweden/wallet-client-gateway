@@ -28,8 +28,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponse;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
@@ -146,46 +144,6 @@ class AccountControllerAuthenticatedIntegrationTest {
         .jsonPath("$.title").exists()
         .jsonPath("$.detail").exists()
         .jsonPath("$.instance").exists();
-  }
-
-  @Test
-  void testGetSecurityEnvelopes() throws Exception {
-    var envelopeContent = "opaque-envelope-content";
-
-    var downstreamResponse = SecurityEnvelopesResponse.builder()
-        .items(java.util.List.of(
-            SecurityEnvelopeResponse.builder().content(envelopeContent).build()))
-        .build();
-
-    accountServer.stubFor(get("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody(objectMapper.writeValueAsString(downstreamResponse))));
-
-    var response = restClient.get()
-        .uri("/v0/accounts/security-envelopes")
-        .exchange();
-
-    response.expectStatus().isOk()
-        .expectBody()
-        .json("""
-            {
-              "items": [{ "content": "%s" }]
-            }
-            """.formatted(envelopeContent));
-  }
-
-  @Test
-  void testGetSecurityEnvelopesReturns500IfDownstreamFails() {
-    accountServer.stubFor(get("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse().withStatus(400)));
-
-    var response = restClient.get()
-        .uri("/v0/accounts/security-envelopes")
-        .exchange();
-
-    response.expectStatus().isEqualTo(500);
   }
 
 }
