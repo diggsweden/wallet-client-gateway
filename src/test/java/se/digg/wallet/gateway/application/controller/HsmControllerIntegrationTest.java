@@ -99,9 +99,11 @@ class HsmControllerIntegrationTest {
     stubAccountHsmEndpoints();
   }
 
-  // The gateway now sources clientId + stateJws from the account on each HSM operation, so stub the
-  // account v0 endpoints HsmService calls: hsm-client-id (fetch/seed) and security-envelopes
-  // (stateJws fetch/write-back).
+  /*
+   * The gateway now sources clientId + stateJws from the account on each HSM operation, so stub the
+   * account v0 endpoints HsmService calls: hsm-client-id (fetch/seed) and security-envelopes
+   * (stateJws fetch/write-back).
+   */
   private void stubAccountHsmEndpoints() {
     accountServer.stubFor(WireMock.get(WireMock.urlPathMatching("/v0/accounts/.*/hsm-client-id"))
         .willReturn(aResponse().withStatus(200).withHeader("content-type", "application/json")

@@ -52,8 +52,7 @@ public class HsmService {
   }
 
   private HsmOperation withAccountState(HsmOperation request, String accountId) {
-    return HsmOperationBuilder.builder()
-        .outerRequestJws(request.outerRequestJws())
+    return HsmOperationBuilder.builder(request)
         .clientId(accountService.getHsmClientId(accountId))
         .stateJws(currentStateJws(accountId))
         .build();
