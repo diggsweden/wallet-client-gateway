@@ -190,13 +190,12 @@ class HsmControllerIntegrationTest {
             """
                 {
                   "status":"ok",
-                  "clientId":"%s",
                   "devAuthorizationCode":"%s",
                   "opaqueServerId":"server",
                   "serverJwsPublicKey":{"kty":"EC","kid":"kid","crv":"P-256","x":"x","y":"y","alg":null,"use":null}
                 }
                 """
-                .formatted(clientId, TEST_DEV_AUTH_CODE));
+                .formatted(TEST_DEV_AUTH_CODE));
   }
 
   @Test
@@ -338,10 +337,9 @@ class HsmControllerIntegrationTest {
               "status": "COMPLETE",
               "id": "%s",
               "result": "%s",
-              "resultUrl": null,
-              "stateJws": "%s"
+              "resultUrl": null
             }
-            """.formatted(requestId, TEST_JWT, testStateJws));
+            """.formatted(requestId, TEST_JWT));
   }
 
   @Test

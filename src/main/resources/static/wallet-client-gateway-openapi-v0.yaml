@@ -549,9 +549,6 @@ components:
         resultUrl:
           type: string
           description: Gateway URL where the asynchronous operation result can be polled.
-        stateJws:
-          type: string
-          description: Updated device-state token. Present when status=complete. Persist and send as stateJws on the next request.
       required:
         - id
         - status
@@ -574,20 +571,14 @@ components:
       properties:
         status:
           type: string
-        clientId:
-          type: string
         devAuthorizationCode:
           type: string
         serverJwsPublicKey:
           $ref: '#/components/schemas/EcJwkResponse'
         opaqueServerId:
           type: string
-        stateJws:
-          type: string
-          description: JWS-encoded device state. Store alongside clientId and send as stateJws on subsequent requests.
       required:
         - status
-        - clientId
 
     AuthChallengeDto:
       type: object
