@@ -6,9 +6,7 @@ package se.digg.wallet.gateway.application.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
@@ -28,10 +26,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeRequest;
-import se.digg.wallet.gateway.api.v0.model.SecurityEnvelopeType;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponse;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
@@ -150,95 +144,4 @@ class AccountControllerAuthenticatedIntegrationTest {
         .jsonPath("$.instance").exists();
   }
 
-  @Test
-  void testAddSecurityEnvelope() throws Exception {
-    var envelopeContent = "envelope-content";
-
-    var expectedDownstreamRequest =
-        se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest.builder()
-            .content(envelopeContent)
-            .build();
-
-    accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedDownstreamRequest)))
-        .willReturn(aResponse()
-            .withStatus(201)
-            .withHeader("content-type", "application/json")
-            .withBody("{}")));
-
-    var response = restClient.post()
-        .uri("/v0/accounts/security-envelopes")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(SecurityEnvelopeRequest.builder()
-            .type(SecurityEnvelopeType.SIGN)
-            .content(envelopeContent)
-            .build())
-        .exchange();
-
-    response.expectStatus().isCreated();
-  }
-
-  @Test
-  void testGetSecurityEnvelopes() throws Exception {
-    var envelopeContent = "opaque-envelope-content";
-
-    var downstreamResponse = SecurityEnvelopesResponse.builder()
-        .items(java.util.List.of(
-            SecurityEnvelopeResponse.builder().content(envelopeContent).build()))
-        .build();
-
-    accountServer.stubFor(get("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("content-type", "application/json")
-            .withBody(objectMapper.writeValueAsString(downstreamResponse))));
-
-    var response = restClient.get()
-        .uri("/v0/accounts/security-envelopes")
-        .exchange();
-
-    response.expectStatus().isOk()
-        .expectBody()
-        .json("""
-            {
-              "items": [{ "content": "%s" }]
-            }
-            """.formatted(envelopeContent));
-  }
-
-  @Test
-  void testGetSecurityEnvelopesReturns500IfDownstreamFails() {
-    accountServer.stubFor(get("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse().withStatus(400)));
-
-    var response = restClient.get()
-        .uri("/v0/accounts/security-envelopes")
-        .exchange();
-
-    response.expectStatus().isEqualTo(500);
-  }
-
-  @Test
-  void returnsProblemWithStatus500WhenSaveSecurityEnvelopeDownstreamFails() {
-    accountServer.stubFor(post("/v0/accounts/" + ACCOUNT_ID + "/security-envelopes")
-        .willReturn(aResponse().withStatus(400)));
-
-    var response = restClient.post()
-        .uri("/v0/accounts/security-envelopes")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(SecurityEnvelopeRequest.builder()
-            .type(SecurityEnvelopeType.SIGN)
-            .content("content")
-            .build())
-        .exchange();
-
-    var expectedStatus = 500;
-    response.expectStatus().isEqualTo(expectedStatus)
-        .expectBody()
-        .jsonPath("$.status").isEqualTo(expectedStatus)
-        .jsonPath("$.type").exists()
-        .jsonPath("$.title").exists()
-        .jsonPath("$.detail").exists()
-        .jsonPath("$.instance").exists();
-  }
 }

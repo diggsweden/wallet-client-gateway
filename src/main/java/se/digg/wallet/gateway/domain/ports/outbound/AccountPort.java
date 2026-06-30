@@ -23,4 +23,8 @@ public interface AccountPort {
   SecurityEnvelopes getSecurityEnvelopes(String accountId);
 
   Jwk getWalletKey(String accountId);
+
+  String getHsmClientId(String accountId);
+
+  void saveHsmClientId(String clientId, String accountId);
 }

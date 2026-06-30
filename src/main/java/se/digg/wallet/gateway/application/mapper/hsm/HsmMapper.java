@@ -44,8 +44,6 @@ public class HsmMapper {
   public HsmOperation toDomain(HsmRequest request) {
     return HsmOperationBuilder.builder()
         .outerRequestJws(request.getOuterRequestJws())
-        .clientId(request.getClientId())
-        .stateJws(request.getStateJws().orElse(null))
         .build();
   }
 
@@ -55,7 +53,6 @@ public class HsmMapper {
         .status(HsmAsyncStatus.fromValue(result.status().name()))
         .result(result.result())
         .resultUrl(toGatewayResultUrl(result))
-        .stateJws(result.stateJws())
         .build();
   }
 
@@ -72,12 +69,10 @@ public class HsmMapper {
         .build();
 
     return RegisterStateResponse.builder()
-        .clientId(result.clientId())
         .serverJwsPublicKey(serverJwsPublicKeyResponse)
         .status(result.status())
         .opaqueServerId(result.opaqueServerId())
         .devAuthorizationCode(result.devAuthorizationCode())
-        .stateJws(result.stateJws())
         .build();
   }
 

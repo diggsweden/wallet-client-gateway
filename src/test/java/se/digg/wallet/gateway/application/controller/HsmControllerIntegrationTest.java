@@ -96,6 +96,29 @@ class HsmControllerIntegrationTest {
       requestId = UUID.randomUUID();
       clientId = UUID.randomUUID().toString();
     }
+    stubAccountHsmEndpoints();
+  }
+
+  /*
+   * The gateway now sources clientId + stateJws from the account on each HSM operation, so stub the
+   * account v0 endpoints HsmService calls: hsm-client-id (fetch/seed) and security-envelopes
+   * (stateJws fetch/write-back).
+   */
+  private void stubAccountHsmEndpoints() {
+    accountServer.stubFor(WireMock.get(WireMock.urlPathMatching("/v0/accounts/.*/hsm-client-id"))
+        .willReturn(aResponse().withStatus(200).withHeader("content-type", "application/json")
+            .withBody("{\"clientId\":\"" + clientId + "\"}")));
+    accountServer.stubFor(WireMock.post(WireMock.urlPathMatching("/v0/accounts/.*/hsm-client-id"))
+        .willReturn(aResponse().withStatus(201).withHeader("content-type", "application/json")
+            .withBody("{\"clientId\":\"" + clientId + "\"}")));
+    accountServer
+        .stubFor(WireMock.get(WireMock.urlPathMatching("/v0/accounts/.*/security-envelopes"))
+            .willReturn(aResponse().withStatus(200).withHeader("content-type", "application/json")
+                .withBody("{\"items\":[]}")));
+    accountServer
+        .stubFor(WireMock.post(WireMock.urlPathMatching("/v0/accounts/.*/security-envelopes"))
+            .willReturn(aResponse().withStatus(201).withHeader("content-type", "application/json")
+                .withBody("{\"content\":\"stored\"}")));
   }
 
   @Test
@@ -167,13 +190,12 @@ class HsmControllerIntegrationTest {
             """
                 {
                   "status":"ok",
-                  "clientId":"%s",
                   "devAuthorizationCode":"%s",
                   "opaqueServerId":"server",
                   "serverJwsPublicKey":{"kty":"EC","kid":"kid","crv":"P-256","x":"x","y":"y","alg":null,"use":null}
                 }
                 """
-                .formatted(clientId, TEST_DEV_AUTH_CODE));
+                .formatted(TEST_DEV_AUTH_CODE));
   }
 
   @Test
@@ -186,7 +208,6 @@ class HsmControllerIntegrationTest {
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
             .outerRequestJws(TEST_JWT)
-            .clientId(clientId)
             .build())
         .exchange()
         .expectStatus()
@@ -306,7 +327,6 @@ class HsmControllerIntegrationTest {
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
             .outerRequestJws(TEST_JWT)
-            .clientId(clientId)
             .build())
         .exchange()
         .expectStatus()
@@ -317,10 +337,9 @@ class HsmControllerIntegrationTest {
               "status": "COMPLETE",
               "id": "%s",
               "result": "%s",
-              "resultUrl": null,
-              "stateJws": "%s"
+              "resultUrl": null
             }
-            """.formatted(requestId, TEST_JWT, testStateJws));
+            """.formatted(requestId, TEST_JWT));
   }
 
   @Test
@@ -347,7 +366,6 @@ class HsmControllerIntegrationTest {
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
             .outerRequestJws(TEST_JWT)
-            .clientId(clientId)
             .build())
         .exchange()
         .expectStatus()
@@ -394,7 +412,6 @@ class HsmControllerIntegrationTest {
         .header("content-type", "application/json")
         .body(HsmRequest.builder()
             .outerRequestJws(TEST_JWT)
-            .clientId(clientId)
             .build())
         .exchange()
         .expectStatus()

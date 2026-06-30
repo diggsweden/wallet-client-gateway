@@ -15,6 +15,7 @@ import se.digg.wallet.gateway.api.v0.model.HsmRequestType;
 import se.digg.wallet.gateway.api.v0.model.HsmResponse;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
+import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.hsm.HsmMapper;
 import se.digg.wallet.gateway.domain.service.hsm.HsmService;
 
@@ -23,17 +24,19 @@ public class HsmController implements HsmApi {
 
   private final HsmService hsmService;
   private final HsmMapper mapper;
+  private final CurrentAccount currentAccount;
 
-  HsmController(HsmService hsmService, HsmMapper mapper) {
+  HsmController(HsmService hsmService, HsmMapper mapper, CurrentAccount currentAccount) {
     this.hsmService = hsmService;
     this.mapper = mapper;
+    this.currentAccount = currentAccount;
   }
 
   @Override
   public ResponseEntity<HsmResponse> createRequest(HsmRequest hsmRequest,
       Optional<HsmRequestType> type) {
 
-    var result = hsmService.submitAsync(mapper.toDomain(hsmRequest));
+    var result = hsmService.submitAsync(mapper.toDomain(hsmRequest), currentAccount.id());
     var hsmResponse = mapper.toHsmResponse(result);
 
     return switch (hsmResponse.getStatus()) {
@@ -46,7 +49,7 @@ public class HsmController implements HsmApi {
   @Override
   public ResponseEntity<HsmResponse> getResult(UUID id) {
 
-    var result = hsmService.getAsyncResult(id);
+    var result = hsmService.getAsyncResult(id, currentAccount.id());
     var hsmResponse = mapper.toHsmResponse(result);
 
     return switch (hsmResponse.getStatus()) {
@@ -60,7 +63,8 @@ public class HsmController implements HsmApi {
   public ResponseEntity<RegisterStateResponse> saveState(
       RegisterStateRequest registerStateRequest) {
 
-    var result = hsmService.registerState(mapper.toDomain(registerStateRequest));
+    var result =
+        hsmService.registerState(mapper.toDomain(registerStateRequest), currentAccount.id());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toRegisterStateResponse(result));
   }

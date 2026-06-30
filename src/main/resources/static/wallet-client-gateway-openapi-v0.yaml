@@ -104,46 +104,6 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
-  /v0/accounts/security-envelopes:
-    get:
-      tags:
-        - Account
-      summary: Get security envelopes
-      description: Returns the security envelopes associated with the authenticated account.
-      operationId: getAccountSecurityEnvelopes
-      responses:
-        '200':
-          description: Security envelopes retrieved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SecurityEnvelopesResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        'default':
-          $ref: '#/components/responses/default'
-
-    post:
-      tags:
-        - Account
-      summary: Add a security envelope to an account
-      description: |
-        This operation will add a security envelope (typically used with the HSM) to the associated account.
-        An account can only have one security envelope for each type. Any existing envelope with the requested
-        type will be replaced.
-      operationId: addAccountSecurityEnvelope
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SecurityEnvelopeRequest'
-        required: true
-      responses:
-        '201':
-          description: The security envelope has been added to the account
-        'default':
-          $ref: '#/components/responses/default'
-
   /public/auth/session/challenge:
     get:
       tags:
@@ -540,43 +500,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/EcJwkRequest'
 
-    SecurityEnvelopeType:
-      type: string
-      description: 'Security envelope type enum constants.'
-      enum:
-        - SIGN
-        - OTHER
-
-    SecurityEnvelopeRequest:
-      properties:
-        type:
-          $ref: '#/components/schemas/SecurityEnvelopeType'
-        content:
-          type: string
-          description: The security envelope content. Typically encrypted opaque materials.
-          minLength: 1
-      required:
-        - type
-        - content
-
-    SecurityEnvelopeResponse:
-      type: object
-      properties:
-        content:
-          type: string
-          description: The security envelope content. Typically encrypted opaque materials.
-          minLength: 1
-      required:
-        - content
-
-    SecurityEnvelopesResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/SecurityEnvelopeResponse'
-
     HsmRequestType:
       type: string
       description: The HSM Request type.
@@ -597,16 +520,8 @@ components:
           type: string
           minLength: 1
           description: Outer request JWS payload for the HSM operation.
-        clientId:
-          type: string
-          minLength: 1
-          description: Client identifier
-        stateJws:
-          type: string
-          description: Optional. Encoded device-state token. When present the BFF skips the Valkey lookup.
       required:
         - outerRequestJws
-        - clientId
 
     HsmAsyncStatus:
       type: string
@@ -634,9 +549,6 @@ components:
         resultUrl:
           type: string
           description: Gateway URL where the asynchronous operation result can be polled.
-        stateJws:
-          type: string
-          description: Updated device-state token. Present when status=complete. Persist and send as stateJws on the next request.
       required:
         - id
         - status
@@ -659,20 +571,14 @@ components:
       properties:
         status:
           type: string
-        clientId:
-          type: string
         devAuthorizationCode:
           type: string
         serverJwsPublicKey:
           $ref: '#/components/schemas/EcJwkResponse'
         opaqueServerId:
           type: string
-        stateJws:
-          type: string
-          description: JWS-encoded device state. Store alongside clientId and send as stateJws on subsequent requests.
       required:
         - status
-        - clientId
 
     AuthChallengeDto:
       type: object

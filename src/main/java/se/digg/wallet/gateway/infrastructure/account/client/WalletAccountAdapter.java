@@ -12,6 +12,7 @@ import se.digg.wallet.gateway.client.account.origin.api.AccountControllerApi;
 import se.digg.wallet.gateway.client.account.origin.model.AccountDto;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
+import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequest;
 import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.domain.model.account.Account;
@@ -76,6 +77,19 @@ public class WalletAccountAdapter implements AccountPort {
   public Jwk getWalletKey(String accountId) {
     UUID id = UUID.fromString(accountId);
     return accountClientMapper.toDomainJwk(accountApi.getAccountWalletKey(id, null));
+  }
+
+  @Override
+  public String getHsmClientId(String accountId) {
+    UUID id = UUID.fromString(accountId);
+    return accountApi.getAccountHsmClientId(id).getClientId();
+  }
+
+  @Override
+  public void saveHsmClientId(String clientId, String accountId) {
+    UUID id = UUID.fromString(accountId);
+    HsmClientIdRequest request = HsmClientIdRequest.builder().clientId(clientId).build();
+    accountApi.addAccountHsmClientId(id, request);
   }
 
 }
