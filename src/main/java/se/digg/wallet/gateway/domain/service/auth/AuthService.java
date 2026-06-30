@@ -35,11 +35,11 @@ public class AuthService {
   private final Logger log = LoggerFactory.getLogger(AuthService.class);
 
   private final ChallengeCache challengeCache;
-  private final WalletAccountAdapter waletAccountAdapter;
+  private final WalletAccountAdapter walletAccountAdapter;
 
   public AuthService(ChallengeCache challengeCache, WalletAccountAdapter walletAccountAdapter) {
     this.challengeCache = challengeCache;
-    this.waletAccountAdapter = walletAccountAdapter;
+    this.walletAccountAdapter = walletAccountAdapter;
   }
 
   public AuthChallengeDto initChallenge(String accountId, String keyId) {
@@ -101,28 +101,27 @@ public class AuthService {
       return Optional.empty();
     }
 
-    Optional<Account> account;
+    Account account;
     try {
       final UUID accountUuid = UUID.fromString(accountId);
-      account = Optional.of(waletAccountAdapter.getAccount(accountUuid));
+      account = walletAccountAdapter.getAccount(accountUuid);
 
     } catch (IllegalArgumentException e) {
-      account = Optional.empty();
+      log.info("No account present with id {}. Not a valid UUID.", accountId, e);
+      return Optional.empty();
 
     } catch (RestClientResponseException e) {
       if (HttpStatus.NOT_FOUND == e.getStatusCode()) {
-        account = Optional.empty();
+        log.info("No account present with id {}", accountId);
+        return Optional.empty();
       } else {
         throw e;
       }
     }
 
-    if (account.isEmpty()) {
-      log.info("No account present with id {}", accountId);
-      return Optional.empty();
-    }
     try {
-      Jwk publicKey = account.get().deviceKey();
+      Jwk publicKey = account.deviceKey();
+
       if (!keyId.equals(publicKey.kid())) {
         log.info("No kid {} present in deviceKey on accountId {}", keyId, accountId);
         return Optional.empty();

@@ -58,11 +58,8 @@ class AuthServiceTest {
         .algorithm(Algorithm.NONE)
         .keyUse(KeyUse.SIGNATURE)
         .generate();
-    var ecPublicJwk = ecJwk.toPublicJWK();
 
     var account = WalletAccountAccountDtoTestBuilder.generateAccount(ecJwk).build();
-      //  WalletAccountAccountDtoTestBuilder.generateWalletAccount(ecPublicJwk)
-      //      .personalIdentityNumber(accountId).build();
 
     when(walletAccountAdapter.getAccount(any())).thenReturn(account);
 
@@ -77,13 +74,10 @@ class AuthServiceTest {
     var keyId = "kid";
 
     var restClientResponseException = new RestClientResponseException(
-      "Requested resource not found",
-      404,
-      "Not Found",
-      null,
-      null,
-      null
-    );
+        "Requested resource not found",
+        404,
+        "Not Found",
+        null, null, null);
     when(walletAccountAdapter.getAccount(any())).thenThrow(restClientResponseException);
 
     var challenge = authService.initChallenge(accountId, keyId);
@@ -103,8 +97,8 @@ class AuthServiceTest {
     var ecPublicJwk = ecJwk.toPublicJWK();
 
     var account = WalletAccountAccountDtoTestBuilder.generateAccount(ecJwk)
-      .personalIdentityNumber(accountId)
-      .build();
+        .personalIdentityNumber(accountId)
+        .build();
 
     when(walletAccountAdapter.getAccount(any()))
         .thenReturn(account);
@@ -114,7 +108,6 @@ class AuthServiceTest {
     assertThat(challenge).isNotNull();
     verify(challengeCache, never()).store(any());
   }
-
 
   @Test
   void testValidateChallenge() throws JOSEException {
@@ -133,7 +126,6 @@ class AuthServiceTest {
         new ValidateAuthChallengeRequestDto(signedJwt);
     assertThat(authService.validateChallenge(authChallangeResonse)).isPresent();
   }
-
 
   @Test
   void testInvalidNonce() throws JOSEException {
