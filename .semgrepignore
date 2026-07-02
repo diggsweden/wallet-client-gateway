@@ -5,3 +5,10 @@
 # OpenGrep / Semgrep ignore patterns
 # The .gitleaks.toml config file contains patterns for detecting keys that triggers OpenGrep secret detection
 .gitleaks.toml
+
+# secrets: inherit is intentional here — reusable-ci does not yet declare
+# explicit secrets in on.workflow_call.secrets, so it cannot be enumerated.
+# TODO: remove once diggsweden/reusable-ci exposes explicit secret declarations.
+.github/workflows/pullrequest-workflow.yml
+.github/workflows/release-dev-workflow.yml
+.github/workflows/release-workflow.yml
