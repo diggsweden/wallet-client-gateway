@@ -31,12 +31,14 @@ public class SecurityConfig {
 
   private final String apiSecret;
   private final List<String> publicPaths;
+  private final List<String> apiKeyPaths;
   private final AntPathMatcher pathMatcher;
 
   public SecurityConfig(
       ApplicationConfig applicationConfig) {
     this.apiSecret = Objects.requireNonNull(applicationConfig.apisecret());
     this.publicPaths = applicationConfig.publicPaths();
+    this.apiKeyPaths = applicationConfig.apiKeyPaths();
     this.pathMatcher = new AntPathMatcher();
   }
 
@@ -71,11 +73,16 @@ public class SecurityConfig {
   private AuthorizationManager<RequestAuthorizationContext> gatewayAuthorizationMgr() {
     var challengeResponseMgr = challengeResponseAuthorizationMgr();
     return (authentication, context) -> {
-      if (isPublicPath(context.getRequest())) {
+      var request = context.getRequest();
+      if (isPublicPath(request)) {
         return new AuthorizationDecision(true);
       }
 
-      boolean apiKeyGranted = hasValidApiKey(context.getRequest());
+      boolean apiKeyGranted = hasValidApiKey(request);
+      if (isApiKeyPath(request)) {
+        return new AuthorizationDecision(apiKeyGranted);
+      }
+
       boolean authGranted = checkIfGranted(challengeResponseMgr.authorize(authentication, context));
       return new AuthorizationDecision(apiKeyGranted && authGranted);
     };
@@ -86,8 +93,16 @@ public class SecurityConfig {
   }
 
   boolean isPublicPath(HttpServletRequest request) {
+    return matchesAny(publicPaths, request);
+  }
+
+  boolean isApiKeyPath(HttpServletRequest request) {
+    return matchesAny(apiKeyPaths, request);
+  }
+
+  private boolean matchesAny(List<String> patterns, HttpServletRequest request) {
     var path = request.getServletPath();
-    return publicPaths.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+    return patterns.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
   }
 
   private boolean checkIfGranted(AuthorizationResult authorizationResult) {

@@ -29,6 +29,7 @@ class ChallengeResponseAuthorizationMgrTest {
     ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
     when(applicationConfig.apisecret()).thenReturn("my_secret_key");
     when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
+    when(applicationConfig.apiKeyPaths()).thenReturn(List.of("/wua"));
     SecurityConfig securityConfig = new SecurityConfig(applicationConfig);
     authorizationMgr = securityConfig.challengeResponseAuthorizationMgr();
   }
@@ -73,14 +74,31 @@ class ChallengeResponseAuthorizationMgrTest {
   void matchesPublicPathWithContextPath() {
     ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
     when(applicationConfig.apisecret()).thenReturn("my_secret_key");
-    when(applicationConfig.publicPaths()).thenReturn(List.of("/accounts"));
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
+    when(applicationConfig.apiKeyPaths()).thenReturn(List.of("/accounts"));
+    var securityConfig = new SecurityConfig(applicationConfig);
+
+    var request = mock(HttpServletRequest.class);
+    when(request.getRequestURI()).thenReturn("/wallet-client-gateway/public/docs");
+    when(request.getServletPath()).thenReturn("/public/docs");
+
+    assertThat(securityConfig.isPublicPath(request)).isTrue();
+  }
+
+  @Test
+  void matchesApiKeyPathWithContextPath() {
+    ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
+    when(applicationConfig.apisecret()).thenReturn("my_secret_key");
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
+    when(applicationConfig.apiKeyPaths()).thenReturn(List.of("/accounts"));
     var securityConfig = new SecurityConfig(applicationConfig);
 
     var request = mock(HttpServletRequest.class);
     when(request.getRequestURI()).thenReturn("/wallet-client-gateway/accounts");
     when(request.getServletPath()).thenReturn("/accounts");
 
-    assertThat(securityConfig.isPublicPath(request)).isTrue();
+    assertThat(securityConfig.isApiKeyPath(request)).isTrue();
+    assertThat(securityConfig.isPublicPath(request)).isFalse();
   }
 
   private Supplier<Authentication> asSupplier(Authentication auth) {
