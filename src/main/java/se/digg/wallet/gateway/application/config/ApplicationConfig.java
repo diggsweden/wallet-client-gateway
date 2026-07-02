@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 public record ApplicationConfig(
     @NotBlank String apisecret,
     @NotEmpty List<String> publicPaths,
+    @NotEmpty List<String> apiKeyPaths,
     @NotNull Walletprovider walletprovider,
     @NotNull Walletaccount walletaccount,
     @NotNull ChallengeCache challengeCache,
@@ -23,6 +24,7 @@ public record ApplicationConfig(
 
   public ApplicationConfig {
     publicPaths = List.copyOf(publicPaths);
+    apiKeyPaths = List.copyOf(apiKeyPaths);
   }
 
   public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
