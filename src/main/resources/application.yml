@@ -21,16 +21,8 @@ properties:
     wua-path: /wallet-unit-attestation
   walletaccount:
     baseurl: http://
-    paths:
-      post: /account
-      get: /account
   wallet-r2ps:
     baseurl: http://
-    paths:
-      sync-operation: /hsm/v1/operations
-      async-request: /hsm/v1/requests
-      async-poll: /hsm/v1/requests/{id}
-      new-state: /hsm/v1/device-states
   challenge-cache:
     ttl-seconds: 30
   logging-filter:

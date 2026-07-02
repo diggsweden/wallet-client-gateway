@@ -16,14 +16,17 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.SignedJWT;
 import java.text.ParseException;
 import java.util.Optional;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
-import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountClient;
-import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountAccountDto;
-import se.digg.wallet.gateway.infrastructure.account.model.WalletAccountJwkDto;
+import se.digg.wallet.gateway.domain.model.account.Account;
+import se.digg.wallet.gateway.domain.model.account.Jwk;
+import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
 
@@ -32,12 +35,11 @@ public class AuthService {
   private final Logger log = LoggerFactory.getLogger(AuthService.class);
 
   private final ChallengeCache challengeCache;
-  private final WalletAccountClient walletAccountClient;
+  private final WalletAccountAdapter walletAccountAdapter;
 
-  public AuthService(ChallengeCache challengeCache,
-      WalletAccountClient walletAccountClient) {
+  public AuthService(ChallengeCache challengeCache, WalletAccountAdapter walletAccountAdapter) {
     this.challengeCache = challengeCache;
-    this.walletAccountClient = walletAccountClient;
+    this.walletAccountAdapter = walletAccountAdapter;
   }
 
   public AuthChallengeDto initChallenge(String accountId, String keyId) {
@@ -94,19 +96,34 @@ public class AuthService {
   }
 
   private Optional<ECKey> getPublicEcKey(String accountId, String keyId) {
-    if (accountId == null || accountId.isEmpty()) {
-      log.info("Account ID empty, cannot handle auth challange");
+    if (accountId == null) {
+      log.info("Account ID is empty, cannot handle auth challange");
       return Optional.empty();
     }
-    Optional<WalletAccountAccountDto> account = walletAccountClient.getAccount(accountId);
-    if (account.isEmpty()) {
-      log.info("No account present with id {}", accountId);
-      return Optional.empty();
-    }
+
+    Account account;
     try {
-      WalletAccountJwkDto publicKey = account.get().publicKey();
+      final UUID accountUuid = UUID.fromString(accountId);
+      account = walletAccountAdapter.getAccount(accountUuid);
+
+    } catch (IllegalArgumentException e) {
+      log.info("No account present with id {}. Not a valid UUID.", accountId, e);
+      return Optional.empty();
+
+    } catch (RestClientResponseException e) {
+      if (HttpStatus.NOT_FOUND == e.getStatusCode()) {
+        log.info("No account present with id {}", accountId);
+        return Optional.empty();
+      } else {
+        throw e;
+      }
+    }
+
+    try {
+      Jwk publicKey = account.deviceKey();
+
       if (!keyId.equals(publicKey.kid())) {
-        log.info("No kid {} present on accountId {}", keyId, accountId);
+        log.info("No kid {} present in deviceKey on accountId {}", keyId, accountId);
         return Optional.empty();
       }
       ECKey publicEcKey = new ECKey.Builder(

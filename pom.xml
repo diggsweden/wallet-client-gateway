@@ -457,27 +457,6 @@
             </configuration>
           </execution>
           <execution>
-            <id>wallet-account-api-client-origin</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <inputSpec>
-                ${project.basedir}/src/main/resources/external-apispec/wallet-account-openapi-origin.yaml
-              </inputSpec>
-              <generatorName>java</generatorName>
-              <configOptions>
-                <apiPackage>se.digg.wallet.gateway.client.account.origin.api</apiPackage>
-                <modelPackage>se.digg.wallet.gateway.client.account.origin.model</modelPackage>
-                <generateBuilders>true</generateBuilders>
-                <library>restclient</library>
-                <useSpringBoot4>true</useSpringBoot4>
-                <useJackson3>false</useJackson3>
-                <useJakartaEe>true</useJakartaEe>
-              </configOptions>
-            </configuration>
-          </execution>
-          <execution>
             <id>wallet-r2ps-hsm-api-client-v0</id>
             <goals>
               <goal>generate</goal>

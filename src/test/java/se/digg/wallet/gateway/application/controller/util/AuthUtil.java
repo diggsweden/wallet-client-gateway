@@ -46,7 +46,7 @@ public class AuthUtil {
       RestTestClient restClient, String accountId, ECKey generatedKeyPair)
       throws Exception {
 
-    wireMockServer.stubFor(get("/account/" + accountId)
+    wireMockServer.stubFor(get("/v0/accounts/" + accountId)
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("content-type", "application/json")
@@ -54,9 +54,9 @@ public class AuthUtil {
                 {
                   "id": "%s",
                   "personalIdentityNumber": "%s",
-                  "emailAdress": "%s",
-                  "telephoneNumber": "%s",
-                  "publicKey": {
+                  "email": "%s",
+                  "phoneNumber": "%s",
+                  "deviceKey": {
                     "kty": "%s",
                     "kid": "%s",
                     "alg": "%s",
