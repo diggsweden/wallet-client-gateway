@@ -17,7 +17,7 @@ properties:
     - "/wua"
   # Paths that require a valid API key (but not challenge-response auth)
   api-key-paths:
-    - "/v0/accounts"
+    - "/v0/account"
   walletprovider:
     baseurl: http://
     wua-path: /wallet-unit-attestation
