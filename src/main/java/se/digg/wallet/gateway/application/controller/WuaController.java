@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.WalletUnitAttestationApi;
-import se.digg.wallet.gateway.api.v0.model.WuaDto;
+import se.digg.wallet.gateway.api.v0.model.WuaResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
@@ -27,7 +27,7 @@ public class WuaController implements WalletUnitAttestationApi {
   }
 
   @Override
-  public ResponseEntity<WuaDto> createWua(Optional<String> nonce) {
+  public ResponseEntity<WuaResponse> createWua(Optional<String> nonce) {
 
     var challengeResponseAuthentication = getChallengeResponseAuthentication();
 
@@ -44,7 +44,7 @@ public class WuaController implements WalletUnitAttestationApi {
     logger.debug("Received request from account id: {}, nonce: {}",
         accountId, nonce.orElse(""));
     var wuaDto = wuaService.createWua(accountId, nonce.orElse(""));
-    var wuaResponse = new WuaDto(wuaDto.jwt());
+    var wuaResponse = WuaResponse.builder().jwt(wuaDto.jwt()).build();
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaResponse);
   }
 

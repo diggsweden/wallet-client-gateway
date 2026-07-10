@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.WuaDto;
+import se.digg.wallet.gateway.api.v0.model.WuaResponse;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
@@ -211,7 +211,7 @@ class WuaControllerIntegrationTest {
     var response = restClient.post()
         .uri("/wua")
         .contentType(MediaType.APPLICATION_JSON)
-        .body(WuaDto.builder()
+        .body(WuaResponse.builder()
             .jwt(WALLET_JWK_STRING)
             .build())
         .exchange();
