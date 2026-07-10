@@ -268,7 +268,11 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
   private ResponseEntity<Object> createResponseEntity(ProblemResponse problemResponse) {
 
-    problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
+    try {
+      problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
+    } catch (Exception e) {
+      LOGGER.trace("The MDC property {} is not present", MDC_TRANSACTION_ID);
+    }
     return ResponseEntity.status(problemResponse.getStatus())
         .contentType(MediaType.APPLICATION_PROBLEM_JSON)
         .body(problemResponse);
