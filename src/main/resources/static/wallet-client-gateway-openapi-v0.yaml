@@ -188,7 +188,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WuaDto'
+                $ref: '#/components/schemas/WuaResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -395,7 +395,7 @@ components:
           description: Name of the property.
           example: deviceKey
 
-    WuaDto:
+    WuaResponse:
       type: object
       properties:
         jwt:
@@ -434,7 +434,12 @@ components:
         email:
           type: string
           format: email
-          description: Optional. Contact e-mail address.
+          # The e-mail regex pattern originates from https://emailregex.com/index.html
+          # Modified to accept both lower and upper case letters.
+          pattern: (?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
+          minLength: 1
+          maxLength: 100
+          description: Optional. Contact e-mail address (RFC 5322 Internet Message Format).
           example: first.last@example.xx
         emailAdress:
           deprecated: true
