@@ -299,7 +299,7 @@
           <excludes>
             <exclude>se/digg/wallet/gateway/api/v0/**</exclude>
             <exclude>se/digg/wallet/gateway/client/account/v0/**</exclude>
-            <exclude>se/digg/wallet/gateway/client/account/origin/**</exclude>
+            <exclude>se/digg/wallet/gateway/client/hsm/v1/**</exclude>
             <exclude>**/*Builder.class</exclude>
             <exclude>**/*Builder$*.class</exclude>
           </excludes>
