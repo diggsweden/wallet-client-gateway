@@ -8,6 +8,8 @@ import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +17,7 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -39,9 +42,12 @@ import static org.mockito.Mockito.when;
 public class AuthenticationApiComponentTest {
 
   private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
+  private static final String REQUEST_ARGUMENT_NOT_VALID =
+      "/problem-details/request-argument-not-valid";
   private static final String SESSION_ID = "f753681e-0cb1-4a79-8f4a-b0cddaf1561f";
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
   private static final String KEY_ID = "26862913-ecd0-4d4d-a3d0-9271665d577e";
+  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
 
   @MockitoBean
   private AuthService authService;
@@ -54,26 +60,32 @@ public class AuthenticationApiComponentTest {
   @BeforeEach
   void setUp() { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
+    MDC.put("transactionId", TRANSACTION_ID);
+  }
+
+  @AfterEach
+  void cleanUp() {
+    MDC.clear();
   }
 
   @ParameterizedTest
   @EmptySource
   @ValueSource(strings = {
       "accountId=",
-      "accountId=null",
-      "accountId=123",
+      "accountId=abc123",
       "keyId=",
-      "keyId=null",
-      "keyId=abc",
+      "keyId=def456",
       "accountId=&keyId=",
-      "accountId=null&keyId=null",
-      "accountId=123&keyId=",
-      "accountId=&keyId=abc"
+      "accountId=abc123&keyId=",
+      "accountId=&keyId=def456"
   })
-  void informsClientOfMissingChallengeRequestQueryParameterProblem(String queryString) {
+  void informsClientOfChallengeRequestArgumentProblem(String queryString) {
 
     var problemResponse = client.get()
-        .uri("/public/auth/session/challenge?{0}", queryString)
+        .uri(uriBuilder -> uriBuilder
+            .path("/public/auth/session/challenge")
+            .query(queryString)
+            .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
@@ -81,11 +93,7 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST);
-    assertThat(problemResponse.getDetail()).hasValueSatisfying(detail -> {
-      assertThat(detail).startsWith("Required parameter '");
-      assertThat(detail).endsWith("' is not present.");
-    });
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, REQUEST_ARGUMENT_NOT_VALID, null);
   }
 
   @ParameterizedTest
@@ -242,6 +250,7 @@ public class AuthenticationApiComponentTest {
     assertThat(problemResponse.getDetail()).isPresent();
     assertThat(problemResponse.getInstance()).isNotEmpty();
     assertThat(problemResponse.getType()).isPresent();
+    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
     if (expectedType != null) {
       assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
     }
