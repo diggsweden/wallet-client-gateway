@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
@@ -150,6 +151,29 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     return createResponseEntity(problemResponse.build());
   }
 
+  @Override
+  protected @Nullable ResponseEntity<Object> handleMissingServletRequestParameter(
+      MissingServletRequestParameterException e, HttpHeaders headers, HttpStatusCode status,
+      WebRequest request) {
+
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+
+    var statusCode = HttpStatus.BAD_REQUEST;
+    var problemDetailResponse = ProblemResponse.builder()
+        .type(REQUEST_ARGUMENT_NOT_VALID.getUri().toASCIIString())
+        .title(statusCode.getReasonPhrase())
+        .status(statusCode.value())
+        .detail(e.getMessage())
+        .instance(httpServletRequest.getContextPath())
+        .build();
+
+    logDebug("A requested resource was not found in remote service",
+        method, path, Map.of());
+
+    return createResponseEntity(problemDetailResponse);
+  }
+
   /*
    * Handle RemoteResourceNotFoundException. Occurs when this service acts like a proxy and a remote
    * service responds with 404 Not found.
@@ -259,8 +283,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
       problemDetailResponse
           .title(title)
-          .detail("unknown")
-          .build();
+          .detail("unknown");
     }
 
     return createResponseEntity(problemDetailResponse.build());
@@ -271,7 +294,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     try {
       problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
     } catch (Exception e) {
-      LOGGER.trace("The MDC property {} is not present", MDC_TRANSACTION_ID);
+      LOGGER.info("The MDC property {} is not present", MDC_TRANSACTION_ID);
     }
     return ResponseEntity.status(problemResponse.getStatus())
         .contentType(MediaType.APPLICATION_PROBLEM_JSON)

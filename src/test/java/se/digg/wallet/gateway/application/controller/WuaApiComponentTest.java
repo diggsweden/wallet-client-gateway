@@ -7,12 +7,14 @@ package se.digg.wallet.gateway.application.controller;
 import java.util.Objects;
 import java.util.UUID;
 import jakarta.annotation.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 public class WuaApiComponentTest {
 
   private static final String ACCOUNT_ID = "61128b3c-ef55-4410-8dff-d8e8bf0cb9a7";
+  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
 
   @MockitoBean
   private WuaService wuaService;
@@ -44,6 +47,12 @@ public class WuaApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
+    MDC.put("transactionId", TRANSACTION_ID);
+  }
+
+  @AfterEach
+  void cleanUp() {
+    MDC.clear();
   }
 
   @Test
@@ -197,6 +206,7 @@ public class WuaApiComponentTest {
     assertThat(problemResponse.getDetail()).isPresent();
     assertThat(problemResponse.getInstance()).isNotEmpty();
     assertThat(problemResponse.getType()).isPresent();
+    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
     if (expectedType != null) {
       assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
     }

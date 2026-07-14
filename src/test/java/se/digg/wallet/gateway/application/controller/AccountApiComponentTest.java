@@ -8,11 +8,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -41,6 +43,7 @@ public class AccountApiComponentTest {
   private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
   private static final String KEY_ID = "26862913-ecd0-4d4d-a3d0-9271665d577e";
+  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
 
   @MockitoBean
   private AccountService accountService;
@@ -50,6 +53,12 @@ public class AccountApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
+    MDC.put("transactionId", TRANSACTION_ID);
+  }
+
+  @AfterEach
+  void cleanUp() {
+    MDC.clear();
   }
 
   @Test
@@ -323,6 +332,7 @@ public class AccountApiComponentTest {
     assertThat(problemResponse.getDetail()).isPresent();
     assertThat(problemResponse.getInstance()).isNotEmpty();
     assertThat(problemResponse.getType()).isPresent();
+    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
     if (expectedType != null) {
       assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
     }
