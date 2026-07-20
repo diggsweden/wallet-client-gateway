@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.2
+  version: 0.0.3
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -65,6 +65,11 @@ paths:
       summary: Create account
       description: Creates a new account
       operationId: createAccount
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
       requestBody:
         content:
           application/json:
@@ -92,6 +97,11 @@ paths:
         This operation adds a public wallet key (typically owned by the HSM) to the associated account.
         Currently, only one wallet key per account is supported. Any existing key will be replaced.
       operationId: addAccountWalletKey
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
       requestBody:
         content:
           application/json:
@@ -112,6 +122,10 @@ paths:
       description: Request new login challenge
       operationId: initChallenge
       parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
         - name: accountId
           in: query
           required: true
@@ -143,6 +157,11 @@ paths:
       summary: Request new Session
       description: Creates a new Session from a given Challenge
       operationId: validateChallenge
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
       requestBody:
         description: Challenge response
         content:
@@ -179,6 +198,10 @@ paths:
       description: Creates a Wallet Unit Attestation
       operationId: createWua
       parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
         - name: nonce
           in: query
           required: false
@@ -204,6 +227,10 @@ paths:
       description: "Submit an HSM key operation request arranged by the client. This process may be completed quickly and returned \nin the response with status 200 OK. On heavy load, when process takes longer than 3 seconds, the response\nwill be 202 Accepted. In this case the process is running in the background. The result must be fetched by\npolling the getResult endpoint using the corresponding request id until completed.\n"
       operationId: createRequest
       parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
         - name: type
           in: query
           description: Optional. Apply the intended HSM operation type. Only used for traceability.
@@ -241,6 +268,10 @@ paths:
         Get the processed HSM key operation result. Use this operation to poll a pending request until completed.
       operationId: getResult
       parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
         - name: id
           in: path
           required: true
@@ -275,6 +306,11 @@ paths:
       summary: Save the device state
       description: Save the latest state using the device key.
       operationId: saveState
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
       requestBody:
         content:
           application/json:
@@ -292,6 +328,46 @@ paths:
           $ref: '#/components/responses/default'
 
 components:
+  parameters:
+    Wallet-Device-OS:
+      name: Wallet-Device-OS
+      in: header
+      description: Optional. Client device operating system name. (Example iOS or Android).
+      example: 'iOS'
+      required: false
+      schema:
+        type: string
+        enum:
+          - iOS
+          - Android
+    Wallet-Device-OS-Version:
+      name: Wallet-Device-OS-Version
+      in: header
+      description: Optional. Client device operating system version.
+      example: '17.4.1'
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+    Wallet-Device-Model:
+      name: Wallet-Device-Model
+      in: header
+      description: Optional. Client device model name.
+      example: 'iPhone 15'
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+    Wallet-App-Version:
+      name: Wallet-App-Version
+      in: header
+      description: Optional. Wallet app version.
+      example: '0.0.12 Build 129'
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+
   responses:
     Unauthorized:
       description: Unauthorized
