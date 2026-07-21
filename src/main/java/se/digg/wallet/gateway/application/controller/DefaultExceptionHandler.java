@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.controller;
 import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
+import static se.digg.wallet.gateway.application.controller.ProblemType.RESOURCE_ALREADY_EXISTS;
 import static se.digg.wallet.gateway.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +39,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.application.controller.exception.RemoteResourceNotFoundException;
 
 @RestControllerAdvice
@@ -198,6 +200,25 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         method, path, Map.of());
 
     return createResponseEntity(problemDetailResponse);
+  }
+
+  /*
+   * Handle AccountAlreadyExistsException. Occurs when account creation conflicts with an already
+   * existing account, e.g. the same device key kid is already in use.
+   */
+  @ExceptionHandler(AccountAlreadyExistsException.class)
+  public ResponseEntity<Object> handleAccountAlreadyExistsException(
+      AccountAlreadyExistsException e) {
+
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+    var problemResponse = buildProblemResponse(RESOURCE_ALREADY_EXISTS)
+        .detail(e.getLocalizedMessage())
+        .instance(path)
+        .build();
+
+    logWarn("Account already exists", method, path, null);
+    return createResponseEntity(problemResponse);
   }
 
   /*

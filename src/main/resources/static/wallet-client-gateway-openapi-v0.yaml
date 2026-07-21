@@ -85,6 +85,14 @@ paths:
                 $ref: '#/components/schemas/CreateAccountResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: |
+            Duplicate account. Indicates a save conflict with an existing account having the same unique
+            account identifier. The deviceKey.kid value for new accounts must be unique.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
         'default':
           $ref: '#/components/responses/default'
 

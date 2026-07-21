@@ -5,7 +5,10 @@
 package se.digg.wallet.gateway.infrastructure.account.client;
 
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientResponseException;
+import se.digg.wallet.gateway.application.controller.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequest;
@@ -40,9 +43,18 @@ public class WalletAccountAdapter implements AccountPort {
 
   @Override
   public Account createAccount(NewAccount newAccount) {
-    AccountResponse response =
-        accountApi.createAccount(accountClientMapper.toClientRequest(newAccount));
-    return accountClientMapper.toDomain(response);
+    try {
+      AccountResponse response =
+          accountApi.createAccount(accountClientMapper.toClientRequest(newAccount));
+      return accountClientMapper.toDomain(response);
+
+    } catch (RestClientResponseException e) {
+      if (HttpStatus.CONFLICT.value() == e.getStatusCode().value()) {
+        throw new AccountAlreadyExistsException("The Account conflicts with an existing one");
+      } else {
+        throw e;
+      }
+    }
   }
 
   @Override

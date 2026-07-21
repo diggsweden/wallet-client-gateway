@@ -26,6 +26,7 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
+import se.digg.wallet.gateway.application.controller.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
 import se.digg.wallet.gateway.domain.service.account.AccountService;
@@ -41,6 +42,7 @@ public class AccountApiComponentTest {
   private static final String EMAIL = "test.testsson@test.test";
   private static final String PHONE_NUMBER = "0700000000";
   private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
+  private static final String RESOURCE_EXISTS = "/problem-details/resource-already-exists";
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
   private static final String KEY_ID = "26862913-ecd0-4d4d-a3d0-9271665d577e";
   private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
@@ -130,6 +132,28 @@ public class AccountApiComponentTest {
         .getResponseBody();
 
     assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "email");
+  }
+
+  @Test
+  void creatingDuplicateAccountReturnsConflictProblem() {
+
+    var accountAlreadyExistsException = new AccountAlreadyExistsException("The message");
+
+    when(accountService.createAccount(any())).thenThrow(accountAlreadyExistsException);
+
+    var problemResponse = client.post()
+        .uri("/v0/accounts")
+        .body(CreateAccountRequest.builder()
+            .deviceKey(defaultKeyRequest().build())
+            .build())
+        .exchange()
+        .expectStatus()
+        .isEqualTo(HttpStatus.CONFLICT.value())
+        .expectBody(ProblemResponse.class)
+        .returnResult()
+        .getResponseBody();
+
+    assertProblemDetails(problemResponse, HttpStatus.CONFLICT, RESOURCE_EXISTS, null);
   }
 
   @ParameterizedTest
