@@ -5,11 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2026-07-21
+
+### Added
+
+- Add device info request headers (#167)
+
+### Changed
+
+- Return conflict problem when creating account duplicate (#168)
+- Split path auth into public, api-key, and full-auth tiers (#163)
+
+### Fixed
+
+- Api component test improvements (#166)
+- Api component tests (#165)
+
 ## [0.6.2] - 2026-07-02
 
 ### Removed
 
 - Remove old account clients (#162)
+
 
 ## [0.6.1] - 2026-07-01
 
@@ -630,6 +647,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.3]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.2..v0.6.3
 [0.6.2]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.1..v0.6.2
 [0.6.1]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.0..v0.6.1
 [0.6.0]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.5.8..v0.6.0
