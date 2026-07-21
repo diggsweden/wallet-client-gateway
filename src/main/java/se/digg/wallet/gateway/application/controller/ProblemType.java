@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import java.net.URI;
@@ -23,6 +24,12 @@ public enum ProblemType {
       "Field value not valid",
       URI.create("/problem-details/field-validation-failure"),
       "Validation fails when processing the request body."),
+
+  RESOURCE_ALREADY_EXISTS(
+      CONFLICT,
+      "Resource already exists",
+      URI.create("/problem-details/resource-already-exists"),
+      "A resource with the same unique identifier already exists."),
 
   INTERNAL(
       INTERNAL_SERVER_ERROR,
