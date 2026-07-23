@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.application.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -135,71 +136,99 @@ public class LoggingFilter extends OncePerRequestFilter {
       Exception exception) {
 
     try {
-      Map<String, Object> logEntry = new LinkedHashMap<>();
+      String timestamp = Instant.now().toString();
 
-      // Basic request info
-      logEntry.put("timestamp", Instant.now().toString());
-      logEntry.put("id", correlationId);
-      logEntry.put("type", "http_request");
-
-      // Request details
-      Map<String, Object> requestDetails = new LinkedHashMap<>();
-      requestDetails.put("method", request.getMethod());
-      requestDetails.put("path", request.getRequestURI());
-      requestDetails.put("queryString", request.getQueryString());
-      requestDetails.put("remoteAddress", request.getRemoteAddr());
-      requestDetails.put("userAgent", request.getHeader("User-Agent"));
-      requestDetails.put("contentType", request.getContentType());
-      requestDetails.put("contentLength", request.getContentLength());
-
-      // Masked headers
-      requestDetails.put("headers", sensitiveDataMasker.maskHeaders(extractHeaders(request)));
-
-      // Masked request body
-      String requestBody = getPayload(request.getContentAsByteArray());
-      if (!requestBody.isEmpty()) {
-        requestDetails.put("body", sensitiveDataMasker.maskJsonBody(requestBody));
-      }
-
-      logEntry.put("request", requestDetails);
-
-      // Response details
-      Map<String, Object> responseDetails = new LinkedHashMap<>();
-      responseDetails.put("status", response.getStatus());
-      responseDetails.put("contentType", response.getContentType());
-
-      // Response body
-      String responseBody = getPayload(response.getContentAsByteArray());
-      if (!responseBody.isEmpty()) {
-        responseDetails.put("body", sensitiveDataMasker.maskJsonBody(responseBody));
-      }
-
-      logEntry.put("response", responseDetails);
-
-      // Timing
-      logEntry.put("durationMs", durationMs);
-
-      // Error info if present
-      if (exception != null) {
-        Map<String, Object> errorDetails = new LinkedHashMap<>();
-        errorDetails.put("type", exception.getClass().getName());
-        errorDetails.put("message", exception.getMessage());
-        logEntry.put("error", errorDetails);
-      }
-
-      // Log as JSON
-      String jsonLog = objectMapper.writeValueAsString(logEntry);
-
-      if (response.getStatus() >= 500) {
-        LOGGER.error(jsonLog);
-      } else if (response.getStatus() >= 400) {
-        LOGGER.warn(jsonLog);
-      } else {
-        LOGGER.info(jsonLog);
-      }
+      doLog(timestamp, correlationId, "request", requestDetails(request), durationMs, exception,
+          response.getStatus());
+      doLog(timestamp, correlationId, "response", responseDetails(response), durationMs, exception,
+          response.getStatus());
 
     } catch (Throwable e) {
       LOGGER.error("Failed to create structured log entry", e);
+    }
+  }
+
+  private void doLog(String timestamp, String correlationId, String key, Object details,
+      long durationMs, Exception exception, int responseStatus)
+      throws JsonProcessingException {
+    Map<String, Object> logEntry = new LinkedHashMap<>();
+
+    // Basic request info
+    logEntry.put("timestamp", timestamp);
+    logEntry.put("id", correlationId);
+    logEntry.put("type", "http_request");
+
+    // request or response details
+    logEntry.put(key, details);
+
+    // Timing
+    logEntry.put("durationMs", durationMs);
+
+    // Error info if present
+    if (exception != null) {
+      logEntry.put("error", errorDetails(exception));
+    }
+
+    writeAsJsonToLogger(logEntry, responseStatus);
+  }
+
+  private Map<String, Object> requestDetails(ContentCachingRequestWrapper request) {
+    // Request details
+    Map<String, Object> requestDetails = new LinkedHashMap<>();
+    requestDetails.put("method", request.getMethod());
+    requestDetails.put("path", request.getRequestURI());
+    requestDetails.put("queryString", request.getQueryString());
+    requestDetails.put("remoteAddress", request.getRemoteAddr());
+    requestDetails.put("userAgent", request.getHeader("User-Agent"));
+    requestDetails.put("contentType", request.getContentType());
+    requestDetails.put("contentLength", request.getContentLength());
+
+    // Masked headers
+    requestDetails.put("headers", sensitiveDataMasker.maskHeaders(extractHeaders(request)));
+
+    // Masked request body
+    String requestBody = getPayload(request.getContentAsByteArray());
+    if (!requestBody.isEmpty()) {
+      requestDetails.put("body", sensitiveDataMasker.maskJsonBody(requestBody));
+    }
+
+    return requestDetails;
+  }
+
+  private Map<String, Object> responseDetails(ContentCachingResponseWrapper response) {
+    // Response details
+    Map<String, Object> responseDetails = new LinkedHashMap<>();
+    responseDetails.put("status", response.getStatus());
+    responseDetails.put("contentType", response.getContentType());
+
+    // Response body
+    String responseBody = getPayload(response.getContentAsByteArray());
+    if (!responseBody.isEmpty()) {
+      responseDetails.put("body", sensitiveDataMasker.maskJsonBody(responseBody));
+    }
+
+    return responseDetails;
+  }
+
+  private Map<String, Object> errorDetails(Exception exception) {
+    Map<String, Object> errorDetails = new LinkedHashMap<>();
+    errorDetails.put("type", exception.getClass().getName());
+    errorDetails.put("message", exception.getMessage());
+
+    return errorDetails;
+  }
+
+  private void writeAsJsonToLogger(Map<String, Object> logEntry, int status)
+      throws JsonProcessingException {
+    // Log as JSON
+    String jsonLog = objectMapper.writeValueAsString(logEntry);
+
+    if (status >= 500) {
+      LOGGER.error(jsonLog);
+    } else if (status >= 400) {
+      LOGGER.warn(jsonLog);
+    } else {
+      LOGGER.info(jsonLog);
     }
   }
 

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -188,8 +189,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void logErrorOnFilterChainException(CapturedOutput console)
-      throws IOException, ServletException {
+  void logErrorOnFilterChainException(CapturedOutput console) throws IOException, ServletException {
 
     var httpServletRequest = new MockHttpServletRequest();
     var httpServletResponse = new MockHttpServletResponse();
@@ -204,7 +204,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void doNotThrowWhenLogEntryCreationFails(CapturedOutput console) {
+  void doNotThrowWhenLogEntryCreationFails() {
 
     var httpServletRequest = MockMvcRequestBuilders
         .get("/test")
@@ -251,31 +251,56 @@ public class LoggingFilterTest {
     assertThat(getLoggedObject(consoleOut)).isEmpty();
   }
 
-  private Map getLoggedObject(String consoleOut) throws JsonProcessingException {
+  private Map<String, Object> getLoggedObject(String consoleOut) throws JsonProcessingException {
 
     var startPos = consoleOut.indexOf("{");
     if (startPos > -1
         && consoleOut.substring(startPos, consoleOut.length() - 1).contains("}")) {
       var jsonString = consoleOut.substring(startPos);
-      return objectMapper.readValue(jsonString, Map.class);
+      return (Map<String, Object>) objectMapper.readValue(jsonString, Map.class);
     }
     return Map.of();
   }
 
-  private Map getLoggedRequest(String consoleOut) throws JsonProcessingException {
+  private Map<String, Object> getLoggedObject(String consoleOut, int rowNumberToGet)
+      throws JsonProcessingException {
 
-    return (Map) getLoggedObject(consoleOut).get("request");
+    var startPos = consoleOut.indexOf("{");
+    if (startPos > -1
+        && consoleOut.substring(startPos, consoleOut.length() - 1).contains("}")) {
+      var jsonString = consoleOut.substring(startPos);
+
+      StringTokenizer tokenizer = new StringTokenizer(jsonString, "\n");
+      int tokenCount = 0;
+      while (tokenizer.hasMoreTokens()) {
+        String token = tokenizer.nextToken();
+        tokenCount++;
+        int startCurlyBracketPos = token.indexOf("{");
+        String subToken = token.substring(startCurlyBracketPos);
+
+        if (tokenCount == rowNumberToGet) {
+          return (Map<String, Object>) (objectMapper.readValue(subToken, Map.class));
+        }
+      }
+    }
+    return Map.of();
   }
 
-  private Map getLoggedRequestHeaders(String consoleOut) throws JsonProcessingException {
+  private Map<String, Object> getLoggedRequest(String consoleOut) throws JsonProcessingException {
+
+    return (Map<String, Object>) getLoggedObject(consoleOut, 1).get("request");
+  }
+
+  private Map<String, Object> getLoggedRequestHeaders(String consoleOut)
+      throws JsonProcessingException {
 
     var loggedRequest = getLoggedRequest(consoleOut);
-    return (Map) loggedRequest.get("headers");
+    return (Map<String, Object>) loggedRequest.get("headers");
   }
 
-  private Map getLoggedResponse(String consoleOut) throws JsonProcessingException {
+  private Map<String, Object> getLoggedResponse(String consoleOut) throws JsonProcessingException {
 
-    return (Map) getLoggedObject(consoleOut).get("response");
+    return (Map<String, Object>) getLoggedObject(consoleOut, 2).get("response");
   }
 
   private static String randomId() {
