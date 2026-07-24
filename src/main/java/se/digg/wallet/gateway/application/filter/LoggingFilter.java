@@ -138,7 +138,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     try {
       String timestamp = Instant.now().toString();
 
-      doLog(timestamp, correlationId, "request", requestDetails(request), durationMs, exception,
+      doLog(timestamp, correlationId, "request", requestDetails(request), durationMs, null,
           response.getStatus());
       doLog(timestamp, correlationId, "response", responseDetails(response), durationMs, exception,
           response.getStatus());

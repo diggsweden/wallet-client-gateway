@@ -200,7 +200,7 @@ public class LoggingFilterTest {
 
     var consoleOut = console.getOut();
 
-    assertThat(getLoggedObject(consoleOut)).containsKey("error");
+    assertThat(getLoggedObject(consoleOut, 2)).containsKey("error");
   }
 
   @Test
