@@ -42,6 +42,9 @@ SPDX-License-Identifier: CC0-1.0
     <Match>
         <Package name="~se\.digg\.wallet\.gateway\.client\.hsm\.v1.*"/>
     </Match>
+    <Match>
+        <Package name="~se\.digg\.wallet\.gateway\.client\.provider\.v0.*"/>
+    </Match>
 
     <!-- Accepting generated builders to have unusual namings -->
     <Match>
@@ -56,5 +59,9 @@ SPDX-License-Identifier: CC0-1.0
     <Match>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
         <Package name="se.digg.wallet.gateway.domain.model.hsm.*"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="se.digg.wallet.gateway.domain.model.provider.*"/>
     </Match>
 </FindBugsFilter>

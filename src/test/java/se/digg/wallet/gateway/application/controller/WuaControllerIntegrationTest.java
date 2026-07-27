@@ -44,24 +44,23 @@ class WuaControllerIntegrationTest {
   @Container
   @ServiceConnection
   static RedisContainer redisContainer = RedisTestConfiguration.redisContainer();
-  public static String WALLET_JWK_STRING;
 
-  public static final UUID TEST_WALLET_ID = UUID.randomUUID();
+  private static final String ACCOUNT_ID = "61128b3c-ef55-4410-8dff-d8e8bf0cb9a7";
   public static final String TEST_NONCE = "nonce";
   /* # nosemgrep */
   private static final String SIGNED_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
       + "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlF1aW5jeSBMYXJzb24i"
       + "LCJpYXQiOjE1MTYyMzkwMjJ9."
       + "WcPGXClpKD7Bc1C0CCDA1060E2GGlTfamrd8-W0ghBE";
-  private RestTestClient restClient;
-
-  private static final String WUA_URL = "/wallet-provider/wallet-unit-attestation";
+  private static final String WUA_URL = "/wallet-unit-attestation";
   private static final String WALLET_KEYS_URL = "/v0/accounts/";
 
-  private boolean authenticated = false;
-  private static final String ACCOUNT_ID = UUID.randomUUID().toString();
+  public static String WALLET_JWK_STRING;
   private static ECKey generatedKeyPair;
   private static ECKey walletKeyPair;
+
+  private boolean authenticated = false;
+  private RestTestClient restClient;
 
   @LocalServerPort
   private int port;

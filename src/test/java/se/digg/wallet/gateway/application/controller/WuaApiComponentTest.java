@@ -5,7 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import java.util.Objects;
-import java.util.UUID;
+
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.WuaResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.application.model.wua.WuaDto;
+import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -166,7 +166,7 @@ public class WuaApiComponentTest {
     SecurityContextHolder.getContext().setAuthentication(challengeAuthToken);
 
     var jwt = "the.response.jwt";
-    var wuaDto = new WuaDto(jwt);
+    var wuaDto = new Wua(jwt);
     when(wuaService.createWua(any(), any())).thenReturn(wuaDto);
 
     var wuaResponse = client.post()

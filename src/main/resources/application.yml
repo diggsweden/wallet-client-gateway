@@ -20,7 +20,6 @@ properties:
     - "/v0/accounts"
   walletprovider:
     baseurl: http://
-    wua-path: /wallet-unit-attestation
   walletaccount:
     baseurl: http://
   wallet-r2ps:

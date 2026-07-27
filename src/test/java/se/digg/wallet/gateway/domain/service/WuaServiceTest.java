@@ -9,13 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.digg.wallet.gateway.application.model.wua.WuaDto;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
+import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
-import se.digg.wallet.gateway.domain.service.wua.WuaMapper;
+import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
-import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
-import se.digg.wallet.gateway.infrastructure.walletprovider.model.WalletProviderCreateWuaDto;
 
 import java.util.UUID;
 
@@ -26,11 +24,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WuaServiceTest {
 
-  @Mock
-  private WalletProviderClient client;
+  private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
 
   @Mock
-  private WuaMapper wuaMapper;
+  private WalletProviderPort walletProviderAdapter;
 
   @Mock
   private AccountPort accountPort;
@@ -41,26 +38,22 @@ class WuaServiceTest {
   @Test
   void createWua() {
     // Given
-    var accountId = UUID.randomUUID();
     var nonce = "nonce";
     var walletKey = new Jwk("kty", "kid", "alg", "use", "crv", "x", "y");
-    var expectedWua = new WuaDto("my dummy jwt");
-    var mappedDto = new WalletProviderCreateWuaDto("data", "nonce");
+    var expectedWua = new Wua("my dummy jwt");
 
-    when(accountPort.getWalletKey(accountId.toString())).thenReturn(walletKey);
-    when(wuaMapper.toWalletProviderCreateWuaDto(walletKey, nonce)).thenReturn(mappedDto);
-    when(client.createWua(mappedDto)).thenReturn(expectedWua.jwt());
+    when(accountPort.getWalletKey(ACCOUNT_ID.toString())).thenReturn(walletKey);
+    when(walletProviderAdapter.createWalletUnitAttestation(eq(walletKey), eq(nonce)))
+        .thenReturn(expectedWua);
 
     // When
-    var actualWuaDto = wuaService.createWua(accountId.toString(), nonce);
+    var actualWuaDto = wuaService.createWua(ACCOUNT_ID.toString(), nonce);
 
     // Then
     assertEquals(expectedWua, actualWuaDto);
     verify(accountPort).getWalletKey(any(String.class));
     verifyNoMoreInteractions(accountPort);
-    verify(wuaMapper).toWalletProviderCreateWuaDto(any(Jwk.class), any(String.class));
-    verifyNoMoreInteractions(wuaMapper);
-    verify(client).createWua(any(WalletProviderCreateWuaDto.class));
-    verifyNoMoreInteractions(client);
+    verify(walletProviderAdapter).createWalletUnitAttestation(any(Jwk.class), any(String.class));
+    verifyNoMoreInteractions(walletProviderAdapter);
   }
 }
