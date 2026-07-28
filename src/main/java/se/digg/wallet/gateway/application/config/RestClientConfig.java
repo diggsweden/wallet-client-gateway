@@ -52,7 +52,7 @@ public class RestClientConfig {
    * @return an WalletUnitAttestationAPI instance.
    */
   @Bean
-  public WalletUnitAttestationApi walletUnitAttestationApiApi(
+  public WalletUnitAttestationApi walletUnitAttestationApi(
       @Value("${properties.walletprovider.baseurl}") String basePath) {
 
     var walletUnitAttestationApi = new WalletUnitAttestationApi();
