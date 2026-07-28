@@ -23,7 +23,6 @@ properties:
     - "/v0/accounts"
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port:0}
-    wua-path: /wallet-provider/wallet-unit-attestation
   walletaccount:
     baseurl: http://localhost:${wiremock.account.port:0}
   wallet-r2ps:

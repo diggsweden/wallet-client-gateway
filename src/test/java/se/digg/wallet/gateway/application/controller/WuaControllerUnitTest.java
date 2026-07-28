@@ -20,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.application.model.wua.WuaDto;
+import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,8 +74,8 @@ class WuaControllerUnitTest {
     SecurityContextHolder.getContext().setAuthentication(
         new ChallengeResponseAuthentication(accountId));
 
-    WuaDto expectedWuaDto = new WuaDto(expectedJwt);
-    when(wuaService.createWua(accountId, nonce)).thenReturn(expectedWuaDto);
+    Wua expectedWua = new Wua(expectedJwt);
+    when(wuaService.createWua(accountId, nonce)).thenReturn(expectedWua);
 
     // Act
     var response = wuaController.createWua(Optional.of(nonce));
@@ -96,8 +96,8 @@ class WuaControllerUnitTest {
     SecurityContextHolder.getContext().setAuthentication(
         new ChallengeResponseAuthentication(accountId));
 
-    WuaDto expectedWuaDto = new WuaDto(expectedJwt);
-    when(wuaService.createWua(accountId, "")).thenReturn(expectedWuaDto);
+    Wua expectedWua = new Wua(expectedJwt);
+    when(wuaService.createWua(accountId, "")).thenReturn(expectedWua);
 
     // Act
     var response = wuaController.createWua(Optional.empty());

@@ -8,22 +8,12 @@ package se.digg.wallet.gateway.application.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
+import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
 
 @Configuration
 public class RestClientConfig {
-
-  /**
-   * Creates a RestClient bean to be used for making HTTP requests.
-   *
-   * @return a RestClient instance.
-   */
-  @Bean
-  public RestClient webClient() {
-    return RestClient.create();
-  }
 
   /**
    * Creates a client bean to be used for remote calls to the Wallet Account API.
@@ -54,5 +44,21 @@ public class RestClientConfig {
         .setBasePath(basePath);
 
     return api;
+  }
+
+  /**
+   * Creates a client bean to be used for remote calls to the Wallet Provider API.
+   *
+   * @return an WalletUnitAttestationAPI instance.
+   */
+  @Bean
+  public WalletUnitAttestationApi walletUnitAttestationApi(
+      @Value("${properties.walletprovider.baseurl}") String basePath) {
+
+    var walletUnitAttestationApi = new WalletUnitAttestationApi();
+    walletUnitAttestationApi.getApiClient()
+        .setBasePath(basePath);
+
+    return walletUnitAttestationApi;
   }
 }

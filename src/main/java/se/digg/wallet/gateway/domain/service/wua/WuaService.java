@@ -4,39 +4,30 @@
 
 package se.digg.wallet.gateway.domain.service.wua;
 
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.application.model.wua.WuaDto;
+import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
-import se.digg.wallet.gateway.infrastructure.walletprovider.client.WalletProviderClient;
+import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
 
 @Service
 public class WuaService {
   private final Logger logger = LoggerFactory.getLogger(WuaService.class);
 
-  private final WalletProviderClient walletProviderClient;
-  private final WuaMapper wuaMapper;
   private final AccountPort accountPort;
+  private final WalletProviderPort walletProviderPort;
 
-  public WuaService(AccountPort accountPort,
-      WalletProviderClient walletProviderClient, WuaMapper wuaMapper) {
+  public WuaService(AccountPort accountPort, WalletProviderPort walletProviderPort) {
     this.accountPort = accountPort;
-    this.walletProviderClient = walletProviderClient;
-    this.wuaMapper = wuaMapper;
+    this.walletProviderPort = walletProviderPort;
   }
 
-  public WuaDto createWua(String accountId, String nonce) {
+  public Wua createWua(String accountId, String nonce) {
+
+    logger.info("Create WUA for accountId: {}, nonce: {}", accountId, nonce);
     var walletKey = accountPort.getWalletKey(accountId);
-    var mapped = wuaMapper.toWalletProviderCreateWuaDto(
-        walletKey,
-        Optional.ofNullable(nonce).orElse(""));
-    var result = walletProviderClient.createWua(mapped);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Mapped request from accountId: {}, nonce: {} to new wua dto {}",
-          accountId, result.substring(0, 10), nonce);
-    }
-    return new WuaDto(result);
+
+    return walletProviderPort.createWalletUnitAttestation(walletKey, nonce);
   }
 }
