@@ -52,7 +52,7 @@ paths:
         "200":
           description: Successfully created Wallet Unit Attestation
           content:
-            plain/text:
+            text/plain:
               schema:
                 $ref: '#/components/schemas/WalletUnitAttestationResponse'
         "400":
