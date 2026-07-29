@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.3
+  version: 0.0.4
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -152,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthChallengeDto'
+                $ref: '#/components/schemas/AuthChallengeResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -192,7 +192,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthChallengeResponse'
+                $ref: '#/components/schemas/SessionResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -500,7 +500,7 @@ components:
       required:
         - signedJwt
 
-    AuthChallengeResponse:
+    SessionResponse:
       type: object
       properties:
         sessionId:
@@ -671,7 +671,7 @@ components:
       required:
         - status
 
-    AuthChallengeDto:
+    AuthChallengeResponse:
       type: object
       properties:
         nonce:

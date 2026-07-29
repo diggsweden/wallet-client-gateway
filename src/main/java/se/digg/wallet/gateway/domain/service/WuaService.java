@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.service.wua;
+package se.digg.wallet.gateway.domain.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

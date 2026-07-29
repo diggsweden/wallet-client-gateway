@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller.exception;
+package se.digg.wallet.gateway.domain.exception;
 
-public class RemoteResourceNotFoundException extends RuntimeException {
+public class RemoteResourceNotFoundException extends WalletException {
 
   public RemoteResourceNotFoundException(String message) {
     super(message);

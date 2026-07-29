@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.model.auth;
+package se.digg.wallet.gateway.domain.model.auth;
 
-public record AuthChallengeDto(String nonce) {
+public record AuthChallengeDto(
+    String nonce) {
 }

@@ -4,6 +4,6 @@
 
 package se.digg.wallet.gateway.domain.model.account;
 
-public record SecurityEnvelope(String content) {
-
+public record SecurityEnvelope(
+    String content) {
 }

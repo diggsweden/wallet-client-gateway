@@ -13,7 +13,6 @@ import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
-import se.digg.wallet.gateway.domain.service.wua.WuaService;
 
 import java.util.UUID;
 

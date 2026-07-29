@@ -2,12 +2,9 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller.exception;
+package se.digg.wallet.gateway.domain.exception;
 
-public class WalletAccountException extends RuntimeException {
-  public WalletAccountException() {
-    super();
-  }
+public class WalletAccountException extends WalletException {
 
   public WalletAccountException(String message) {
     super(message);

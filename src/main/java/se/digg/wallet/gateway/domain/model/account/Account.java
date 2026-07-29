@@ -11,7 +11,7 @@ import java.util.UUID;
 public record Account(
     UUID id,
     String personalIdentityNumber,
-    String emailAdress,
-    String telephoneNumber,
+    String email,
+    String phoneNumber,
     Jwk deviceKey) {
 }

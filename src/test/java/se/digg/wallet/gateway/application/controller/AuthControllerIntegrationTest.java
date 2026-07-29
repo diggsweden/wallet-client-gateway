@@ -37,15 +37,15 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
+import se.digg.wallet.gateway.api.v0.model.SessionResponse;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
-import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeResponseDto;
+import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
+import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -126,10 +126,10 @@ class AuthControllerIntegrationTest {
         .is2xxSuccessful()
         .expectHeader()
         .exists(SessionConfig.SESSION_HEADER)
-        .expectBody(ValidateAuthChallengeResponseDto.class)
-        .value(dto -> {
-          assertNotNull(dto);
-          assertThat(dto.sessionId()).isNotBlank();
+        .expectBody(SessionResponse.class)
+        .value(sessionResponse -> {
+          assertNotNull(sessionResponse);
+          assertThat(sessionResponse.getSessionId()).isNotBlank();
         });
   }
 

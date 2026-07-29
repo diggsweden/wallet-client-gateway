@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.WalletUnitAttestationApi;
 import se.digg.wallet.gateway.api.v0.model.WuaResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.domain.service.wua.WuaService;
+import se.digg.wallet.gateway.domain.service.WuaService;
 
 @RestController
 public class WuaController implements WalletUnitAttestationApi {

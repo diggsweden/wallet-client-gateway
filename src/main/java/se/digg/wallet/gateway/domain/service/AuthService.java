@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.service.auth;
+package se.digg.wallet.gateway.domain.service;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
+import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
@@ -48,6 +48,7 @@ public class AuthService {
     if (ecKey.isEmpty()) {
       // generate nonce but do not cache it
       // rate limit this case harshly
+      log.info("Challenge init verification failed. accountId={}, keyId={}", accountId, keyId);
       return new AuthChallengeDto(AuthChallengeCacheValue.generateNonce());
     }
 
@@ -123,7 +124,7 @@ public class AuthService {
       Jwk publicKey = account.deviceKey();
 
       if (!keyId.equals(publicKey.kid())) {
-        log.info("No kid {} present in deviceKey on accountId {}", keyId, accountId);
+        log.info("Device key id {} does not match the deviceKey on accountId {}", keyId, accountId);
         return Optional.empty();
       }
       ECKey publicEcKey = new ECKey.Builder(

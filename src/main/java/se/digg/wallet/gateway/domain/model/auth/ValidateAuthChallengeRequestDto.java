@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.model.auth;
+package se.digg.wallet.gateway.domain.model.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
-public record ValidateAuthChallengeRequestDto(@NotBlank String signedJwt) implements Serializable {
-
+public record ValidateAuthChallengeRequestDto(
+    @NotBlank String signedJwt) implements Serializable {
 }

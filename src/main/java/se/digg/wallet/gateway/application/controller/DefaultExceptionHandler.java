@@ -39,8 +39,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.application.controller.exception.AccountAlreadyExistsException;
-import se.digg.wallet.gateway.application.controller.exception.RemoteResourceNotFoundException;
+import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
+import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 
 @RestControllerAdvice
 public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {

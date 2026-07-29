@@ -6,5 +6,6 @@ package se.digg.wallet.gateway.domain.model.account;
 
 import java.util.List;
 
-public record SecurityEnvelopes(List<SecurityEnvelope> items) {
+public record SecurityEnvelopes(
+    List<SecurityEnvelope> items) {
 }

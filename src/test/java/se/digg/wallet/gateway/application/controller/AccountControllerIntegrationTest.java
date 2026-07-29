@@ -93,7 +93,7 @@ class AccountControllerIntegrationTest {
   @Test
   void testCreateAccountWithEmptyEmailAndSsn() throws Exception {
     var generatedAccountId = stubAccountCreationWithNullValues();
-    var accountWithEmptyEmailAndSsn = CreateAccountRequest.builder()
+    var accountWithEmptyEmailAndSsn = CreateAccountRequestDtoTestBuilder.withDefaults()
         .deviceKey(KeyRequestTestBuilder.withDefaults().build())
         .build();
     var response = restClient.post()

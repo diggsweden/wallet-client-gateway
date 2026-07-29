@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import se.digg.wallet.gateway.api.v0.AuthenticationApi;
-import se.digg.wallet.gateway.api.v0.model.AuthChallengeDto;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
+import se.digg.wallet.gateway.api.v0.model.SessionResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
-import se.digg.wallet.gateway.domain.service.auth.AuthService;
+import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.domain.service.AuthService;
 
 @RestController
 public class AuthenticationController implements AuthenticationApi {
@@ -29,16 +29,16 @@ public class AuthenticationController implements AuthenticationApi {
   }
 
   @Override
-  public ResponseEntity<AuthChallengeDto> initChallenge(String accountId, String keyId) {
+  public ResponseEntity<AuthChallengeResponse> initChallenge(String accountId, String keyId) {
     var challenge = authService.initChallenge(accountId, keyId);
-    var response = AuthChallengeDto.builder()
+    var response = AuthChallengeResponse.builder()
         .nonce(challenge.nonce())
         .build();
     return ResponseEntity.ok(response);
   }
 
   @Override
-  public ResponseEntity<AuthChallengeResponse> validateChallenge(
+  public ResponseEntity<SessionResponse> validateChallenge(
       AuthChallengeRequest authChallengeRequest) {
     var challengeRequest = new ValidateAuthChallengeRequestDto(authChallengeRequest.getSignedJwt());
     var validationResult = authService.validateChallenge(challengeRequest);
@@ -47,7 +47,7 @@ public class AuthenticationController implements AuthenticationApi {
           ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
       createAndSaveSession(req, validationResult.orElseThrow());
       String sessionId = req.getSession(false).getId();
-      var response = AuthChallengeResponse.builder()
+      var response = SessionResponse.builder()
           .sessionId(sessionId)
           .build();
       return ResponseEntity.ok(response);

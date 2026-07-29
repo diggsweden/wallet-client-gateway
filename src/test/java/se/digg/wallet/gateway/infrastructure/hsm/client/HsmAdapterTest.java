@@ -12,7 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestClientResponseException;
-import se.digg.wallet.gateway.application.controller.exception.RemoteResourceNotFoundException;
+import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
 import se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseDto;
 import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwk;

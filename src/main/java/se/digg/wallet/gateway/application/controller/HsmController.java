@@ -17,7 +17,7 @@ import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.hsm.HsmMapper;
-import se.digg.wallet.gateway.domain.service.hsm.HsmService;
+import se.digg.wallet.gateway.domain.service.HsmService;
 
 @RestController
 public class HsmController implements HsmApi {

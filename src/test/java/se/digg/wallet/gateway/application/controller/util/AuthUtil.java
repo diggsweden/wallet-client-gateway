@@ -27,8 +27,8 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.auth.AuthChallengeDto;
-import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
+import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 
 public class AuthUtil {
   public static String ACCOUNT_ID = UUID.randomUUID().toString();

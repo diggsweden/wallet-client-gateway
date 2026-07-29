@@ -14,8 +14,8 @@ public class WalletAccountAccountDtoTestBuilder {
   public static AccountBuilder generateAccount(ECKey ecKey) {
     return AccountBuilder.builder()
         .id(UUID.randomUUID())
-        .emailAdress("dummy@dummy.se")
-        .personalIdentityNumber("197707011234")
+        .email("dummy@test.test")
+        .personalIdentityNumber("191010101010")
         .deviceKey(JwkBuilder.builder()
             .kty(ecKey.getKeyType().getValue())
             .crv(ecKey.getCurve().toString())

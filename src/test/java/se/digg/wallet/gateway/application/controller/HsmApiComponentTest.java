@@ -39,7 +39,7 @@ import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwk;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.HsmAsyncStatus;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResultBuilder;
-import se.digg.wallet.gateway.domain.service.hsm.HsmService;
+import se.digg.wallet.gateway.domain.service.HsmService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
