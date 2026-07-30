@@ -8,9 +8,9 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
-import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
-import se.digg.wallet.gateway.client.account.v0.model.KeyResponse;
-import se.digg.wallet.gateway.client.account.v0.model.KeysResponse;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.domain.model.account.Account;
@@ -33,8 +33,8 @@ public class AccountClientMapper {
         .build();
   }
 
-  public KeyRequest toClientRequest(Jwk deviceKey) {
-    return KeyRequest.builder()
+  public EcJwkRequest toClientRequest(Jwk deviceKey) {
+    return EcJwkRequest.builder()
         .alg(deviceKey.alg())
         .crv(deviceKey.crv())
         .kid(deviceKey.kid())
@@ -67,7 +67,7 @@ public class AccountClientMapper {
         .build();
   }
 
-  public Jwk toDomain(KeyResponse response) {
+  public Jwk toDomain(EcJwkResponse response) {
     return JwkBuilder.builder()
         .kid(response.getKid())
         .kty(response.getKty())
@@ -79,7 +79,7 @@ public class AccountClientMapper {
         .build();
   }
 
-  public Jwk toDomainJwk(KeysResponse response) {
+  public Jwk toDomainJwk(EcJwkItemsResponse response) {
     if (response.getItems() == null || response.getItems().isEmpty()) {
       throw new IllegalStateException("No wallet key found for account");
     }

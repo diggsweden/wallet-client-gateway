@@ -31,8 +31,8 @@ import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
-import se.digg.wallet.gateway.application.model.KeyRequestTestBuilder;
-import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
+import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -81,7 +81,7 @@ class AccountControllerAuthenticatedIntegrationTest {
 
   @Test
   void testAddWalletKey() throws Exception {
-    var expectedRequest = KeyRequest.builder()
+    var expectedRequest = EcJwkRequest.builder()
         .kty("KTY").kid("KID").alg("ALG").use("USE")
         .crv("CRV").x("X").y("Y")
         .build();
@@ -93,7 +93,7 @@ class AccountControllerAuthenticatedIntegrationTest {
     var response = restClient.post()
         .uri("/v0/accounts/wallet-keys")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(KeyRequestTestBuilder.withDefaults().build())
+        .body(EcJwkRequestTestBuilder.withDefaults().build())
         .exchange();
 
     response.expectStatus().isCreated();
@@ -102,7 +102,7 @@ class AccountControllerAuthenticatedIntegrationTest {
   @Test
   void returnProblemWithStatus400WhenCreateWalletKeyLacksRequiredKid() throws Exception {
 
-    var emptyKeyRequest = KeyRequest.builder()
+    var emptyKeyRequest = EcJwkRequest.builder()
         .kid(null)
         .build();
 
@@ -131,7 +131,7 @@ class AccountControllerAuthenticatedIntegrationTest {
     var response = restClient.post()
         .uri("/v0/accounts/wallet-keys")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(KeyRequestTestBuilder.withDefaults().build())
+        .body(EcJwkRequestTestBuilder.withDefaults().build())
         .exchange();
 
     var expectedStatus = 500;
