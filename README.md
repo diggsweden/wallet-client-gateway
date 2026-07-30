@@ -11,7 +11,7 @@ A secure API gateway service for the European Digital Identity Wallet ecosystem.
 
 ## Development
 
-To run application locally, se docker-compose/README.md
+To run the application locally, see docker-compose/README.md
 
 ### Java Code Coverage Reports
 
@@ -41,7 +41,7 @@ based on the OpenAPI specification yaml.
 
 With `mvn generate-sources` or `mvn compile`, java code classes (interfaces and models) are created
 in the target folder. The generated code is owned entirely by the API specification and must not be
-commited to the git repository. To implement and import generated
+committed to the git repository. To implement and import generated
 java classes in the controller implementation just refer to the package and class name of the
 generated classes.
 
@@ -58,7 +58,7 @@ The plugins used with the openapi-generator along with configuration is defined 
 
 ### Utilize REST API-profile linter
 
-The API should be compliant with the REST API-profile on an acceptable level. To highlight any compliancy issues,
+The API should be compliant with the REST API-profile on an acceptable level. To highlight any compliance issues,
 the OpenAPI specification should be evaluated regularly with the linting tool RAP-LP
 [rest-api-profile-lint-processor](https://github.com/diggsweden/rest-api-profil-lint-processor).
 
@@ -100,7 +100,7 @@ A copy of the OpenAPI specification file will also appear in the target director
 When making changes to the API-specification, backward compatibility is crucial and must be ensured.
 
 > **_Important!_**
-> If breaking the API backwards compatibility, a new major version of th API-specification must be implemented.
+> If breaking the API backwards compatibility, a new major version of the API-specification must be implemented.
 
 This project utilizes the tool [openapi-diff](https://github.com/OpenAPITools/openapi-diff) configured as a
 maven plugin. On `mvn test` the API-specification in the project (newSpec) is compared with the current
