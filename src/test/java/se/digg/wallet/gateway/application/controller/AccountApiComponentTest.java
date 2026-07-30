@@ -26,10 +26,10 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
-import se.digg.wallet.gateway.application.controller.exception.AccountAlreadyExistsException;
+import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
-import se.digg.wallet.gateway.domain.service.account.AccountService;
+import se.digg.wallet.gateway.domain.service.AccountService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AccountApiComponentTest {
 
-  private static final String PERSONAL_IDENTITY_NUMBER = "2010101010";
+  private static final String PERSONAL_IDENTITY_NUMBER = "1910101010";
   private static final String EMAIL = "test.testsson@test.test";
   private static final String PHONE_NUMBER = "0700000000";
   private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
@@ -214,8 +214,8 @@ public class AccountApiComponentTest {
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
         .id(ACCOUNT_ID)
         .personalIdentityNumber(null)
-        .emailAdress(null)
-        .telephoneNumber(null)
+        .email(null)
+        .phoneNumber(null)
         .deviceKey(deviceKeyDto)
         .build();
     when(accountService.createAccount(any())).thenReturn(accountDto);
@@ -255,7 +255,7 @@ public class AccountApiComponentTest {
 
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
         .id(ACCOUNT_ID)
-        .emailAdress(email)
+        .email(email)
         .deviceKey(deviceKeyDto)
         .build();
     when(accountService.createAccount(any())).thenReturn(accountDto);
@@ -288,8 +288,8 @@ public class AccountApiComponentTest {
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
         .id(ACCOUNT_ID)
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
-        .emailAdress(EMAIL)
-        .telephoneNumber(PHONE_NUMBER)
+        .email(EMAIL)
+        .phoneNumber(PHONE_NUMBER)
         .deviceKey(deviceKeyDto)
         .build();
     when(accountService.createAccount(any())).thenReturn(accountDto);

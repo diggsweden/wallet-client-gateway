@@ -27,12 +27,13 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.WebApplicationContext;
-import se.digg.wallet.gateway.api.v0.model.AuthChallengeDto;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.domain.service.auth.AuthService;
+import se.digg.wallet.gateway.api.v0.model.SessionResponse;
+import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
+import se.digg.wallet.gateway.domain.service.AuthService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -143,7 +144,7 @@ public class AuthenticationApiComponentTest {
   void servesInitChallenge() {
 
     var nonce = "test-nonce";
-    var challengeDto = new se.digg.wallet.gateway.application.model.auth.AuthChallengeDto(nonce);
+    var challengeDto = new AuthChallengeDto(nonce);
     when(authService.initChallenge(any(), any())).thenReturn(challengeDto);
 
     var authChallengeResponse = client.get()
@@ -151,7 +152,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(AuthChallengeDto.class)
+        .expectBody(AuthChallengeResponse.class)
         .returnResult()
         .getResponseBody();
 
@@ -225,7 +226,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(AuthChallengeResponse.class)
+        .expectBody(SessionResponse.class)
         .returnResult()
         .getResponseBody();
 

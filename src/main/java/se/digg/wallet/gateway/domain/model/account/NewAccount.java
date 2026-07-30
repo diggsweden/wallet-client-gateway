@@ -4,10 +4,12 @@
 
 package se.digg.wallet.gateway.domain.model.account;
 
+import io.soabase.recordbuilder.core.RecordBuilder;
 
-public record NewAccount(String personalIdentityNumber,
-    String emailAdress,
-    String telephoneNumber,
+@RecordBuilder
+public record NewAccount(
+    String personalIdentityNumber,
+    String email,
+    String phoneNumber,
     Jwk deviceKey) {
-
 }

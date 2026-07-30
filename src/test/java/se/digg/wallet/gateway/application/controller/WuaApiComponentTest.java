@@ -27,7 +27,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.WuaResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.domain.model.wua.Wua;
-import se.digg.wallet.gateway.domain.service.wua.WuaService;
+import se.digg.wallet.gateway.domain.service.WuaService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

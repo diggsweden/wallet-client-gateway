@@ -17,7 +17,7 @@ import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
-import se.digg.wallet.gateway.domain.service.account.AccountService;
+import se.digg.wallet.gateway.domain.service.AccountService;
 
 @RestController
 public class AccountController implements AccountApi {

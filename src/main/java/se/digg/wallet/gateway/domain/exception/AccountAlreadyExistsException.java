@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.application.controller.exception;
+package se.digg.wallet.gateway.domain.exception;
 
 /**
  * Thrown when an account creation request conflicts with an already existing account, e.g. when an

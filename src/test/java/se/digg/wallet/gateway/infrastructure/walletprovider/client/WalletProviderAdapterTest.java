@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import se.digg.wallet.gateway.application.config.WalletRuntimeException;
+import se.digg.wallet.gateway.domain.exception.WalletRuntimeException;
 import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.JwkBuilder;

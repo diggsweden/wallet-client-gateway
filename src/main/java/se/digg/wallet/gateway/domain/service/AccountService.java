@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.service.account;
+package se.digg.wallet.gateway.domain.service;
 
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.domain.model.account.Account;

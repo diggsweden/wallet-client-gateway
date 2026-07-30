@@ -7,7 +7,6 @@ package se.digg.wallet.gateway.application.model;
 import com.nimbusds.jose.jwk.ECKey;
 
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.application.model.common.JwkDtoBuilder;
 
 public class KeyRequestTestBuilder {
 
@@ -33,30 +32,4 @@ public class KeyRequestTestBuilder {
         .y(key.getY().toString())
         .use(key.getKeyUse().toString());
   }
-
-  // Legacy remove when refactor
-  public static JwkDtoBuilder withLegacyDefaults() {
-    return JwkDtoBuilder.builder()
-        .alg("ALG")
-        .kty("KTY")
-        .kid("KID")
-        .crv("CRV")
-        .x("X")
-        .y("Y")
-        .use("USE");
-  }
-
-  // Legacy remove when refactor
-  public static JwkDtoBuilder ofLegacy(ECKey key) {
-    return JwkDtoBuilder.builder()
-        .alg(key.getAlgorithm().toString())
-        .kty(key.getKeyType().getValue())
-        .kid(key.getKeyID())
-        .crv(key.getCurve().toString())
-        .x(key.getX().toString())
-        .y(key.getY().toString())
-        .use(key.getKeyUse().toString());
-  }
-
-
 }

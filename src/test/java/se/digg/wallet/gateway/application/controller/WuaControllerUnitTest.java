@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.domain.model.wua.Wua;
-import se.digg.wallet.gateway.domain.service.wua.WuaService;
+import se.digg.wallet.gateway.domain.service.WuaService;
 
 @ExtendWith(MockitoExtension.class)
 class WuaControllerUnitTest {

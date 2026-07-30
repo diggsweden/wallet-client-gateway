@@ -17,8 +17,8 @@ public class ApiInfoController implements ApiInfoApi {
 
   private static final String NAME = "Wallet Client Gateway API";
   private static final String STATUS = "alpha";
-  private static final String VERSION = "0.0.2";
-  private static final LocalDate RELEASE_DATE = LocalDate.of(2026, 6, 3);
+  private static final String VERSION = "0.0.4";
+  private static final LocalDate RELEASE_DATE = LocalDate.of(2026, 7, 29);
   private static final List<String> LINKS = Collections.emptyList();
 
   @Override

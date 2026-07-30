@@ -2,9 +2,12 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.service.hsm;
+package se.digg.wallet.gateway.domain.service;
 
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
@@ -14,10 +17,10 @@ import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperationBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 import se.digg.wallet.gateway.domain.ports.outbound.HsmPort;
-import se.digg.wallet.gateway.domain.service.account.AccountService;
 
 @Service
 public class HsmService {
+  private final Logger logger = LoggerFactory.getLogger(HsmService.class);
 
   private final HsmPort hsmPort;
   private final AccountService accountService;
@@ -29,10 +32,16 @@ public class HsmService {
 
   public DeviceStateRegistrationResult registerState(DeviceStateRegistration request,
       String accountId) {
+
+    logger.info("Register device state for account {}", accountId);
     DeviceStateRegistrationResult result = hsmPort.registerState(request);
 
-    if (result.clientId() != null) {
+    var clientId = result.clientId();
+    if (clientId != null) {
+      logger.info("Save clientId {} to account {}", clientId, accountId);
       accountService.saveHsmClientId(result.clientId(), accountId);
+    } else {
+      logger.info("Result clientId is null. Account {} not updated.", accountId);
     }
 
     persistStateJws(result.stateJws(), accountId);

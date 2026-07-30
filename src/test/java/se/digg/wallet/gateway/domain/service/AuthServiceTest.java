@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.service.auth;
+package se.digg.wallet.gateway.domain.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,7 +32,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.application.model.WalletAccountAccountDtoTestBuilder;
-import se.digg.wallet.gateway.application.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
+import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
+import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
+import se.digg.wallet.gateway.domain.service.AuthService;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;

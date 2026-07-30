@@ -11,6 +11,7 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
+import se.digg.wallet.gateway.domain.model.account.NewAccountBuilder;
 
 @Component
 public class AccountMapper {
@@ -23,11 +24,12 @@ public class AccountMapper {
   }
 
   public NewAccount toDomain(CreateAccountRequest request) {
-    return new NewAccount(
-        request.getPersonalIdentityNumber().orElse(null),
-        request.getEmail().orElse(request.getEmailAdress().orElse(null)),
-        request.getTelephoneNumber().orElse(null),
-        toDomain(request.getDeviceKey()));
+    return NewAccountBuilder.builder()
+        .personalIdentityNumber(request.getPersonalIdentityNumber().orElse(null))
+        .email(request.getEmail().orElse(request.getEmailAdress().orElse(null)))
+        .phoneNumber(request.getTelephoneNumber().orElse(null))
+        .deviceKey(toDomain(request.getDeviceKey()))
+        .build();
   }
 
   public Jwk toDomain(EcJwkRequest request) {

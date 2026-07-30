@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
-import se.digg.wallet.gateway.application.controller.exception.AccountAlreadyExistsException;
+import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequest;

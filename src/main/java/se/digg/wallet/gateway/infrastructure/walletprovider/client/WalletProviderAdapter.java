@@ -10,7 +10,7 @@ import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import se.digg.wallet.gateway.application.config.WalletRuntimeException;
+import se.digg.wallet.gateway.domain.exception.WalletRuntimeException;
 import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
 import se.digg.wallet.gateway.client.provider.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.gateway.domain.model.account.Jwk;

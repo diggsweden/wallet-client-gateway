@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
-import se.digg.wallet.gateway.application.controller.exception.RemoteResourceNotFoundException;
+import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;

@@ -15,15 +15,15 @@ SPDX-License-Identifier: CC0-1.0
     </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
-        <Class name="se.digg.wallet.gateway.domain.service.auth.AuthService"/>
+        <Class name="se.digg.wallet.gateway.domain.service.AuthService"/>
     </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
-        <Class name="se.digg.wallet.gateway.domain.service.account.AccountService"/>
+        <Class name="se.digg.wallet.gateway.domain.service.AccountService"/>
     </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
-        <Class name="se.digg.wallet.gateway.domain.service.wua.WuaService"/>
+        <Class name="se.digg.wallet.gateway.domain.service.WuaService"/>
     </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
