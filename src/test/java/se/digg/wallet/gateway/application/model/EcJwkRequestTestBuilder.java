@@ -8,8 +8,7 @@ import com.nimbusds.jose.jwk.ECKey;
 
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 
-public class KeyRequestTestBuilder {
-
+public class EcJwkRequestTestBuilder {
 
   public static EcJwkRequest.Builder withDefaults() {
     return EcJwkRequest.builder()

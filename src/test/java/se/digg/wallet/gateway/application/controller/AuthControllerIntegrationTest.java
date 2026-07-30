@@ -43,7 +43,7 @@ import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
-import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
+import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
 import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
@@ -170,7 +170,7 @@ class AuthControllerIntegrationTest {
                 }
                 """.formatted(
                 ACCOUNT_ID,
-                CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER,
+                CreateAccountRequestTestBuilder.PERSONAL_IDENTITY_NUMBER,
                 "a@b.c",
                 "007 007",
                 ecKey.getKeyType().getValue(),

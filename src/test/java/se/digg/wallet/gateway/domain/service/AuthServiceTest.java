@@ -24,24 +24,22 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientResponseException;
-import se.digg.wallet.gateway.application.model.WalletAccountAccountDtoTestBuilder;
-import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
-import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
+import se.digg.wallet.gateway.application.model.AccountTestBuilder;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
-import se.digg.wallet.gateway.domain.service.AuthService;
 import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
+
+  private static final String ACCOUNT_ID = "61128b3c-ef55-4410-8dff-d8e8bf0cb9a7";
 
   @Mock
   ChallengeCache challengeCache;
@@ -51,7 +49,6 @@ class AuthServiceTest {
 
   @InjectMocks
   AuthService authService;
-  static String accountId = UUID.randomUUID().toString();
 
   @Test
   void validInputResultsInCachedValue() throws Exception {
@@ -62,11 +59,11 @@ class AuthServiceTest {
         .keyUse(KeyUse.SIGNATURE)
         .generate();
 
-    var account = WalletAccountAccountDtoTestBuilder.generateAccount(ecJwk).build();
+    var account = AccountTestBuilder.generateAccount(ecJwk).build();
 
     when(walletAccountAdapter.getAccount(any())).thenReturn(account);
 
-    var challenge = authService.initChallenge(accountId, keyId);
+    var challenge = authService.initChallenge(ACCOUNT_ID, keyId);
 
     assertThat(challenge).isNotNull();
     verify(challengeCache).store(any());
@@ -83,7 +80,7 @@ class AuthServiceTest {
         null, null, null);
     when(walletAccountAdapter.getAccount(any())).thenThrow(restClientResponseException);
 
-    var challenge = authService.initChallenge(accountId, keyId);
+    var challenge = authService.initChallenge(ACCOUNT_ID, keyId);
 
     assertThat(challenge).isNotNull();
     verify(challengeCache, never()).store(any());
@@ -97,16 +94,12 @@ class AuthServiceTest {
         .algorithm(Algorithm.NONE)
         .keyUse(KeyUse.SIGNATURE)
         .generate();
-    var ecPublicJwk = ecJwk.toPublicJWK();
 
-    var account = WalletAccountAccountDtoTestBuilder.generateAccount(ecJwk)
-        .personalIdentityNumber(accountId)
-        .build();
+    var account = AccountTestBuilder.generateAccount(ecJwk).build();
 
-    when(walletAccountAdapter.getAccount(any()))
-        .thenReturn(account);
+    when(walletAccountAdapter.getAccount(any())).thenReturn(account);
 
-    var challenge = authService.initChallenge(accountId, "WRONG_KID");
+    var challenge = authService.initChallenge(ACCOUNT_ID, "WRONG_KID");
 
     assertThat(challenge).isNotNull();
     verify(challengeCache, never()).store(any());
@@ -119,7 +112,7 @@ class AuthServiceTest {
         .algorithm(Algorithm.NONE)
         .keyUse(KeyUse.SIGNATURE)
         .generate();
-    String nonce = AuthChallengeCacheValue.generate(accountId, ecJwk).nonce();
+    String nonce = AuthChallengeCacheValue.generate(ACCOUNT_ID, ecJwk).nonce();
 
     when(challengeCache.get(nonce))
         .thenReturn(Optional.of(fromNonce(nonce, ecJwk)));
@@ -137,7 +130,7 @@ class AuthServiceTest {
         .algorithm(Algorithm.NONE)
         .keyUse(KeyUse.SIGNATURE)
         .generate();
-    String nonce = AuthChallengeCacheValue.generate(accountId, ecJwk).nonce();
+    String nonce = AuthChallengeCacheValue.generate(ACCOUNT_ID, ecJwk).nonce();
     when(challengeCache.get(nonce)).thenReturn(Optional.empty());
     String signedJwt = createSignedJwt(ecJwk, nonce);
     ValidateAuthChallengeRequestDto authChallangeResonse =
@@ -152,7 +145,7 @@ class AuthServiceTest {
         .algorithm(Algorithm.NONE)
         .keyUse(KeyUse.SIGNATURE)
         .generate();
-    String nonce = AuthChallengeCacheValue.generate(accountId, ecJwk).nonce();
+    String nonce = AuthChallengeCacheValue.generate(ACCOUNT_ID, ecJwk).nonce();
 
     var ecPublicJwkMap = ecJwk.toPublicJWK().toJSONObject();
     ecPublicJwkMap.put("kid", "WRONG");
@@ -174,7 +167,7 @@ class AuthServiceTest {
         .algorithm(Algorithm.NONE)
         .keyUse(KeyUse.SIGNATURE)
         .generate();
-    String nonce = AuthChallengeCacheValue.generate(accountId, ecJwk).nonce();
+    String nonce = AuthChallengeCacheValue.generate(ACCOUNT_ID, ecJwk).nonce();
 
     when(challengeCache.get(nonce))
         .thenReturn(Optional.of(fromNonce(nonce, ecJwk)));
@@ -188,7 +181,7 @@ class AuthServiceTest {
   private String createSignedJwt(ECKey ecJwk, String nonce) throws JOSEException {
     JWSSigner signer = new ECDSASigner(ecJwk);
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-        .claim("accountId", accountId)
+        .claim("accountId", ACCOUNT_ID)
         .claim("nonce", nonce)
         .expirationTime(new Date(new Date().getTime() + 60 * 1000))
         .build();
@@ -202,6 +195,6 @@ class AuthServiceTest {
   }
 
   static AuthChallengeCacheValue fromNonce(String nonce, ECKey ecJwk) {
-    return new AuthChallengeCacheValue(nonce, accountId, ecJwk.toJSONString());
+    return new AuthChallengeCacheValue(nonce, ACCOUNT_ID, ecJwk.toJSONString());
   }
 }
