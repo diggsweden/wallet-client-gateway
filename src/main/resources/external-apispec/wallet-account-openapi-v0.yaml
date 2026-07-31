@@ -369,23 +369,23 @@ components:
       type: object
       example: |
         {
-          "name": "Wallet Client Gateway API",
-          "version": "0.0.1",
-          "releaseDate": "2026-07-07",
+          "name": "Wallet Account API",
+          "version": "0.0.3",
+          "releaseDate": "2026-07-31",
           "status": "active",
           "links": []
         }
       properties:
         name:
           type: string
-          example: Wallet Client Gateway API
+          example: Wallet Account API
         version:
           type: string
-          example: 0.0.1
+          example: 0.0.3
         releaseDate:
           type: string
           format: date
-          example: '2026-07-07'
+          example: '2026-07-31'
         status:
           description: 'API lifecycle status keyword, such as alpha, beta, active, deprecated, retired or decommissioned.'
           type: string
