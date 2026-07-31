@@ -12,7 +12,7 @@ import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequest;
-import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
@@ -59,7 +59,7 @@ public class WalletAccountAdapter implements AccountPort {
 
   @Override
   public void addWalletKey(Jwk walletKey, String accountId) {
-    KeyRequest keyRequest = accountClientMapper.toClientRequest(walletKey);
+    EcJwkRequest keyRequest = accountClientMapper.toClientRequest(walletKey);
     UUID id = UUID.fromString(accountId);
     accountApi.addAccountWalletKey(id, keyRequest);
   }

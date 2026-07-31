@@ -9,9 +9,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.EMAIL_ADDRESS;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder.EMAIL_ADDRESS;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder.PERSONAL_IDENTITY_NUMBER;
+import static se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder.TELEPHONE_NUMBER;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
@@ -30,19 +30,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
-import se.digg.wallet.gateway.application.model.CreateAccountRequestDtoTestBuilder;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
-import se.digg.wallet.gateway.application.model.KeyRequestTestBuilder;
+import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
-import se.digg.wallet.gateway.client.account.v0.model.KeyRequest;
-import se.digg.wallet.gateway.client.account.v0.model.KeyResponse;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -93,8 +91,8 @@ class AccountControllerIntegrationTest {
   @Test
   void testCreateAccountWithEmptyEmailAndSsn() throws Exception {
     var generatedAccountId = stubAccountCreationWithNullValues();
-    var accountWithEmptyEmailAndSsn = CreateAccountRequestDtoTestBuilder.withDefaults()
-        .deviceKey(KeyRequestTestBuilder.withDefaults().build())
+    var accountWithEmptyEmailAndSsn = CreateAccountRequestTestBuilder.withDefaults()
+        .deviceKey(EcJwkRequestTestBuilder.withDefaults().build())
         .build();
     var response = restClient.post()
         .uri("/v0/accounts")
@@ -114,7 +112,7 @@ class AccountControllerIntegrationTest {
     var response = restClient.post()
         .uri("v0/accounts")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(CreateAccountRequestDtoTestBuilder.withDefaults().build())
+        .body(CreateAccountRequestTestBuilder.withDefaults().build())
         .exchange();
 
     response.expectStatus()
@@ -123,7 +121,7 @@ class AccountControllerIntegrationTest {
 
   @Test
   void testValidation() {
-    var requestBody = CreateAccountRequestDtoTestBuilder.withDefaults()
+    var requestBody = CreateAccountRequestTestBuilder.withDefaults()
         .deviceKey(null)
         .build();
     var response = restClient.post()
@@ -140,7 +138,7 @@ class AccountControllerIntegrationTest {
   void creatingDuplicateAccountReturnsConflictProblem() {
 
     var expectedRequest = AccountRequest.builder()
-        .deviceKey(KeyRequest.builder()
+        .deviceKey(EcJwkRequest.builder()
             .kty("KTY")
             .kid(KEY_ID)
             .alg("ALG")
@@ -153,7 +151,7 @@ class AccountControllerIntegrationTest {
 
     var expectedResponse = AccountResponse.builder()
         .id(ACCOUNT_ID)
-        .deviceKey(KeyResponse.builder()
+        .deviceKey(EcJwkResponse.builder()
             .kty("KTY").kid(KEY_ID).alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();
@@ -232,7 +230,7 @@ class AccountControllerIntegrationTest {
         .id(generatedAccountId)
         .email(null)
         .phoneNumber(null)
-        .deviceKey(KeyResponse.builder()
+        .deviceKey(EcJwkResponse.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();
@@ -254,7 +252,7 @@ class AccountControllerIntegrationTest {
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
         .email(EMAIL_ADDRESS)
         .phoneNumber(TELEPHONE_NUMBER)
-        .deviceKey(KeyRequest.builder()
+        .deviceKey(EcJwkRequest.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();
@@ -263,7 +261,7 @@ class AccountControllerIntegrationTest {
         .id(generatedAccountId)
         .email(EMAIL_ADDRESS)
         .phoneNumber(TELEPHONE_NUMBER)
-        .deviceKey(KeyResponse.builder()
+        .deviceKey(EcJwkResponse.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();

@@ -8,11 +8,15 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 
 public class CreateAccountRequestTestBuilder {
 
+  public static final String PERSONAL_IDENTITY_NUMBER = "191010101010";
+  public static final String EMAIL_ADDRESS = "test.testsson@test.test";
+  public static final String TELEPHONE_NUMBER = "0700000000";
+
   public static CreateAccountRequest.Builder withDefaults() {
     return CreateAccountRequest.builder()
-        .personalIdentityNumber(CreateAccountRequestDtoTestBuilder.PERSONAL_IDENTITY_NUMBER)
-        .emailAdress(CreateAccountRequestDtoTestBuilder.EMAIL_ADDRESS)
-        .telephoneNumber(CreateAccountRequestDtoTestBuilder.TELEPHONE_NUMBER)
-        .deviceKey(KeyRequestTestBuilder.withDefaults().build());
+        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
+        .email(EMAIL_ADDRESS)
+        .telephoneNumber(TELEPHONE_NUMBER)
+        .deviceKey(EcJwkRequestTestBuilder.withDefaults().build());
   }
 }

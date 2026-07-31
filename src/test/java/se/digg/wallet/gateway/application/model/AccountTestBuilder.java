@@ -9,7 +9,7 @@ import java.util.UUID;
 import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
 
-public class WalletAccountAccountDtoTestBuilder {
+public class AccountTestBuilder {
 
   public static AccountBuilder generateAccount(ECKey ecKey) {
     return AccountBuilder.builder()
