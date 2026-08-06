@@ -9,6 +9,7 @@ spring:
 # Application Properties
 properties:
   apisecret: my_secret_key
+  oldapisecret: my_old_secret_key
   public-paths:
     - "/"
     - "/actuator/**"
@@ -18,7 +19,6 @@ properties:
     - "/swagger-ui.html"
     - "/swagger-ui/**"
     - "/public/**"
-    - "/wua"
   api-key-paths:
     - "/v0/accounts"
   walletprovider:

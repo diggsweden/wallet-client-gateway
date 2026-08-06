@@ -130,7 +130,7 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
-  void testRequestingWuaNotAuthenticatedReturnsBadRequest() {
+  void testRequestingWuaNotAuthenticatedReturnsForbidden() {
     authenticated = false;
 
     RestTestClient unauthenticatedClient = RestTestClient.bindToServer()
@@ -141,12 +141,14 @@ class WuaControllerIntegrationTest {
         .uri("/wua" + "?nonce=" + TEST_NONCE)
         .exchange();
 
+    // /wua is behind the full-auth tier (API key + challenge-response session), so
+    // Spring Security's gatewayAuthorizationMgr() rejects this before it reaches the controller.
     response.expectStatus()
-        .isBadRequest();
+        .isForbidden();
   }
 
   @Test
-  void testRequestingWuaNoAccountIdReturnsUnAuthorized() {
+  void testRequestingWuaNoAccountIdReturnsForbidden() {
     AuthUtil.ACCOUNT_ID = null;
 
     // Create a new RestTestClient without authentication (no session header)
@@ -158,10 +160,10 @@ class WuaControllerIntegrationTest {
         .uri("/wua" + "?nonce=" + TEST_NONCE)
         .exchange();
 
-    // Spring Security's challengeResponseAuthorizationMgr() blocks requests that don't have
+    // Spring Security's gatewayAuthorizationMgr() blocks requests that don't have
     // a valid ChallengeResponseAuthentication in the session, returning 403 Forbidden
     response.expectStatus()
-        .isBadRequest();
+        .isForbidden();
 
     // Revert for other tests using AuthUtil.ACCOUNT_ID.
     AuthUtil.ACCOUNT_ID = ACCOUNT_ID;
