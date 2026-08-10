@@ -89,6 +89,30 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
+  void testCreateAccountWithOldApiKeyIsAccepted() throws Exception {
+    var generatedAccountId = stubAccountCreation();
+
+    var response = restClient.post()
+        .uri("/v0/accounts")
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.oldapisecret())
+        .body(CreateAccountRequestTestBuilder.withDefaults().build())
+        .exchange();
+
+    expectCreatedWithAccountId(response, generatedAccountId);
+  }
+
+  @Test
+  void testCreateAccountWithInvalidApiKeyIsRejected() {
+    var response = restClient.post()
+        .uri("/v0/accounts")
+        .header(SecurityConfig.API_KEY_HEADER, "not-a-valid-key")
+        .body(CreateAccountRequestTestBuilder.withDefaults().build())
+        .exchange();
+
+    response.expectStatus().isForbidden();
+  }
+
+  @Test
   void testCreateAccountWithEmptyEmailAndSsn() throws Exception {
     var generatedAccountId = stubAccountCreationWithNullValues();
     var accountWithEmptyEmailAndSsn = CreateAccountRequestTestBuilder.withDefaults()

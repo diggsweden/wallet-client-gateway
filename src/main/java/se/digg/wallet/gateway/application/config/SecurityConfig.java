@@ -5,6 +5,8 @@
 package se.digg.wallet.gateway.application.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.util.AntPathMatcher;
@@ -29,23 +32,32 @@ public class SecurityConfig {
 
   public static final String API_KEY_HEADER = "X-API-KEY";
 
-  private final String apiSecret;
+  private final byte[] apiSecret;
+  private final byte[] oldApiSecret;
   private final List<String> publicPaths;
   private final List<String> apiKeyPaths;
   private final AntPathMatcher pathMatcher;
 
   public SecurityConfig(
       ApplicationConfig applicationConfig) {
-    this.apiSecret = Objects.requireNonNull(applicationConfig.apisecret());
+    this.apiSecret = toBytes(Objects.requireNonNull(applicationConfig.apisecret()));
+    this.oldApiSecret = toBytes(applicationConfig.oldapisecret());
     this.publicPaths = applicationConfig.publicPaths();
     this.apiKeyPaths = applicationConfig.apiKeyPaths();
     this.pathMatcher = new AntPathMatcher();
+  }
+
+  private static byte[] toBytes(String secret) {
+    return secret == null || secret.isBlank() ? null : secret.getBytes(StandardCharsets.UTF_8);
   }
 
   @Bean
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) {
     httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
+        // Unused by this stateless API (no redirect-based login flow); disabling it avoids
+        // per-request session mishits against Valkey.
+        .requestCache(RequestCacheConfigurer::disable)
         .authorizeHttpRequests((authorize) -> authorize
             .anyRequest()
             .access(gatewayAuthorizationMgr()));
@@ -88,8 +100,19 @@ public class SecurityConfig {
     };
   }
 
-  private boolean hasValidApiKey(HttpServletRequest request) {
-    return apiSecret.equals(request.getHeader(API_KEY_HEADER));
+  boolean hasValidApiKey(HttpServletRequest request) {
+    var header = request.getHeader(API_KEY_HEADER);
+    if (header == null) {
+      return false;
+    }
+    return constantTimeEquals(apiSecret, header) || constantTimeEquals(oldApiSecret, header);
+  }
+
+  private boolean constantTimeEquals(byte[] secret, String header) {
+    if (secret == null) {
+      return false;
+    }
+    return MessageDigest.isEqual(secret, header.getBytes(StandardCharsets.UTF_8));
   }
 
   boolean isPublicPath(HttpServletRequest request) {

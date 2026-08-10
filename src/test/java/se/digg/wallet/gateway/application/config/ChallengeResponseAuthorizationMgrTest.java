@@ -101,6 +101,51 @@ class ChallengeResponseAuthorizationMgrTest {
     assertThat(securityConfig.isPublicPath(request)).isFalse();
   }
 
+  @Test
+  void acceptsOldApiKeyWhileConfigured() {
+    ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
+    when(applicationConfig.apisecret()).thenReturn("my_secret_key");
+    when(applicationConfig.oldapisecret()).thenReturn("my_old_secret_key");
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
+    when(applicationConfig.apiKeyPaths()).thenReturn(List.of("/accounts"));
+    var securityConfig = new SecurityConfig(applicationConfig);
+
+    var request = mock(HttpServletRequest.class);
+    when(request.getHeader(SecurityConfig.API_KEY_HEADER)).thenReturn("my_old_secret_key");
+
+    assertThat(securityConfig.hasValidApiKey(request)).isTrue();
+  }
+
+  @Test
+  void rejectsOldApiKeyWhenMisconfiguredAsBlank() {
+    ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
+    when(applicationConfig.apisecret()).thenReturn("my_secret_key");
+    when(applicationConfig.oldapisecret()).thenReturn("  ");
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
+    when(applicationConfig.apiKeyPaths()).thenReturn(List.of("/accounts"));
+    var securityConfig = new SecurityConfig(applicationConfig);
+
+    var request = mock(HttpServletRequest.class);
+    when(request.getHeader(SecurityConfig.API_KEY_HEADER)).thenReturn("  ");
+
+    assertThat(securityConfig.hasValidApiKey(request)).isFalse();
+  }
+
+  @Test
+  void rejectsOldApiKeyOnceRotationIsCompleted() {
+    ApplicationConfig applicationConfig = mock(ApplicationConfig.class);
+    when(applicationConfig.apisecret()).thenReturn("my_secret_key");
+    when(applicationConfig.oldapisecret()).thenReturn(null);
+    when(applicationConfig.publicPaths()).thenReturn(List.of("/public/**"));
+    when(applicationConfig.apiKeyPaths()).thenReturn(List.of("/accounts"));
+    var securityConfig = new SecurityConfig(applicationConfig);
+
+    var request = mock(HttpServletRequest.class);
+    when(request.getHeader(SecurityConfig.API_KEY_HEADER)).thenReturn("my_old_secret_key");
+
+    assertThat(securityConfig.hasValidApiKey(request)).isFalse();
+  }
+
   private Supplier<Authentication> asSupplier(Authentication auth) {
     return () -> auth;
   }
