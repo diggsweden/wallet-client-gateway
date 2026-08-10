@@ -32,25 +32,31 @@ public class SecurityConfig {
 
   public static final String API_KEY_HEADER = "X-API-KEY";
 
-  private final String apiSecret;
-  private final String oldApiSecret;
+  private final byte[] apiSecret;
+  private final byte[] oldApiSecret;
   private final List<String> publicPaths;
   private final List<String> apiKeyPaths;
   private final AntPathMatcher pathMatcher;
 
   public SecurityConfig(
       ApplicationConfig applicationConfig) {
-    this.apiSecret = Objects.requireNonNull(applicationConfig.apisecret());
-    this.oldApiSecret = applicationConfig.oldapisecret();
+    this.apiSecret = toBytes(Objects.requireNonNull(applicationConfig.apisecret()));
+    this.oldApiSecret = toBytes(applicationConfig.oldapisecret());
     this.publicPaths = applicationConfig.publicPaths();
     this.apiKeyPaths = applicationConfig.apiKeyPaths();
     this.pathMatcher = new AntPathMatcher();
+  }
+
+  private static byte[] toBytes(String secret) {
+    return secret == null || secret.isBlank() ? null : secret.getBytes(StandardCharsets.UTF_8);
   }
 
   @Bean
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) {
     httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
+        // Unused by this stateless API (no redirect-based login flow); disabling it avoids
+        // per-request session mishits against Valkey.
         .requestCache(RequestCacheConfigurer::disable)
         .authorizeHttpRequests((authorize) -> authorize
             .anyRequest()
@@ -102,12 +108,11 @@ public class SecurityConfig {
     return constantTimeEquals(apiSecret, header) || constantTimeEquals(oldApiSecret, header);
   }
 
-  private boolean constantTimeEquals(String secret, String header) {
-    if (secret == null || secret.isBlank()) {
+  private boolean constantTimeEquals(byte[] secret, String header) {
+    if (secret == null) {
       return false;
     }
-    return MessageDigest.isEqual(
-        secret.getBytes(StandardCharsets.UTF_8), header.getBytes(StandardCharsets.UTF_8));
+    return MessageDigest.isEqual(secret, header.getBytes(StandardCharsets.UTF_8));
   }
 
   boolean isPublicPath(HttpServletRequest request) {
