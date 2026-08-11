@@ -3,8 +3,9 @@
 
 # Application Properties
 properties:
-  apisecret: secret
-  oldapisecret: secret2
+  # apisecret (required, PROPERTIES_APISECRET) and oldapisecret (optional, for
+  # rotation, PROPERTIES_OLDAPISECRET) must be set by the deploy environment.
+  # No default here on purpose - the app fails fast at startup if apisecret is missing.
   # Truly public paths - no authentication required
   public-paths:
     - "/"
