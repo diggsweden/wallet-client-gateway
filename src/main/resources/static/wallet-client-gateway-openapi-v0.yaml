@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.4
+  version: 0.0.5
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -434,8 +434,8 @@ components:
         status:
           type: integer
           description: Reflects the http response status code with 3 digits returned by the server.
-          minLength: 3
-          maxLength: 3
+          minimum: 100
+          maximum: 599
           example: 400
         title:
           type: string
