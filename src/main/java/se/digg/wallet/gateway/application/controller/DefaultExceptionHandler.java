@@ -92,7 +92,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             violation.getRootBeanClass().getName(),
             violation.getPropertyPath().toString(),
             violation.getMessage())).toList());
-    logDebug("Request argument not valid", path, method, violations);
+    logDebug("Request argument not valid", method, path, violations);
 
     return createResponseEntity(problemResponse.build());
   }

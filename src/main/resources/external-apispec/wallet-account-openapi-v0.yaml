@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Account API
-  version: 0.0.3
+  version: 0.0.4
   description: |
     Wallet Account API tillhandahåller serveroperationer för hantering av plånbokskonton till den svenska
     statliga digitala identitetsplånboken. Detta API används endast internt.
@@ -313,8 +313,8 @@ components:
         status:
           type: integer
           description: Reflects the http response status code with 3 digits returned by the server.
-          minLength: 3
-          maxLength: 3
+          minimum: 100
+          maximum: 599
           example: 400
         title:
           type: string
