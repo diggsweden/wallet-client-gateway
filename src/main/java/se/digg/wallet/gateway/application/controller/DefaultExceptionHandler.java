@@ -92,7 +92,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             violation.getRootBeanClass().getName(),
             violation.getPropertyPath().toString(),
             violation.getMessage())).toList());
-    logDebug("Request argument not valid", method, path, violations);
+    logDebug("Request argument not valid", method, path, violations, e);
 
     return createResponseEntity(problemResponse.build());
   }
@@ -148,7 +148,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             .map(ObjectError::getDefaultMessage).toList(),
         "fieldErrors", e.getBindingResult().getFieldErrors().stream()
             .map(FieldError::getDefaultMessage).toList());
-    logDebug("Input validation failure", method, path, errors);
+    logDebug("Input validation failure", method, path, errors, e);
 
     return createResponseEntity(problemResponse.build());
   }
@@ -170,8 +170,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .instance(httpServletRequest.getContextPath())
         .build();
 
-    logDebug("A requested resource was not found in remote service",
-        method, path, Map.of());
+    logDebug("Missing servlet request parameter",
+        method, path, Map.of(), e);
 
     return createResponseEntity(problemDetailResponse);
   }
@@ -197,7 +197,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .build();
 
     logDebug("A requested resource was not found in remote service",
-        method, path, Map.of());
+        method, path, Map.of(), e);
 
     return createResponseEntity(problemDetailResponse);
   }
@@ -217,7 +217,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .instance(path)
         .build();
 
-    logWarn("Account already exists", method, path, null);
+    logWarn("Account already exists", method, path, e);
     return createResponseEntity(problemResponse);
   }
 
@@ -240,7 +240,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             .build();
 
         logDebug("A requested resource was not found in remote service",
-            method, path, Map.of());
+            method, path, Map.of(), httpClientError);
 
       } else {
         problemResponse = buildProblemResponse(INTERNAL)
@@ -299,6 +299,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
           .detail(problemDetail.getDetail());
 
     } else {
+      LOGGER.info("Unsupported problem detail body object class: {}",
+          body != null ? body.getClass().getName() : "null");
+
       var title = statusCode.is4xxClientError() ? HttpStatus.BAD_REQUEST.getReasonPhrase()
           : HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
 
@@ -329,12 +332,6 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
             .orElse(ABOUT_BLANK))
         .title(problemType.getTitle())
         .status(problemType.getHttpStatus().value());
-  }
-
-  private void logDebug(String message, String method, String path,
-      @Nullable Map<String, ?> properties) {
-
-    logDebug(message, method, path, properties, null);
   }
 
   private void logDebug(String message, String method, String path,
