@@ -26,7 +26,8 @@ public class HsmAsyncStatusTest {
       "error",
       "Error"
   })
-  void matchingValueReturnsEnum(String value) {
+  void a_status_string_matches_case_insensitively_to_the_corresponding_hsm_async_status(
+      String value) {
     var matchedEnum = assertDoesNotThrow(() -> HsmAsyncStatus.fromValue(value));
     assertThat(matchedEnum).isNotNull();
   }
@@ -37,7 +38,7 @@ public class HsmAsyncStatusTest {
       "123456",
       "ABCDEF"
   })
-  void nonMatchingValueThrowsIllegalArgumentException(String value) {
+  void a_null_blank_or_unrecognized_value_throws_illegal_argument_exception(String value) {
     assertThrows(IllegalArgumentException.class, () -> HsmAsyncStatus.fromValue(value));
   }
 }

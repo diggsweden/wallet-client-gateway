@@ -13,8 +13,6 @@ import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
 import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
-import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
 import se.digg.wallet.gateway.domain.model.account.NewAccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper;
@@ -22,13 +20,14 @@ import se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class AccountClientMapperTest {
 
+  private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
   private static final String PERSONAL_IDENTITY_NUMBER = "1910101010";
   private static final String EMAIL = "test.testsson@test.test";
   private static final String PHONE_NUMBER = "0700000000";
@@ -41,9 +40,9 @@ public class AccountClientMapperTest {
   }
 
   @Test
-  void mapNewAccountValuesToClientRequest() {
+  void a_new_accounts_personal_details_and_device_key_are_mapped_to_client_request() {
 
-    var jwk = defaultJwk();
+    var jwk = JwkTestBuilder.withDefaults().build();
 
     var newAccount = NewAccountBuilder.builder()
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
@@ -52,7 +51,7 @@ public class AccountClientMapperTest {
         .deviceKey(jwk)
         .build();
 
-    var result = assertDoesNotThrow(() -> mapper.toClientRequest(newAccount));
+    var result = mapper.toClientRequest(newAccount);
 
     assertThat(result).isNotNull();
     assertThat(result.getPersonalIdentityNumber()).isEqualTo(newAccount.personalIdentityNumber());
@@ -70,13 +69,12 @@ public class AccountClientMapperTest {
   }
 
   @Test
-  void mapJwkValuesToClientRequest() {
+  void a_jwks_fields_are_mapped_to_the_client_request() {
 
-    var jwk = defaultJwk();
+    var jwk = JwkTestBuilder.withDefaults().build();
 
-    var result = assertDoesNotThrow(() -> mapper.toClientRequest(jwk));
+    var result = mapper.toClientRequest(jwk);
 
-    assertThat(result).isNotNull();
     assertThat(result).isNotNull();
     assertThat(result.getKid()).isEqualTo(jwk.kid());
     assertThat(result.getKty()).isEqualTo(jwk.kty());
@@ -88,12 +86,12 @@ public class AccountClientMapperTest {
   }
 
   @Test
-  void mapSecurityEnvelopeValuesToClientRequest() {
+  void a_security_envelopes_content_is_mapped_to_the_client_request() {
 
     var content = "the-content";
     var securityEnvelope = new SecurityEnvelope(content);
 
-    var result = assertDoesNotThrow(() -> mapper.toClientRequest(securityEnvelope));
+    var result = mapper.toClientRequest(securityEnvelope);
 
     assertThat(result).isNotNull();
     assertThat(result.getContent()).isEqualTo(content);
@@ -110,21 +108,21 @@ public class AccountClientMapperTest {
 
   @ParameterizedTest
   @MethodSource("emptySecurityEnvelopeItems")
-  void mapNullAndEmptySecurityEnvelopesResponseShouldReturnEmptyItems(
+  void a_security_envelopes_response_with_null_or_empty_items_maps_to_an_empty_items_list(
       List<SecurityEnvelopeResponse> emptyItems) {
 
     var response = SecurityEnvelopesResponse.builder()
         .items(emptyItems)
         .build();
 
-    var result = assertDoesNotThrow(() -> mapper.toDomain(response));
+    var result = mapper.toDomain(response);
 
     assertThat(result).isNotNull();
     assertThat(result.items()).isEmpty();
   }
 
   @Test
-  void mapSecurityEnvelopesResponseValuesToDomainObject() {
+  void a_security_envelopes_response_items_map_to_domain_objects_with_matching_content() {
 
     var content = "the-content";
     var response = SecurityEnvelopesResponse.builder()
@@ -134,7 +132,7 @@ public class AccountClientMapperTest {
                 .build()))
         .build();
 
-    var result = assertDoesNotThrow(() -> mapper.toDomain(response));
+    var result = mapper.toDomain(response);
 
     assertThat(result).isNotNull();
     assertThat(result.items()).isNotEmpty();
@@ -143,19 +141,21 @@ public class AccountClientMapperTest {
   }
 
   @Test
-  void mapAccountResponseValuesToDomainObject() {
+  void an_account_response_fields_are_mapped_to_the_domain_account() {
 
-    var responseKey = defaultEcJwkResponse();
+    var responseKey = EcJwkResponseTestBuilder.withDefaults().build();
     var response = AccountResponse.builder()
+        .id(ACCOUNT_ID)
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
         .email(EMAIL)
         .phoneNumber(PHONE_NUMBER)
         .deviceKey(responseKey)
         .build();
 
-    var result = assertDoesNotThrow(() -> mapper.toDomain(response));
+    var result = mapper.toDomain(response);
 
     assertThat(result).isNotNull();
+    assertThat(result.id()).isEqualTo(response.getId());
     assertThat(result.personalIdentityNumber()).isEqualTo(response.getPersonalIdentityNumber());
     assertThat(result.email()).isEqualTo(response.getEmail());
     assertThat(result.phoneNumber()).isEqualTo(response.getPhoneNumber());
@@ -171,11 +171,11 @@ public class AccountClientMapperTest {
   }
 
   @Test
-  void mapEcJwkResponseValuesToDomainObject() {
+  void an_ec_jwk_response_fields_are_mapped_to_the_domain_jwk() {
 
-    var responseKey = defaultEcJwkResponse();
+    var responseKey = EcJwkResponseTestBuilder.withDefaults().build();
 
-    var result = assertDoesNotThrow(() -> mapper.toDomain(responseKey));
+    var result = mapper.toDomain(responseKey);
 
     assertThat(result).isNotNull();
     assertThat(result.kid()).isEqualTo(responseKey.getKid());
@@ -198,24 +198,26 @@ public class AccountClientMapperTest {
 
   @ParameterizedTest
   @MethodSource("emptyEcJwkResponse")
-  void mapNullAndEmptyEcJwkItemsThrowsIllegalStateException(List<EcJwkResponse> emptyItems) {
+  void an_ec_jwk_items_response_with_null_or_empty_items_throws_illegal_state_exception(
+      List<EcJwkResponse> emptyItems) {
 
     var response = EcJwkItemsResponse.builder()
         .items(emptyItems)
         .build();
 
-    assertThrows(IllegalStateException.class, () -> mapper.toDomainJwk(response));
+    assertThatThrownBy(() -> mapper.toDomainJwk(response))
+        .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
-  void mapEcJwkItemsResponseValuesToDomainObject() {
+  void an_ec_jwk_items_responses_first_item_maps_to_a_domain_jwk_with_matching_fields() {
 
-    var responseKey = defaultEcJwkResponse();
+    var responseKey = EcJwkResponseTestBuilder.withDefaults().build();
     var response = EcJwkItemsResponse.builder()
         .items(List.of(responseKey))
         .build();
 
-    var result = assertDoesNotThrow(() -> mapper.toDomainJwk(response));
+    var result = mapper.toDomainJwk(response);
 
     assertThat(result).isNotNull();
     assertThat(result.kid()).isEqualTo(responseKey.getKid());
@@ -225,29 +227,5 @@ public class AccountClientMapperTest {
     assertThat(result.crv()).isEqualTo(responseKey.getCrv());
     assertThat(result.x()).isEqualTo(responseKey.getX());
     assertThat(result.y()).isEqualTo(responseKey.getY());
-  }
-
-  private Jwk defaultJwk() {
-    return JwkBuilder.builder()
-        .kid("kid")
-        .kty("kty")
-        .alg("alg")
-        .use("use")
-        .crv("crv")
-        .x("x")
-        .y("y")
-        .build();
-  }
-
-  private EcJwkResponse defaultEcJwkResponse() {
-    return EcJwkResponse.builder()
-        .kid("kid")
-        .kty("kty")
-        .alg("alg")
-        .use("use")
-        .crv("crv")
-        .x("x")
-        .y("y")
-        .build();
   }
 }
