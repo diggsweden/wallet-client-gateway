@@ -60,6 +60,7 @@ public class AccountClientMapper {
 
   public Account toDomain(AccountResponse response) {
     return AccountBuilder.builder()
+        .personalIdentityNumber(response.getPersonalIdentityNumber())
         .email(response.getEmail())
         .phoneNumber(response.getPhoneNumber())
         .id(response.getId())
