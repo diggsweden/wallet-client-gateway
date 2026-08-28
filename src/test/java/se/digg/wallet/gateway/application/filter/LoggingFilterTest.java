@@ -25,6 +25,7 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -45,6 +46,7 @@ import static org.mockito.Mockito.when;
         "properties.logging-filter.exclude-path.exact-match=/,/exclude",
         "properties.logging-filter.exclude-path.contains=/actuator,.html"
     })
+@ActiveProfiles("test")
 public class LoggingFilterTest {
 
   @Autowired
