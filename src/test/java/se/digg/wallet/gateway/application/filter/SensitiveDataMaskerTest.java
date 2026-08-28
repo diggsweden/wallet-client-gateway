@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     "properties.logging-filter.sensitive-data-mask.body-json-fields=sensitive,secret",
     "properties.logging-filter.sensitive-data-mask.mask-value=***MASKED***"
 })
+@ActiveProfiles("test")
 public class SensitiveDataMaskerTest {
 
   @Autowired
