@@ -72,41 +72,43 @@ public class LoggingFilter extends OncePerRequestFilter {
     MDC.put(MDC_CORRELATION_ID, correlationId);
     MDC.put(MDC_TRANSACTION_ID, transactionId);
 
-    // Wrap request and response
-    ContentCachingRequestWrapper wrappedRequest =
-        new ContentCachingRequestWrapper(request, maxPayloadLength);
-    ContentCachingResponseWrapper wrappedResponse =
-        new ContentCachingResponseWrapper(response);
-
-    // Add correlation ID to response header
-    wrappedResponse.setHeader("X-Correlation-ID", correlationId);
-
-    Instant startTime = Instant.now();
-    Exception capturedException = null;
-
     try {
-      filterChain.doFilter(wrappedRequest, wrappedResponse);
-    } catch (Exception e) {
-      capturedException = e;
-      throw e;
-    } finally {
-      // Calculate duration
-      long durationMs = Instant.now().toEpochMilli() - startTime.toEpochMilli();
+      // Wrap request and response
+      ContentCachingRequestWrapper wrappedRequest =
+          new ContentCachingRequestWrapper(request, maxPayloadLength);
+      ContentCachingResponseWrapper wrappedResponse =
+          new ContentCachingResponseWrapper(response);
 
-      if (isLoggingEnabled) {
-        // Build structured log entry
-        logStructuredEntry(
-            correlationId,
-            wrappedRequest,
-            wrappedResponse,
-            durationMs,
-            capturedException);
+      // Add correlation ID to response header
+      wrappedResponse.setHeader("X-Correlation-ID", correlationId);
+
+      Instant startTime = Instant.now();
+      Exception capturedException = null;
+
+      try {
+        filterChain.doFilter(wrappedRequest, wrappedResponse);
+      } catch (Exception e) {
+        capturedException = e;
+        throw e;
+      } finally {
+        // Calculate duration
+        long durationMs = Instant.now().toEpochMilli() - startTime.toEpochMilli();
+
+        if (isLoggingEnabled) {
+          // Build structured log entry
+          logStructuredEntry(
+              correlationId,
+              wrappedRequest,
+              wrappedResponse,
+              durationMs,
+              capturedException);
+        }
+
+        // Copy response body back
+        wrappedResponse.copyBodyToResponse();
       }
-
-      // Copy response body back
-      wrappedResponse.copyBodyToResponse();
-
-      // Clean up MDC
+    } finally {
+      // Ensure MDC is always cleared
       MDC.clear();
     }
   }
