@@ -20,7 +20,7 @@ properties:
     - "/swagger-ui/**"
     - "/public/**"
   api-key-paths:
-    - "/v0/accounts"
+    - "/v0/account"
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port:0}
   walletaccount:

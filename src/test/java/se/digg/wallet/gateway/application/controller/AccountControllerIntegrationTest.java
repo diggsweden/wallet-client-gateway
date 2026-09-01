@@ -80,7 +80,7 @@ class AccountControllerIntegrationTest {
     var generatedAccountId = stubAccountCreation();
 
     var response = restClient.post()
-        .uri("/v0/accounts")
+        .uri("/v0/account")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(CreateAccountRequestTestBuilder.withDefaults().build())
         .exchange();
@@ -119,7 +119,7 @@ class AccountControllerIntegrationTest {
         .deviceKey(EcJwkRequestTestBuilder.withDefaults().build())
         .build();
     var response = restClient.post()
-        .uri("/v0/accounts")
+        .uri("/v0/account")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(accountWithEmptyEmailAndSsn)
         .exchange();
@@ -149,7 +149,7 @@ class AccountControllerIntegrationTest {
         .deviceKey(null)
         .build();
     var response = restClient.post()
-        .uri("v0/accounts")
+        .uri("v0/account")
         .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
         .body(requestBody)
         .exchange();
