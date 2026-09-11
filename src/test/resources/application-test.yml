@@ -45,3 +45,8 @@ properties:
         authorization, x-api-key, api-key, apikey, x-auth-token, cookie, set-cookie, x-csrf-token
       body-json-fields: >
         password, secret, token, accessToken, access_token, refreshToken, refresh_token, apiKey, api_key, personalIdentificationNumber, email, phoneNumber
+  resilience:
+    retry-policy:
+      max-retries: 2
+      delay-millis: 100
+      multiplier: 1

@@ -4,172 +4,256 @@
 
 package se.digg.wallet.gateway.infrastructure.hsm.client;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
-import se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseDto;
-import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwk;
-import se.digg.wallet.gateway.client.hsm.v1.model.NewStateResponseDto;
-import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationBuilder;
-import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder;
-import se.digg.wallet.gateway.domain.model.hsm.HsmOperationBuilder;
-import se.digg.wallet.gateway.infrastructure.hsm.mapper.HsmClientMapper;
-
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import se.digg.wallet.gateway.infrastructure.hsm.HsmTestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
 public class HsmAdapterTest {
 
+  private static final UUID REQUEST_ID = UUID.fromString("616adb0e-0b09-4af9-a5a3-0181a69e373b");
+  private static final byte[] PROBLEM_RESPONSE_BODY = "".getBytes(StandardCharsets.UTF_8);
+  private static final int ONCE = 1;
+  private static final int TWICE = 2;
+  private static final int THREE = 3;
+
   @MockitoBean
   private HandlersApi hsmApi;
 
   @Autowired
-  private HsmClientMapper mapper;
-
-  @Autowired
   private HsmAdapter hsmAdapter;
 
-  private UUID randomId;
+  private int maxRetries;
 
-  @BeforeEach
-  void beforeEach() {
-    randomId = UUID.randomUUID();
-  }
+  static Throwable restClientResponseException(HttpStatus httpStatus) {
 
-  @Test
-  void stateRegistered() {
-
-    var devAuthorizationCode = "the-dev-auth-code";
-    var serverId = "the.server.id";
-    var status = "complete";
-    var stateResponse = NewStateResponseDto.builder()
-        .clientId(UUID.randomUUID().toString())
-        .devAuthorizationCode(devAuthorizationCode)
-        .opaqueServerId(serverId)
-        .status(status)
-        .serverJwsPublicKey(EcPublicJwk.builder()
-            .kid("kid")
-            .kty("kty")
-            .crv("crv")
-            .x("x")
-            .y("y")
-            .build())
-        .build();
-
-    when(hsmApi.createState(any())).thenReturn(stateResponse);
-
-    var deviceStateRegistration = DeviceStateRegistrationBuilder.builder()
-        .walletKey(EcPublicJwkBuilder.builder()
-            .kid("kid")
-            .kty("kty")
-            .crv("crv")
-            .x("x")
-            .y("y")
-            .build())
-        .build();
-
-    assertDoesNotThrow(() -> hsmAdapter.registerState(deviceStateRegistration));
-  }
-
-  @Test
-  void hsmRequestCreated() {
-
-    var hsmResponse = AsyncResponseDto.builder()
-        .correlationId(randomId)
-        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatus.COMPLETE)
-        .result("the-result")
-        .build();
-
-    when(hsmApi.service(any())).thenReturn(hsmResponse);
-
-    var hsmOperation = HsmOperationBuilder.builder()
-        .clientId(UUID.randomUUID().toString())
-        .outerRequestJws("the-request")
-        .stateJws("the-state")
-        .build();
-
-    assertDoesNotThrow(() -> hsmAdapter.submitAsync(hsmOperation));
-  }
-
-
-  @Test
-  void asyncResponseRemoteBadRequest() {
-
-    var restClientResponseException = new RestClientResponseException(
-        "Mocked exception",
-        HttpStatus.BAD_REQUEST,
-        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+    return new RestClientResponseException(
+        "Mocked exception - %d %s".formatted(httpStatus.value(), httpStatus.getReasonPhrase()),
+        httpStatus,
+        httpStatus.getReasonPhrase(),
         HttpHeaders.EMPTY,
-        "problem-detail-response-body".getBytes(StandardCharsets.UTF_8),
+        PROBLEM_RESPONSE_BODY,
         StandardCharsets.UTF_8);
-
-    when(hsmApi.taskResponse(eq(randomId))).thenThrow(restClientResponseException);
-
-    assertThrows(RestClientResponseException.class, () -> hsmAdapter.getAsyncResult(randomId));
   }
 
-  @Test
-  void asyncResponseRemoteServerError() {
+  static List<Throwable> unrecoverableClientResponseExceptions() {
 
-    var restClientResponseException = new RestClientResponseException(
-        "Mocked exception",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-        HttpHeaders.EMPTY,
-        "problem-detail-response-body".getBytes(StandardCharsets.UTF_8),
-        StandardCharsets.UTF_8);
+    var exceptions = new ArrayList<Throwable>();
 
-    when(hsmApi.taskResponse(eq(randomId))).thenThrow(restClientResponseException);
+    exceptions.add(restClientResponseException(HttpStatus.BAD_REQUEST));
+    exceptions.add(restClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR));
+    exceptions.add(new ResourceAccessException("Mocked ResourceAccessException"));
+    exceptions.add(new RestClientException("Mocked RestClientException"));
+    exceptions.add(new RuntimeException("Mocked RuntimeException"));
 
-    assertThrows(RestClientResponseException.class, () -> hsmAdapter.getAsyncResult(randomId));
+    return exceptions;
   }
 
-  @Test
-  void asyncResponseNotFound() {
+  static List<Throwable> recoverableClientResponseExceptions() {
 
-    var restClientResponseException = new RestClientResponseException(
-        "Mocked exception",
-        HttpStatus.NOT_FOUND,
-        HttpStatus.NOT_FOUND.getReasonPhrase(),
-        HttpHeaders.EMPTY,
-        "response-body".getBytes(StandardCharsets.UTF_8),
-        StandardCharsets.UTF_8);
+    var exceptions = new ArrayList<Throwable>();
 
-    when(hsmApi.taskResponse(eq(randomId))).thenThrow(restClientResponseException);
+    exceptions.add(restClientResponseException(HttpStatus.TOO_MANY_REQUESTS));
+    exceptions.add(restClientResponseException(HttpStatus.SERVICE_UNAVAILABLE));
 
-    assertThrows(RemoteResourceNotFoundException.class, () -> hsmAdapter.getAsyncResult(randomId));
+    return exceptions;
   }
 
-  @Test
-  void asyncResponse() {
+  @ParameterizedTest
+  @MethodSource("unrecoverableClientResponseExceptions")
+  void an_unrecoverable_device_state_registration_failure_must_not_retry(
+      Throwable unrecoverableException) {
 
-    var expectedResult = UUID.randomUUID().toString();
-    var hsmResponse = AsyncResponseDto.builder()
-        .correlationId(UUID.randomUUID())
-        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatus.COMPLETE)
-        .result(expectedResult)
-        .build();
-    when(hsmApi.taskResponse(eq(randomId))).thenReturn(hsmResponse);
+    when(hsmApi.createState(any())).thenThrow(unrecoverableException);
 
-    var result = assertDoesNotThrow(() -> hsmAdapter.getAsyncResult(randomId));
+    assertThatThrownBy(() -> hsmAdapter.registerState(HsmTestBuilder
+        .deviceStateRegistrationWithDefaults().build())).isEqualTo(unrecoverableException);
+    verify(hsmApi, times(ONCE)).createState(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("recoverableClientResponseExceptions")
+  void a_recoverable_device_state_registration_failure_must_succeed_on_retry(
+      Throwable recoverableException) {
+
+    when(hsmApi.createState(any()))
+        .thenThrow(recoverableException)
+        .thenReturn(HsmTestBuilder.newStateResponseWithDefaults().build());
+
+    var result = hsmAdapter.registerState(HsmTestBuilder.deviceStateRegistrationWithDefaults()
+        .build());
 
     assertThat(result).isNotNull();
+    verify(hsmApi, times(TWICE)).createState(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("recoverableClientResponseExceptions")
+  void a_recoverable_device_state_registration_failure_must_throw_exception_when_exceeding_max_retries(
+      Throwable recoverableException) {
+
+    when(hsmApi.createState(any()))
+        .thenThrow(recoverableException)
+        .thenThrow(recoverableException)
+        .thenThrow(recoverableException);
+
+    assertThatThrownBy(() -> hsmAdapter.registerState(HsmTestBuilder
+        .deviceStateRegistrationWithDefaults().build())).isEqualTo(recoverableException);
+    verify(hsmApi, times(THREE)).createState(any());
+  }
+
+  @Test
+  void device_state_successfully_registered() {
+
+    when(hsmApi.createState(any()))
+        .thenReturn(HsmTestBuilder.newStateResponseWithDefaults().build());
+
+    var result = hsmAdapter.registerState(HsmTestBuilder.deviceStateRegistrationWithDefaults()
+        .build());
+
+    assertThat(result).isNotNull();
+    verify(hsmApi, times(ONCE)).createState(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("unrecoverableClientResponseExceptions")
+  void an_unrecoverable_hsm_response_failure_must_not_retry(Throwable unrecoverableException) {
+
+    when(hsmApi.service(any())).thenThrow(unrecoverableException);
+
+    assertThatThrownBy(() -> hsmAdapter.submitAsync(HsmTestBuilder.hsmOperationWithDefaults()
+        .build())).isEqualTo(unrecoverableException);
+    verify(hsmApi, times(ONCE)).service(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("recoverableClientResponseExceptions")
+  void a_recoverable_hsm_response_failure_should_succeed_on_retry(Throwable recoverableException) {
+
+    when(hsmApi.service(any()))
+        .thenThrow(recoverableException)
+        .thenReturn(HsmTestBuilder.asyncResponse().build());
+
+    var result = hsmAdapter.submitAsync(HsmTestBuilder.hsmOperationWithDefaults().build());
+
+    assertThat(result).isNotNull();
+    verify(hsmApi, times(TWICE)).service(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("recoverableClientResponseExceptions")
+  void a_recoverable_hsm_response_failure_must_throw_exception_when_exceeding_max_retries(
+      Throwable recoverableException) {
+
+    when(hsmApi.service(any()))
+        .thenThrow(recoverableException)
+        .thenThrow(recoverableException)
+        .thenThrow(recoverableException);
+
+    assertThatThrownBy(() -> hsmAdapter.submitAsync(HsmTestBuilder.hsmOperationWithDefaults()
+        .build())).isEqualTo(recoverableException);
+    verify(hsmApi, times(THREE)).service(any());
+  }
+
+  @Test
+  void hsm_request_successfully_created() {
+
+    when(hsmApi.service(any())).thenReturn(HsmTestBuilder.asyncResponse().build());
+
+    var result = hsmAdapter.submitAsync(HsmTestBuilder.hsmOperationWithDefaults().build());
+
+    assertThat(result).isNotNull();
+    assertThat(result.id()).isEqualTo(REQUEST_ID);
+    verify(hsmApi, times(ONCE)).service(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("unrecoverableClientResponseExceptions")
+  void an_unrecoverable_async_response_failure_must_not_retry(Throwable unrecoverableException) {
+
+    when(hsmApi.taskResponse(any())).thenThrow(unrecoverableException);
+
+    assertThatThrownBy(() -> hsmAdapter.getAsyncResult(REQUEST_ID))
+        .isEqualTo(unrecoverableException);
+    verify(hsmApi, times(ONCE)).taskResponse(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("recoverableClientResponseExceptions")
+  void a_recoverable_async_response_failure_must_succeed_on_retry(Throwable recoverableException) {
+
+    when(hsmApi.taskResponse(any()))
+        .thenThrow(recoverableException)
+        .thenReturn(HsmTestBuilder.asyncResponse().build());
+
+    var result = hsmAdapter.getAsyncResult(REQUEST_ID);
+
+    assertThat(result).isNotNull();
+    assertThat(result.id()).isEqualTo(REQUEST_ID);
+    verify(hsmApi, times(TWICE)).taskResponse(any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("recoverableClientResponseExceptions")
+  void a_recoverable_async_response_failure_must_throw_exception_when_exceeding_max_retries(
+      Throwable recoverableException) {
+
+    when(hsmApi.taskResponse(any()))
+        .thenThrow(recoverableException)
+        .thenThrow(recoverableException)
+        .thenThrow(recoverableException);
+
+    assertThatThrownBy(() -> hsmAdapter.getAsyncResult(REQUEST_ID))
+        .isEqualTo(recoverableException);
+    verify(hsmApi, times(THREE)).taskResponse(any());
+  }
+
+  @Test
+  void an_async_response_not_found_must_throw_remote_resource_not_found_exception() {
+
+    when(hsmApi.taskResponse(any()))
+        .thenThrow(restClientResponseException(HttpStatus.NOT_FOUND));
+
+    assertThatThrownBy(() -> hsmAdapter.getAsyncResult(REQUEST_ID))
+        .isInstanceOf(RemoteResourceNotFoundException.class);
+    verify(hsmApi, times(ONCE)).taskResponse(any());
+  }
+
+  @Test
+  void serves_async_response() {
+
+    when(hsmApi.taskResponse(any()))
+        .thenReturn(HsmTestBuilder.asyncResponse().build());
+
+    var result = assertDoesNotThrow(() -> hsmAdapter.getAsyncResult(REQUEST_ID));
+
+    assertThat(result).isNotNull();
+    assertThat(result.id()).isEqualTo(REQUEST_ID);
+    verify(hsmApi, times(ONCE)).taskResponse(any());
   }
 }

@@ -42,6 +42,11 @@ properties:
         authorization, x-api-key, api-key, apikey, x-auth-token, cookie, set-cookie, x-csrf-token
       body-json-fields: >
         password, secret, token, accessToken, access_token, refreshToken, refresh_token, apiKey, api_key
+  resilience:
+    retry-policy:
+      max-retries: 2
+      delay-millis: 1000
+      multiplier: 1.5
 # Wallet Client Gateway Configuration
 server:
   port: 8080

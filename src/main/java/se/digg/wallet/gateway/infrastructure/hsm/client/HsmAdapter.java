@@ -8,11 +8,12 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
-import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
+import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResult;
 import se.digg.wallet.gateway.domain.model.hsm.HsmOperation;
@@ -31,27 +32,36 @@ public class HsmAdapter implements HsmPort {
   @Autowired
   private HsmClientMapper mapper;
 
+  @Autowired
+  private RetryTemplate hsmRetryTemplate;
+
   @Override
   public DeviceStateRegistrationResult registerState(DeviceStateRegistration request) {
     var clientRequest = mapper.toClientRequest(request);
     logger.info("Create State client request: {}", clientRequest);
-    var result = hsmApi.createState(clientRequest);
-    return mapper.toDomainResponse(result);
+    return hsmRetryTemplate.invoke(() -> {
+      var result = hsmApi.createState(clientRequest);
+      return mapper.toDomainResponse(result);
+    });
   }
 
   @Override
   public HsmOperationResult submitAsync(HsmOperation request) {
-    var result = hsmApi.service(mapper.toClientRequest(request));
-    return mapper.toDomainResponse(result);
+    return hsmRetryTemplate.invoke(() -> {
+      var result = hsmApi.service(mapper.toClientRequest(request));
+      return mapper.toDomainResponse(result);
+    });
   }
 
   @Override
   public HsmOperationResult getAsyncResult(UUID id) {
     try {
-      logger.info("Find HSM result in remote service. id: {} in", id);
-      var result = hsmApi.taskResponse(id);
-      logger.info("HSM result from remote service: {}", result);
-      return mapper.toDomainResponse(result);
+      return hsmRetryTemplate.invoke(() -> {
+        logger.info("Find HSM result in remote service. id: {} in", id);
+        var result = hsmApi.taskResponse(id);
+        logger.info("HSM result from remote service: {}", result);
+        return mapper.toDomainResponse(result);
+      });
 
     } catch (RestClientResponseException e) {
       if (HttpStatus.NOT_FOUND.value() == e.getStatusCode().value()) {
