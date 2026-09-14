@@ -5,11 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.10] - 2026-09-14
+
+### Added
+
+- Add mdc leak prevention (#179)
+
+### Changed
+
+- Hsm retry on recoverable failure (#181)
+
 ## [0.6.9] - 2026-08-28
 
 ### Removed
 
 - Remove default values for api-key (#175)
+
 
 ## [0.6.8] - 2026-08-28
 
@@ -703,6 +714,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.10]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.9..v0.6.10
 [0.6.9]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.8..v0.6.9
 [0.6.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.7..v0.6.8
 [0.6.7]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.6..v0.6.7
