@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.5
+  version: 0.0.6
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -156,12 +156,41 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
+    get:
+      tags:
+        - Account
+      summary: Get the public keys of an account
+      description: |
+        Get the stored public keys of the account associated with the user context.
+      operationId: getAccountKeys
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+        - name: kid
+          description: 'Optional. Filter on the key id.'
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Keys result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcJwkListResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
     delete:
       tags:
         - Account
       summary: Delete keys from an account
       description: |
         This operation deletes public keys from the account associated with the user context.
+        A delete request referring to non existing key(s) will be ignored (silent fail in backend).
       operationId: deleteAccountKeys
       parameters:
         - $ref: '#/components/parameters/Wallet-Device-OS'
@@ -177,14 +206,6 @@ paths:
       responses:
         '204':
           description: Keys deleted
-        '409':
-          description: |
-            Duplicate key. Indicates a save conflict with an existing key having the same unique id.
-            The kid value for new keys must be unique.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
         'default':
           $ref: '#/components/responses/default'
 
@@ -666,6 +687,15 @@ components:
     EcJwkResponse:
       allOf:
         - $ref: '#/components/schemas/EcJwkRequest'
+
+    EcJwkListResponse:
+      type: object
+      description: Collection of EcJwkResponse items.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcJwkResponse'
 
     KeyIdRequest:
       type: object

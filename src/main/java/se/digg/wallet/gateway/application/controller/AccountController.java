@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import jakarta.validation.Valid;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import se.digg.wallet.gateway.api.v0.AccountApi;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkListRequest;
+import se.digg.wallet.gateway.api.v0.model.EcJwkListResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyIdListRequest;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
@@ -45,6 +47,11 @@ public class AccountController implements AccountApi {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createAccountResponse);
+  }
+
+  @Override
+  public ResponseEntity<EcJwkListResponse> getAccountKeys(Optional<String> kid) {
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @Override
