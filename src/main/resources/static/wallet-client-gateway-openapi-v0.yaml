@@ -98,7 +98,6 @@ paths:
 
   /v0/accounts/wallet-keys:
     post:
-      deprecated: true
       tags:
         - Account
       summary: Add a wallet key to an account
@@ -120,71 +119,6 @@ paths:
       responses:
         '201':
           description: Public wallet key added to account
-        'default':
-          $ref: '#/components/responses/default'
-
-  /v0/accounts/keys:
-    post:
-      tags:
-        - Account
-      summary: Add keys to an account
-      description: |
-        This operation adds public keys to the account associated with the user context. Each key id must be unique.
-      operationId: addAccountKeys
-      parameters:
-        - $ref: '#/components/parameters/Wallet-Device-OS'
-        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
-        - $ref: '#/components/parameters/Wallet-Device-Model'
-        - $ref: '#/components/parameters/Wallet-App-Version'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EcJwkListRequest'
-        required: true
-      responses:
-        '204':
-          description: Keys saved
-        '409':
-          description: |
-            Duplicate key. Indicates a save conflict with an existing key having the same unique id.
-            The kid value for new keys must be unique.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
-        'default':
-          $ref: '#/components/responses/default'
-
-    delete:
-      tags:
-        - Account
-      summary: Delete keys from an account
-      description: |
-        This operation deletes public keys from the account associated with the user context.
-      operationId: deleteAccountKeys
-      parameters:
-        - $ref: '#/components/parameters/Wallet-Device-OS'
-        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
-        - $ref: '#/components/parameters/Wallet-Device-Model'
-        - $ref: '#/components/parameters/Wallet-App-Version'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/KeyIdListRequest'
-        required: true
-      responses:
-        '204':
-          description: Keys deleted
-        '409':
-          description: |
-            Duplicate key. Indicates a save conflict with an existing key having the same unique id.
-            The kid value for new keys must be unique.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
         'default':
           $ref: '#/components/responses/default'
 
@@ -653,38 +587,9 @@ components:
         - x
         - y
 
-    EcJwkListRequest:
-      type: object
-      description: List of keys
-      properties:
-        items:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/EcJwkRequest'
-
     EcJwkResponse:
       allOf:
         - $ref: '#/components/schemas/EcJwkRequest'
-
-    KeyIdRequest:
-      type: object
-      description: A key id reference.
-      properties:
-        id:
-          type: string
-      required:
-        - id
-
-    KeyIdListRequest:
-      type: object
-      description: List of key id references.
-      properties:
-        items:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/KeyIdRequest'
 
     HsmRequestType:
       type: string
