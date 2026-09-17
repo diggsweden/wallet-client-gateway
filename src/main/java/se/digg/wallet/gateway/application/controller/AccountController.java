@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.AccountApi;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.EcJwkListRequest;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.api.v0.model.KeyIdListRequest;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
@@ -45,16 +43,6 @@ public class AccountController implements AccountApi {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createAccountResponse);
-  }
-
-  @Override
-  public ResponseEntity<Void> deleteAccountKeys(KeyIdListRequest keyIdListRequest) {
-    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
-  }
-
-  @Override
-  public ResponseEntity<Void> addAccountKeys(EcJwkListRequest ecJwkListRequest) {
-    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @Override
