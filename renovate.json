@@ -58,6 +58,16 @@
       "addLabels": ["docker", "infrastructure"]
     },
     {
+      "description": "wallet-ecosystem action is pinned to a commit for supply-chain safety (not a mutable @main ref). Check for updates on every run instead of only in the weekend schedule window, and require the commit to be at least 1 day old before automerging it - a buffer for something to surface (advisory, revert, CI failure elsewhere) before we adopt it automatically. Automerge is restricted to weekday working hours so a bad merge doesn't land unnoticed overnight or over a weekend.",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["diggsweden/wallet-ecosystem"],
+      "schedule": ["at any time"],
+      "minimumReleaseAge": "1 day",
+      "automerge": true,
+      "automergeSchedule": ["after 8am and before 6pm every weekday"],
+      "timezone": "Europe/Stockholm"
+    },
+    {
       "description": "Mise dependencies - Major updates",
       "matchManagers": ["mise"],
       "matchUpdateTypes": ["major"],
