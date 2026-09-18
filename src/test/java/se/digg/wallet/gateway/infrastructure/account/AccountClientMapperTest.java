@@ -8,11 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponse;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
+import se.digg.wallet.gateway.client.account.v0.model.AccountResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponseDto;
 import se.digg.wallet.gateway.domain.model.account.NewAccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper;
@@ -97,9 +97,9 @@ public class AccountClientMapperTest {
     assertThat(result.getContent()).isEqualTo(content);
   }
 
-  static List<List<SecurityEnvelopeResponse>> emptySecurityEnvelopeItems() {
+  static List<List<SecurityEnvelopeResponseDto>> emptySecurityEnvelopeItems() {
 
-    var items = new ArrayList<List<SecurityEnvelopeResponse>>();
+    var items = new ArrayList<List<SecurityEnvelopeResponseDto>>();
     items.add(null);
     items.add(Collections.emptyList());
 
@@ -109,9 +109,9 @@ public class AccountClientMapperTest {
   @ParameterizedTest
   @MethodSource("emptySecurityEnvelopeItems")
   void a_security_envelopes_response_with_null_or_empty_items_maps_to_an_empty_items_list(
-      List<SecurityEnvelopeResponse> emptyItems) {
+      List<SecurityEnvelopeResponseDto> emptyItems) {
 
-    var response = SecurityEnvelopesResponse.builder()
+    var response = SecurityEnvelopesResponseDto.builder()
         .items(emptyItems)
         .build();
 
@@ -125,9 +125,9 @@ public class AccountClientMapperTest {
   void a_security_envelopes_response_items_map_to_domain_objects_with_matching_content() {
 
     var content = "the-content";
-    var response = SecurityEnvelopesResponse.builder()
+    var response = SecurityEnvelopesResponseDto.builder()
         .items(List.of(
-            SecurityEnvelopeResponse.builder()
+            SecurityEnvelopeResponseDto.builder()
                 .content(content)
                 .build()))
         .build();
@@ -144,7 +144,7 @@ public class AccountClientMapperTest {
   void an_account_response_fields_are_mapped_to_the_domain_account() {
 
     var responseKey = EcJwkResponseTestBuilder.withDefaults().build();
-    var response = AccountResponse.builder()
+    var response = AccountResponseDto.builder()
         .id(ACCOUNT_ID)
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
         .email(EMAIL)
@@ -187,9 +187,9 @@ public class AccountClientMapperTest {
     assertThat(result.y()).isEqualTo(responseKey.getY());
   }
 
-  static List<List<EcJwkResponse>> emptyEcJwkResponse() {
+  static List<List<EcJwkResponseDto>> emptyEcJwkResponse() {
 
-    var items = new ArrayList<List<EcJwkResponse>>();
+    var items = new ArrayList<List<EcJwkResponseDto>>();
     items.add(null);
     items.add(Collections.emptyList());
 
@@ -199,9 +199,9 @@ public class AccountClientMapperTest {
   @ParameterizedTest
   @MethodSource("emptyEcJwkResponse")
   void an_ec_jwk_items_response_with_null_or_empty_items_throws_illegal_state_exception(
-      List<EcJwkResponse> emptyItems) {
+      List<EcJwkResponseDto> emptyItems) {
 
-    var response = EcJwkItemsResponse.builder()
+    var response = EcJwkItemsResponseDto.builder()
         .items(emptyItems)
         .build();
 
@@ -213,7 +213,7 @@ public class AccountClientMapperTest {
   void an_ec_jwk_items_responses_first_item_maps_to_a_domain_jwk_with_matching_fields() {
 
     var responseKey = EcJwkResponseTestBuilder.withDefaults().build();
-    var response = EcJwkItemsResponse.builder()
+    var response = EcJwkItemsResponseDto.builder()
         .items(List.of(responseKey))
         .build();
 

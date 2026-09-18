@@ -4,12 +4,12 @@
 
 package se.digg.wallet.gateway.infrastructure.account;
 
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponseDto;
 
 public class EcJwkResponseTestBuilder {
 
-  public static EcJwkResponse.Builder withDefaults() {
-    return EcJwkResponse.builder()
+  public static EcJwkResponseDto.Builder withDefaults() {
+    return EcJwkResponseDto.builder()
         .kid("kid")
         .kty("kty")
         .alg("alg")

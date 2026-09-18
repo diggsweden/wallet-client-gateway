@@ -26,14 +26,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.WebApplicationContext;
-import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.api.v0.model.EcJwkResponse;
-import se.digg.wallet.gateway.api.v0.model.HsmRequest;
-import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
-import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
+import se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto;
+import se.digg.wallet.gateway.api.v0.model.EcJwkResponseDto;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResultBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwk;
@@ -78,13 +78,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/requests")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws(emptyOuterRequestJws)
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -106,13 +106,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/requests")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws("outer.request.jws")
             .build())
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -128,13 +128,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/requests")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws("outer.request.jws")
             .build())
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -157,20 +157,20 @@ public class HsmApiComponentTest {
     authenticateByChallenge();
     var hsmResponse = client.post()
         .uri("/hsm/v0/requests")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws("outer.request.jws")
             .build())
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
     assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
-        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.ERROR);
+        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.ERROR);
     assertThat(hsmResponse.getResult()).isEmpty();
     assertThat(hsmResponse.getResultUrl().isEmpty());
   }
@@ -191,20 +191,20 @@ public class HsmApiComponentTest {
     authenticateByChallenge();
     var hsmResponse = client.post()
         .uri("/hsm/v0/requests")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws("outer.request.jws")
             .build())
         .exchange()
         .expectStatus()
         .isAccepted()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
     assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
-        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.PENDING);
+        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.PENDING);
     assertThat(hsmResponse.getResult()).isEmpty();
     assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
   }
@@ -226,20 +226,20 @@ public class HsmApiComponentTest {
     authenticateByChallenge();
     var hsmResponse = client.post()
         .uri("/hsm/v0/requests")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws("outer.request.jws")
             .build())
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
     assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
-        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.COMPLETE);
+        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.COMPLETE);
     assertThat(hsmResponse.getResult()).isPresent().get().isEqualTo(result);
     assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
   }
@@ -263,14 +263,14 @@ public class HsmApiComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
     assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
-        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.ERROR);
+        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.ERROR);
     assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
   }
 
@@ -293,14 +293,14 @@ public class HsmApiComponentTest {
         .exchange()
         .expectStatus()
         .isAccepted()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
     assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
-        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.PENDING);
+        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.PENDING);
     assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
   }
 
@@ -324,14 +324,14 @@ public class HsmApiComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
     assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
-        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.COMPLETE);
+        se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.COMPLETE);
     assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
   }
 
@@ -340,13 +340,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/device-states")
-        .body(RegisterStateRequest.builder()
+        .body(RegisterStateRequestDto.builder()
             .deviceKey(null)
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -365,13 +365,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/device-states")
-        .body(RegisterStateRequest.builder()
-            .deviceKey(EcJwkRequest.builder().build())
+        .body(RegisterStateRequestDto.builder()
+            .deviceKey(EcJwkRequestDto.builder().build())
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -392,14 +392,14 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/device-states")
-        .body(RegisterStateRequest.builder()
+        .body(RegisterStateRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .ttl(invalidTtl)
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -420,13 +420,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/device-states")
-        .body(RegisterStateRequest.builder()
+        .body(RegisterStateRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .build())
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -442,13 +442,13 @@ public class HsmApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/hsm/v0/device-states")
-        .body(RegisterStateRequest.builder()
+        .body(RegisterStateRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .build())
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -487,14 +487,14 @@ public class HsmApiComponentTest {
 
     var registerStateResponse = client.post()
         .uri("/hsm/v0/device-states")
-        .body(RegisterStateRequest.builder()
+        .body(RegisterStateRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .ttl(optionalTtl)
             .build())
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(RegisterStateResponse.class)
+        .expectBody(RegisterStateResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -521,8 +521,8 @@ public class HsmApiComponentTest {
     SecurityContextHolder.getContext().setAuthentication(challengeAuthToken);
   }
 
-  private static EcJwkRequest.Builder defaultKeyRequest() {
-    return EcJwkRequest.builder()
+  private static EcJwkRequestDto.Builder defaultKeyRequest() {
+    return EcJwkRequestDto.builder()
         .kid(KEY_ID)
         .kty("EC")
         .crv("P-256")
@@ -530,8 +530,8 @@ public class HsmApiComponentTest {
         .y("5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40");
   }
 
-  private static EcJwkResponse toKeyResponse(EcPublicJwk jwkDto) {
-    return EcJwkResponse.builder()
+  private static EcJwkResponseDto toKeyResponse(EcPublicJwk jwkDto) {
+    return EcJwkResponseDto.builder()
         .kid(jwkDto.kid())
         .kty(jwkDto.kty())
         .crv(jwkDto.crv())
@@ -540,13 +540,13 @@ public class HsmApiComponentTest {
         .build();
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus) {
 
     assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus,
       @Nullable String expectedType,
       @Nullable String expectedInvalidParameterProperty) {
@@ -566,7 +566,7 @@ public class HsmApiComponentTest {
       assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
       assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
           .stream()
-          .map(ProblemParameterResponse::getProperty)
+          .map(ProblemParameterResponseDto::getProperty)
           .map(value -> value.orElse(null))
           .filter(Objects::nonNull)
           .toList());

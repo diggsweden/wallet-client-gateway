@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseDto;
-import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwk;
+import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwkDto;
 import se.digg.wallet.gateway.client.hsm.v1.model.NewStateResponseDto;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.HsmAsyncStatus;
@@ -124,7 +124,7 @@ public class HsmClientMapperTest {
         .opaqueServerId(opaqueServerId)
         .devAuthorizationCode(devAuthorizationCode)
         .status(status)
-        .serverJwsPublicKey(EcPublicJwk.builder()
+        .serverJwsPublicKey(EcPublicJwkDto.builder()
             .kid(kid)
             .kty(kty)
             .crv(crv)
@@ -176,7 +176,7 @@ public class HsmClientMapperTest {
     var stateJws = UUID.randomUUID().toString();
     var request = AsyncResponseDto.builder()
         .correlationId(randomId)
-        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatus.COMPLETE)
+        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatusDto.COMPLETE)
         .result(resultValue)
         .resultUrl(resultUrl)
         .stateJws(stateJws)

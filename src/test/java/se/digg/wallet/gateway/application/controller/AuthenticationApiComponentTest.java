@@ -28,11 +28,11 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.WebApplicationContext;
-import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
-import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.api.v0.model.SessionResponse;
+import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequestDto;
+import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
+import se.digg.wallet.gateway.api.v0.model.SessionResponseDto;
 import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.domain.service.AuthService;
 
@@ -92,7 +92,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -115,7 +115,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -134,7 +134,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -154,7 +154,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(AuthChallengeResponse.class)
+        .expectBody(AuthChallengeResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -166,7 +166,7 @@ public class AuthenticationApiComponentTest {
   @NullAndEmptySource
   void informsClientOfMissingSignedJwtProblem(String emptySignedJwt) {
 
-    var sessionRequest = AuthChallengeRequest.builder()
+    var sessionRequest = AuthChallengeRequestDto.builder()
         .signedJwt(emptySignedJwt)
         .build();
     var problemResponse = client.post()
@@ -175,7 +175,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -187,7 +187,7 @@ public class AuthenticationApiComponentTest {
 
     when(authService.validateChallenge(any())).thenReturn(Optional.empty());
 
-    var sessionRequest = AuthChallengeRequest.builder()
+    var sessionRequest = AuthChallengeRequestDto.builder()
         .signedJwt("signed.jwt.test")
         .build();
     client
@@ -218,7 +218,7 @@ public class AuthenticationApiComponentTest {
                 .with(sessionPostProcessor)))
         .build();
 
-    var sessionRequest = AuthChallengeRequest.builder()
+    var sessionRequest = AuthChallengeRequestDto.builder()
         .signedJwt("signed.jwt.test")
         .build();
     var sessionResponse = mockSessionClient
@@ -228,7 +228,7 @@ public class AuthenticationApiComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(SessionResponse.class)
+        .expectBody(SessionResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -236,13 +236,13 @@ public class AuthenticationApiComponentTest {
     assertThat(sessionResponse.getSessionId()).isNotEmpty().isEqualTo(SESSION_ID);
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus) {
 
     assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus,
       @Nullable String expectedType,
       @Nullable String expectedInvalidParameterProperty) {
@@ -262,7 +262,7 @@ public class AuthenticationApiComponentTest {
       assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
       assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
           .stream()
-          .map(ProblemParameterResponse::getProperty)
+          .map(ProblemParameterResponseDto::getProperty)
           .map(value -> value.orElse(null))
           .filter(Objects::nonNull)
           .toList());

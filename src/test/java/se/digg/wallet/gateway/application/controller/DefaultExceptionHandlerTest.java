@@ -16,7 +16,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -49,8 +49,8 @@ public class DefaultExceptionHandlerTest {
     var responseEntity = assertDoesNotThrow(() -> exceptionHandler
         .createResponseEntity(unknownBody, HttpHeaders.EMPTY, httpStatus, webRequest));
 
-    assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
-    var problemResponse = (ProblemResponse) responseEntity.getBody();
+    assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponseDto.class);
+    var problemResponse = (ProblemResponseDto) responseEntity.getBody();
     assertProblemDetails(problemResponse, httpStatus);
   }
 
@@ -65,8 +65,8 @@ public class DefaultExceptionHandlerTest {
             webRequest));
 
     assertThat(responseEntity).isNotNull();
-    assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
-    var problemResponse = (ProblemResponse) responseEntity.getBody();
+    assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponseDto.class);
+    var problemResponse = (ProblemResponseDto) responseEntity.getBody();
     assertThat(problemResponse.getTransactionId()).isEmpty();
   }
 
@@ -83,13 +83,13 @@ public class DefaultExceptionHandlerTest {
             webRequest));
 
     assertThat(responseEntity).isNotNull();
-    assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
-    var problemResponse = (ProblemResponse) responseEntity.getBody();
+    assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponseDto.class);
+    var problemResponse = (ProblemResponseDto) responseEntity.getBody();
 
     assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(transactionId);
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus) {
 
     assertThat(problemResponse).isNotNull();

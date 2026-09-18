@@ -6,13 +6,13 @@ package se.digg.wallet.gateway.infrastructure.account.mapper;
 
 import java.util.List;
 import org.springframework.stereotype.Component;
-import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
-import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
+import se.digg.wallet.gateway.client.account.v0.model.AccountRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.AccountResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponseDto;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
@@ -24,8 +24,8 @@ import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
 @Component
 public class AccountClientMapper {
 
-  public AccountRequest toClientRequest(NewAccount newAccount) {
-    return AccountRequest.builder()
+  public AccountRequestDto toClientRequest(NewAccount newAccount) {
+    return AccountRequestDto.builder()
         .email(newAccount.email())
         .phoneNumber(newAccount.phoneNumber())
         .personalIdentityNumber(newAccount.personalIdentityNumber())
@@ -33,8 +33,8 @@ public class AccountClientMapper {
         .build();
   }
 
-  public EcJwkRequest toClientRequest(Jwk deviceKey) {
-    return EcJwkRequest.builder()
+  public EcJwkRequestDto toClientRequest(Jwk deviceKey) {
+    return EcJwkRequestDto.builder()
         .alg(deviceKey.alg())
         .crv(deviceKey.crv())
         .kid(deviceKey.kid())
@@ -45,11 +45,11 @@ public class AccountClientMapper {
         .build();
   }
 
-  public SecurityEnvelopeRequest toClientRequest(SecurityEnvelope securityEnvelope) {
-    return SecurityEnvelopeRequest.builder().content(securityEnvelope.content()).build();
+  public SecurityEnvelopeRequestDto toClientRequest(SecurityEnvelope securityEnvelope) {
+    return SecurityEnvelopeRequestDto.builder().content(securityEnvelope.content()).build();
   }
 
-  public SecurityEnvelopes toDomain(SecurityEnvelopesResponse response) {
+  public SecurityEnvelopes toDomain(SecurityEnvelopesResponseDto response) {
     List<SecurityEnvelope> items = response.getItems() == null
         ? List.of()
         : response.getItems().stream()
@@ -58,7 +58,7 @@ public class AccountClientMapper {
     return new SecurityEnvelopes(items);
   }
 
-  public Account toDomain(AccountResponse response) {
+  public Account toDomain(AccountResponseDto response) {
     return AccountBuilder.builder()
         .personalIdentityNumber(response.getPersonalIdentityNumber())
         .email(response.getEmail())
@@ -68,7 +68,7 @@ public class AccountClientMapper {
         .build();
   }
 
-  public Jwk toDomain(EcJwkResponse response) {
+  public Jwk toDomain(EcJwkResponseDto response) {
     return JwkBuilder.builder()
         .kid(response.getKid())
         .kty(response.getKty())
@@ -80,7 +80,7 @@ public class AccountClientMapper {
         .build();
   }
 
-  public Jwk toDomainJwk(EcJwkItemsResponse response) {
+  public Jwk toDomainJwk(EcJwkItemsResponseDto response) {
     if (response.getItems() == null || response.getItems().isEmpty()) {
       throw new IllegalStateException("No wallet key found for account");
     }

@@ -6,8 +6,8 @@ package se.digg.wallet.gateway.application.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.COMPLETE;
-import static se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.PENDING;
+import static se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.COMPLETE;
+import static se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto.PENDING;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -30,9 +30,9 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.HsmRequest;
-import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.AuthUtil;
@@ -130,8 +130,8 @@ class HsmControllerIntegrationTest {
     unauthenticated.post()
         .uri(REGISTER_STATE_URL)
         .header("content-type", "application/json")
-        .body(se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-            .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
+        .body(se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+            .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto.builder()
                 .kty("EC")
                 .crv("P-256")
                 .x("x")
@@ -167,8 +167,8 @@ class HsmControllerIntegrationTest {
                 }
                 """.formatted(clientId, TEST_DEV_AUTH_CODE))));
 
-    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
+    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -206,13 +206,13 @@ class HsmControllerIntegrationTest {
     var problemResponse = restClient.post()
         .uri(HSM_REQUESTS_URL + "?" + paramType + "=" + unknownType)
         .header("content-type", "application/json")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws(TEST_JWT)
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -241,8 +241,8 @@ class HsmControllerIntegrationTest {
                 }
                 """)));
 
-    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
+    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -259,7 +259,7 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -273,8 +273,8 @@ class HsmControllerIntegrationTest {
   @ValueSource(strings = {"30d", "30"})
   void validationFailureWithBadTtlFormat(String ttl) {
 
-    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequest.builder()
-        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequest.builder()
+    var registerStateRequest = se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto.builder()
+        .deviceKey(se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto.builder()
             .kty("EC")
             .crv("P-256")
             .x("x")
@@ -291,7 +291,7 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -325,7 +325,7 @@ class HsmControllerIntegrationTest {
     restClient.post()
         .uri(HSM_REQUESTS_URL)
         .header("content-type", "application/json")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws(TEST_JWT)
             .build())
         .exchange()
@@ -364,13 +364,13 @@ class HsmControllerIntegrationTest {
     var hsmResponse = restClient.post()
         .uri(HSM_REQUESTS_URL)
         .header("content-type", "application/json")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws(TEST_JWT)
             .build())
         .exchange()
         .expectStatus()
         .isAccepted()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -410,13 +410,13 @@ class HsmControllerIntegrationTest {
     var hsmResponse = restClient.post()
         .uri(HSM_REQUESTS_URL)
         .header("content-type", "application/json")
-        .body(HsmRequest.builder()
+        .body(HsmRequestDto.builder()
             .outerRequestJws(TEST_JWT)
             .build())
         .exchange()
         .expectStatus()
         .isAccepted()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -426,7 +426,7 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isAccepted()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -454,7 +454,7 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isAccepted()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -487,7 +487,7 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(HsmResponse.class)
+        .expectBody(HsmResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -509,7 +509,7 @@ class HsmControllerIntegrationTest {
         .exchange()
         .expectStatus()
         .isNotFound()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 

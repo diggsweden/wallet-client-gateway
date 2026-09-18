@@ -423,6 +423,7 @@
               <generatorName>spring</generatorName>
               <apiPackage>se.digg.wallet.gateway.api.v0</apiPackage>
               <modelPackage>se.digg.wallet.gateway.api.v0.model</modelPackage>
+              <modelNameSuffix>Dto</modelNameSuffix>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateApiTests>true</generateApiTests>
               <configOptions>
@@ -447,6 +448,7 @@
                 ${project.basedir}/src/main/resources/external-apispec/wallet-account-openapi-v0.yaml
               </inputSpec>
               <generatorName>java</generatorName>
+              <modelNameSuffix>Dto</modelNameSuffix>
               <configOptions>
                 <apiPackage>se.digg.wallet.gateway.client.account.v0.api</apiPackage>
                 <modelPackage>se.digg.wallet.gateway.client.account.v0.model</modelPackage>
@@ -469,6 +471,14 @@
                 ${project.basedir}/src/main/resources/external-apispec/wallet-hsm-openapi-v1.json
               </inputSpec>
               <generatorName>java</generatorName>
+              <modelNameSuffix>Dto</modelNameSuffix>
+              <!-- These three schemas are already named with a Dto suffix in the spec itself;
+                   without this mapping modelNameSuffix would double it to e.g. AsyncResponseDtoDto. -->
+              <modelNameMappings>
+                <modelNameMapping>AsyncResponseDto=AsyncResponseDto</modelNameMapping>
+                <modelNameMapping>NewStateRequestDto=NewStateRequestDto</modelNameMapping>
+                <modelNameMapping>NewStateResponseDto=NewStateResponseDto</modelNameMapping>
+              </modelNameMappings>
               <configOptions>
                 <apiPackage>se.digg.wallet.gateway.client.hsm.v1.api</apiPackage>
                 <modelPackage>se.digg.wallet.gateway.client.hsm.v1.model</modelPackage>
@@ -490,6 +500,7 @@
                 ${project.basedir}/src/main/resources/external-apispec/wallet-provider-openapi-v0.yaml
               </inputSpec>
               <generatorName>java</generatorName>
+              <modelNameSuffix>Dto</modelNameSuffix>
               <configOptions>
                 <apiPackage>se.digg.wallet.gateway.client.provider.v0.api</apiPackage>
                 <modelPackage>se.digg.wallet.gateway.client.provider.v0.model</modelPackage>

@@ -10,7 +10,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.ApiInfoApi;
-import se.digg.wallet.gateway.api.v0.model.ApiInfoResponse;
+import se.digg.wallet.gateway.api.v0.model.ApiInfoResponseDto;
 
 @RestController
 public class ApiInfoController implements ApiInfoApi {
@@ -22,8 +22,8 @@ public class ApiInfoController implements ApiInfoApi {
   private static final List<String> LINKS = Collections.emptyList();
 
   @Override
-  public ResponseEntity<ApiInfoResponse> getApiInfo() {
-    return ResponseEntity.ok().body(ApiInfoResponse.builder()
+  public ResponseEntity<ApiInfoResponseDto> getApiInfo() {
+    return ResponseEntity.ok().body(ApiInfoResponseDto.builder()
         .name(NAME)
         .status(STATUS)
         .version(VERSION)

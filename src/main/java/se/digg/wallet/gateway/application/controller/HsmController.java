@@ -10,11 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.HsmApi;
-import se.digg.wallet.gateway.api.v0.model.HsmRequest;
-import se.digg.wallet.gateway.api.v0.model.HsmRequestType;
-import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
-import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestTypeDto;
+import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.hsm.HsmMapper;
 import se.digg.wallet.gateway.domain.service.HsmService;
@@ -33,8 +33,8 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<HsmResponse> createRequest(HsmRequest hsmRequest,
-      Optional<HsmRequestType> type) {
+  public ResponseEntity<HsmResponseDto> createRequest(HsmRequestDto hsmRequest,
+      Optional<HsmRequestTypeDto> type) {
 
     var result = hsmService.submitAsync(mapper.toDomain(hsmRequest), currentAccount.id());
     var hsmResponse = mapper.toHsmResponse(result);
@@ -47,7 +47,7 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<HsmResponse> getResult(UUID id) {
+  public ResponseEntity<HsmResponseDto> getResult(UUID id) {
 
     var result = hsmService.getAsyncResult(id, currentAccount.id());
     var hsmResponse = mapper.toHsmResponse(result);
@@ -60,8 +60,8 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<RegisterStateResponse> saveState(
-      RegisterStateRequest registerStateRequest) {
+  public ResponseEntity<RegisterStateResponseDto> saveState(
+      RegisterStateRequestDto registerStateRequest) {
 
     var result =
         hsmService.registerState(mapper.toDomain(registerStateRequest), currentAccount.id());

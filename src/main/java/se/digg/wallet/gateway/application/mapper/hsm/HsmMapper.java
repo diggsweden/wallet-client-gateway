@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
-import se.digg.wallet.gateway.api.v0.model.EcJwkResponse;
-import se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus;
-import se.digg.wallet.gateway.api.v0.model.HsmRequest;
-import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
-import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
+import se.digg.wallet.gateway.api.v0.model.EcJwkResponseDto;
+import se.digg.wallet.gateway.api.v0.model.HsmAsyncStatusDto;
+import se.digg.wallet.gateway.api.v0.model.HsmRequestDto;
+import se.digg.wallet.gateway.api.v0.model.HsmResponseDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateRequestDto;
+import se.digg.wallet.gateway.api.v0.model.RegisterStateResponseDto;
 import se.digg.wallet.gateway.application.controller.HsmController;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationBuilder;
@@ -26,7 +26,7 @@ import se.digg.wallet.gateway.domain.model.hsm.HsmOperationResult;
 @Component
 public class HsmMapper {
 
-  public DeviceStateRegistration toDomain(RegisterStateRequest request) {
+  public DeviceStateRegistration toDomain(RegisterStateRequestDto request) {
     var deviceKeyRequest = request.getDeviceKey();
     var publicKey = EcPublicJwkBuilder.builder()
         .kty(deviceKeyRequest.getKty())
@@ -41,24 +41,24 @@ public class HsmMapper {
         .build();
   }
 
-  public HsmOperation toDomain(HsmRequest request) {
+  public HsmOperation toDomain(HsmRequestDto request) {
     return HsmOperationBuilder.builder()
         .outerRequestJws(request.getOuterRequestJws())
         .build();
   }
 
-  public HsmResponse toHsmResponse(HsmOperationResult result) {
-    return HsmResponse.builder()
+  public HsmResponseDto toHsmResponse(HsmOperationResult result) {
+    return HsmResponseDto.builder()
         .id(result.id())
-        .status(HsmAsyncStatus.fromValue(result.status().name()))
+        .status(HsmAsyncStatusDto.fromValue(result.status().name()))
         .result(result.result())
         .resultUrl(toGatewayResultUrl(result))
         .build();
   }
 
-  public RegisterStateResponse toRegisterStateResponse(DeviceStateRegistrationResult result) {
+  public RegisterStateResponseDto toRegisterStateResponse(DeviceStateRegistrationResult result) {
     var serverJwsPublicKey = result.serverJwsPublicKey();
-    var serverJwsPublicKeyResponse = EcJwkResponse.builder()
+    var serverJwsPublicKeyResponse = EcJwkResponseDto.builder()
         .alg(null)
         .crv(serverJwsPublicKey.crv())
         .kid(serverJwsPublicKey.kid())
@@ -68,7 +68,7 @@ public class HsmMapper {
         .y(serverJwsPublicKey.y())
         .build();
 
-    return RegisterStateResponse.builder()
+    return RegisterStateResponseDto.builder()
         .serverJwsPublicKey(serverJwsPublicKeyResponse)
         .status(result.status())
         .opaqueServerId(result.opaqueServerId())

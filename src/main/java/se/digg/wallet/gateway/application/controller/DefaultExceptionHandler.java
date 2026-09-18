@@ -37,8 +37,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 
@@ -71,7 +71,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     try {
       var violations = e
-          .getConstraintViolations().stream().map(violation -> ProblemParameterResponse.builder()
+          .getConstraintViolations().stream().map(violation -> ProblemParameterResponseDto.builder()
               .reason(violation.getMessage())
               .value(Optional.ofNullable(violation.getInvalidValue()).map(Object::toString)
                   .orElse(null))
@@ -116,7 +116,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     try {
       var objectErrors = e.getBindingResult().getGlobalErrors().stream()
-          .map(error -> ProblemParameterResponse.builder()
+          .map(error -> ProblemParameterResponseDto.builder()
               .reason(error.getDefaultMessage())
               .value(null)
               .property(error.getObjectName())
@@ -124,7 +124,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
           .toList();
 
       var fieldErrors = e.getBindingResult().getFieldErrors().stream()
-          .map(error -> ProblemParameterResponse.builder()
+          .map(error -> ProblemParameterResponseDto.builder()
               .reason(error.getDefaultMessage())
               .value(Optional.ofNullable(error.getRejectedValue()).map(Object::toString)
                   .orElse(null))
@@ -162,7 +162,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     var path = httpServletRequest.getServletPath();
 
     var statusCode = HttpStatus.BAD_REQUEST;
-    var problemDetailResponse = ProblemResponse.builder()
+    var problemDetailResponse = ProblemResponseDto.builder()
         .type(REQUEST_ARGUMENT_NOT_VALID.getUri().toASCIIString())
         .title(statusCode.getReasonPhrase())
         .status(statusCode.value())
@@ -188,7 +188,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     var path = httpServletRequest.getServletPath();
 
     var statusCode = HttpStatus.NOT_FOUND;
-    var problemDetailResponse = ProblemResponse.builder()
+    var problemDetailResponse = ProblemResponseDto.builder()
         .type(ABOUT_BLANK)
         .title(statusCode.getReasonPhrase())
         .status(statusCode.value())
@@ -227,7 +227,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(RestClientException.class)
   public ResponseEntity<Object> handleRestClientException(RestClientException e) {
 
-    ProblemResponse problemResponse = null;
+    ProblemResponseDto problemResponse = null;
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
 
@@ -288,7 +288,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   protected ResponseEntity<Object> createResponseEntity(@Nullable Object body,
       HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 
-    var problemDetailResponse = ProblemResponse.builder()
+    var problemDetailResponse = ProblemResponseDto.builder()
         .type(ABOUT_BLANK)
         .status(statusCode.value())
         .instance(request.getContextPath());
@@ -313,7 +313,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     return createResponseEntity(problemDetailResponse.build());
   }
 
-  private ResponseEntity<Object> createResponseEntity(ProblemResponse problemResponse) {
+  private ResponseEntity<Object> createResponseEntity(ProblemResponseDto problemResponse) {
 
     try {
       problemResponse.setTransactionId(Optional.of(MDC.get(MDC_TRANSACTION_ID)));
@@ -325,9 +325,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .body(problemResponse);
   }
 
-  private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {
+  private ProblemResponseDto.Builder buildProblemResponse(ProblemType problemType) {
 
-    return ProblemResponse.builder()
+    return ProblemResponseDto.builder()
         .type(Optional.ofNullable(problemType.getUri().toASCIIString())
             .orElse(ABOUT_BLANK))
         .title(problemType.getTitle())

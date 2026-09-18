@@ -23,9 +23,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.WebApplicationContext;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.api.v0.model.WuaResponse;
+import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
+import se.digg.wallet.gateway.api.v0.model.WuaResponseDto;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.service.WuaService;
@@ -100,7 +100,7 @@ public class WuaApiComponentTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -125,7 +125,7 @@ public class WuaApiComponentTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -145,7 +145,7 @@ public class WuaApiComponentTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -176,7 +176,7 @@ public class WuaApiComponentTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(WuaResponse.class)
+        .expectBody(WuaResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -191,13 +191,13 @@ public class WuaApiComponentTest {
     }
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus) {
 
     assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus,
       @Nullable String expectedType,
       @Nullable String expectedInvalidParameterProperty) {
@@ -217,7 +217,7 @@ public class WuaApiComponentTest {
       assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
       assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
           .stream()
-          .map(ProblemParameterResponse::getProperty)
+          .map(ProblemParameterResponseDto::getProperty)
           .map(value -> value.orElse(null))
           .filter(Objects::nonNull)
           .toList());

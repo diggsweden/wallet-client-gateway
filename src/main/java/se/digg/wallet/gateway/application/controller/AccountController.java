@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.AccountApi;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountResponseDto;
+import se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
@@ -34,11 +34,11 @@ public class AccountController implements AccountApi {
   }
 
   @Override
-  public ResponseEntity<CreateAccountResponse> createAccount(
-      @Valid CreateAccountRequest createAccountRequest) {
+  public ResponseEntity<CreateAccountResponseDto> createAccount(
+      @Valid CreateAccountRequestDto createAccountRequest) {
     NewAccount newAccount = mapper.toDomain(createAccountRequest);
     Account account = accountService.createAccount(newAccount);
-    CreateAccountResponse createAccountResponse = mapper.toResponse(account);
+    CreateAccountResponseDto createAccountResponse = mapper.toResponse(account);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -46,7 +46,7 @@ public class AccountController implements AccountApi {
   }
 
   @Override
-  public ResponseEntity<Void> addAccountWalletKey(@Valid EcJwkRequest keyRequest) {
+  public ResponseEntity<Void> addAccountWalletKey(@Valid EcJwkRequestDto keyRequest) {
     Jwk jwk = mapper.toDomain(keyRequest);
     var accountId = currentAccount.id();
     accountService.addAccountWalletKey(jwk, accountId);

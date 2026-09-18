@@ -8,8 +8,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseDto;
-import se.digg.wallet.gateway.client.hsm.v1.model.BffRequest;
-import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwk;
+import se.digg.wallet.gateway.client.hsm.v1.model.BffRequestDto;
+import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwkDto;
 import se.digg.wallet.gateway.client.hsm.v1.model.NewStateRequestDto;
 import se.digg.wallet.gateway.client.hsm.v1.model.NewStateResponseDto;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistration;
@@ -27,7 +27,7 @@ public class HsmClientMapper {
     var publicKey = request.walletKey();
     Assert.notNull(publicKey, "WalletKey must not be null");
 
-    var clientPublicKey = EcPublicJwk.builder()
+    var clientPublicKey = EcPublicJwkDto.builder()
         .kid(publicKey.kid())
         .kty(publicKey.kty())
         .crv(publicKey.crv())
@@ -41,8 +41,8 @@ public class HsmClientMapper {
         .build();
   }
 
-  public BffRequest toClientRequest(HsmOperation request) {
-    return BffRequest.builder()
+  public BffRequestDto toClientRequest(HsmOperation request) {
+    return BffRequestDto.builder()
         .clientId(request.clientId())
         .outerRequestJws(request.outerRequestJws())
         .stateJws(request.stateJws())

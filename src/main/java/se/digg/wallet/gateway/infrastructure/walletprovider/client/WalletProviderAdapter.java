@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import se.digg.wallet.gateway.domain.exception.WalletRuntimeException;
 import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
-import se.digg.wallet.gateway.client.provider.v0.model.WalletUnitAttestationRequest;
+import se.digg.wallet.gateway.client.provider.v0.model.WalletUnitAttestationRequestDto;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.wua.Wua;
 import se.digg.wallet.gateway.domain.model.wua.WuaBuilder;
@@ -33,7 +33,7 @@ public class WalletProviderAdapter implements WalletProviderPort {
     Assert.notNull(walletKey, "WalletKey must not be null");
     try {
       var jwkString = objectMapper.writeValueAsString(walletKey);
-      var request = WalletUnitAttestationRequest.builder()
+      var request = WalletUnitAttestationRequestDto.builder()
           .jwk(jwkString)
           .nonce(nonce)
           .build();

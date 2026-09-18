@@ -22,11 +22,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.WebApplicationContext;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountResponseDto;
+import se.digg.wallet.gateway.api.v0.model.EcJwkRequestDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponseDto;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
@@ -70,13 +70,13 @@ public class AccountApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .deviceKey(null)
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -95,13 +95,13 @@ public class AccountApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
-            .deviceKey(EcJwkRequest.builder().build())
+        .body(CreateAccountRequestDto.builder()
+            .deviceKey(EcJwkRequestDto.builder().build())
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -122,14 +122,14 @@ public class AccountApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .email(badFormattedEmailAddress)
             .deviceKey(defaultKeyRequest().build())
             .build())
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -145,13 +145,13 @@ public class AccountApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .build())
         .exchange()
         .expectStatus()
         .isEqualTo(HttpStatus.CONFLICT.value())
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -172,13 +172,13 @@ public class AccountApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .build())
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -194,13 +194,13 @@ public class AccountApiComponentTest {
 
     var problemResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .deviceKey(defaultKeyRequest().build())
             .build())
         .exchange()
         .expectStatus()
         .is5xxServerError()
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -210,7 +210,7 @@ public class AccountApiComponentTest {
   @Test
   void createAccountWithoutOptionalsReturnsSavedValues() {
 
-    final EcJwkRequest deviceKeyRequest = defaultKeyRequest().build();
+    final EcJwkRequestDto deviceKeyRequest = defaultKeyRequest().build();
     final Jwk deviceKeyDto = toPublicKeyDto(deviceKeyRequest);
 
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
@@ -224,13 +224,13 @@ public class AccountApiComponentTest {
 
     var accountResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .deviceKey(deviceKeyRequest)
             .build())
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(CreateAccountResponse.class)
+        .expectBody(CreateAccountResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -252,7 +252,7 @@ public class AccountApiComponentTest {
   })
   void acceptsCreateAccountRequestsWithValidEmail(String email) {
 
-    final EcJwkRequest deviceKeyRequest = defaultKeyRequest().build();
+    final EcJwkRequestDto deviceKeyRequest = defaultKeyRequest().build();
     final Jwk deviceKeyDto = toPublicKeyDto(deviceKeyRequest);
 
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
@@ -264,7 +264,7 @@ public class AccountApiComponentTest {
 
     var accountResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .personalIdentityNumber(null)
             .email(email)
             .telephoneNumber(null)
@@ -273,7 +273,7 @@ public class AccountApiComponentTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(CreateAccountResponse.class)
+        .expectBody(CreateAccountResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -284,7 +284,7 @@ public class AccountApiComponentTest {
   @Test
   void createAccountWithOptionalsReturnsAccountId() {
 
-    final EcJwkRequest deviceKeyRequest = defaultKeyRequest().build();
+    final EcJwkRequestDto deviceKeyRequest = defaultKeyRequest().build();
     final Jwk deviceKeyDto = toPublicKeyDto(deviceKeyRequest);
 
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
@@ -298,7 +298,7 @@ public class AccountApiComponentTest {
 
     var accountResponse = client.post()
         .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
+        .body(CreateAccountRequestDto.builder()
             .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
             .email(EMAIL)
             .telephoneNumber(PHONE_NUMBER)
@@ -307,7 +307,7 @@ public class AccountApiComponentTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(CreateAccountResponse.class)
+        .expectBody(CreateAccountResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -315,8 +315,8 @@ public class AccountApiComponentTest {
     assertThat(accountResponse.getAccountId()).isNotNull().isEqualTo(ACCOUNT_ID);
   }
 
-  private static EcJwkRequest.Builder defaultKeyRequest() {
-    return EcJwkRequest.builder()
+  private static EcJwkRequestDto.Builder defaultKeyRequest() {
+    return EcJwkRequestDto.builder()
         .kid(KEY_ID)
         .kty("EC")
         .crv("P-256")
@@ -324,7 +324,7 @@ public class AccountApiComponentTest {
         .y("5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40");
   }
 
-  private static Jwk toPublicKeyDto(EcJwkRequest keyRequest) {
+  private static Jwk toPublicKeyDto(EcJwkRequestDto keyRequest) {
     return JwkBuilder.builder()
         .kty(keyRequest.getKty())
         .kid(keyRequest.getKid())
@@ -341,13 +341,13 @@ public class AccountApiComponentTest {
     }
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus) {
 
     assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
   }
 
-  private static void assertProblemDetails(ProblemResponse problemResponse,
+  private static void assertProblemDetails(ProblemResponseDto problemResponse,
       HttpStatus expectedHttpStatus,
       @Nullable String expectedType,
       @Nullable String expectedInvalidParameterProperty) {
@@ -367,7 +367,7 @@ public class AccountApiComponentTest {
       assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
       assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
           .stream()
-          .map(ProblemParameterResponse::getProperty)
+          .map(ProblemParameterResponseDto::getProperty)
           .map(value -> value.orElse(null))
           .filter(Objects::nonNull)
           .toList());

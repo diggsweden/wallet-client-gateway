@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.SessionResponse;
+import se.digg.wallet.gateway.api.v0.model.SessionResponseDto;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
@@ -126,7 +126,7 @@ class AuthControllerIntegrationTest {
         .is2xxSuccessful()
         .expectHeader()
         .exists(SessionConfig.SESSION_HEADER)
-        .expectBody(SessionResponse.class)
+        .expectBody(SessionResponseDto.class)
         .value(sessionResponse -> {
           assertNotNull(sessionResponse);
           assertThat(sessionResponse.getSessionId()).isNotBlank();

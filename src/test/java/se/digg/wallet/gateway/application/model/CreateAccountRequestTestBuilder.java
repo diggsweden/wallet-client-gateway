@@ -4,7 +4,7 @@
 
 package se.digg.wallet.gateway.application.model;
 
-import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountRequestDto;
 
 public class CreateAccountRequestTestBuilder {
 
@@ -12,8 +12,8 @@ public class CreateAccountRequestTestBuilder {
   public static final String EMAIL_ADDRESS = "test.testsson@test.test";
   public static final String TELEPHONE_NUMBER = "0700000000";
 
-  public static CreateAccountRequest.Builder withDefaults() {
-    return CreateAccountRequest.builder()
+  public static CreateAccountRequestDto.Builder withDefaults() {
+    return CreateAccountRequestDto.builder()
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
         .email(EMAIL_ADDRESS)
         .telephoneNumber(TELEPHONE_NUMBER)

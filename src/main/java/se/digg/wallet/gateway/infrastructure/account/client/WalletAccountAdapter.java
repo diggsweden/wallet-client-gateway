@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
-import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
-import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequest;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
+import se.digg.wallet.gateway.client.account.v0.model.AccountResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequestDto;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
@@ -37,14 +37,14 @@ public class WalletAccountAdapter implements AccountPort {
 
   @Override
   public Account getAccount(UUID accountId) {
-    AccountResponse response = accountApi.getAccount(accountId);
+    AccountResponseDto response = accountApi.getAccount(accountId);
     return accountClientMapper.toDomain(response);
   }
 
   @Override
   public Account createAccount(NewAccount newAccount) {
     try {
-      AccountResponse response =
+      AccountResponseDto response =
           accountApi.createAccount(accountClientMapper.toClientRequest(newAccount));
       return accountClientMapper.toDomain(response);
 
@@ -59,7 +59,7 @@ public class WalletAccountAdapter implements AccountPort {
 
   @Override
   public void addWalletKey(Jwk walletKey, String accountId) {
-    EcJwkRequest keyRequest = accountClientMapper.toClientRequest(walletKey);
+    EcJwkRequestDto keyRequest = accountClientMapper.toClientRequest(walletKey);
     UUID id = UUID.fromString(accountId);
     accountApi.addAccountWalletKey(id, keyRequest);
   }
@@ -67,7 +67,7 @@ public class WalletAccountAdapter implements AccountPort {
   @Override
   public void addSecurityEnvelope(SecurityEnvelope securityEnvelope, String accountId) {
     UUID id = UUID.fromString(accountId);
-    SecurityEnvelopeRequest request = accountClientMapper.toClientRequest(securityEnvelope);
+    SecurityEnvelopeRequestDto request = accountClientMapper.toClientRequest(securityEnvelope);
     accountApi.addAccountSecurityEnvelope(id, request);
   }
 
@@ -92,7 +92,7 @@ public class WalletAccountAdapter implements AccountPort {
   @Override
   public void saveHsmClientId(String clientId, String accountId) {
     UUID id = UUID.fromString(accountId);
-    HsmClientIdRequest request = HsmClientIdRequest.builder().clientId(clientId).build();
+    HsmClientIdRequestDto request = HsmClientIdRequestDto.builder().clientId(clientId).build();
     accountApi.addAccountHsmClientId(id, request);
   }
 }

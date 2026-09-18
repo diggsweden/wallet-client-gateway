@@ -30,17 +30,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.wiremock.spring.InjectWireMock;
-import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.api.v0.model.CreateAccountResponseDto;
+import se.digg.wallet.gateway.api.v0.model.ProblemResponseDto;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
 import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
-import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
-import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
+import se.digg.wallet.gateway.client.account.v0.model.AccountRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.AccountResponseDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequestDto;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponseDto;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -161,8 +161,8 @@ class AccountControllerIntegrationTest {
   @Test
   void creatingDuplicateAccountReturnsConflictProblem() {
 
-    var expectedRequest = AccountRequest.builder()
-        .deviceKey(EcJwkRequest.builder()
+    var expectedRequest = AccountRequestDto.builder()
+        .deviceKey(EcJwkRequestDto.builder()
             .kty("KTY")
             .kid(KEY_ID)
             .alg("ALG")
@@ -173,9 +173,9 @@ class AccountControllerIntegrationTest {
             .build())
         .build();
 
-    var expectedResponse = AccountResponse.builder()
+    var expectedResponse = AccountResponseDto.builder()
         .id(ACCOUNT_ID)
-        .deviceKey(EcJwkResponse.builder()
+        .deviceKey(EcJwkResponseDto.builder()
             .kty("KTY").kid(KEY_ID).alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();
@@ -205,7 +205,7 @@ class AccountControllerIntegrationTest {
                     .withHeader("content-type", "application/problem+json")
                     .withBody(
                         objectMapper.writeValueAsString(
-                            ProblemResponse.builder()
+                            ProblemResponseDto.builder()
                                 .status(HttpStatus.CONFLICT.value())
                                 .title(HttpStatus.CONFLICT.getReasonPhrase())
                                 .build())))
@@ -217,7 +217,7 @@ class AccountControllerIntegrationTest {
         .body(expectedRequest)
         .exchange()
         .expectStatus().isCreated()
-        .expectBody(CreateAccountResponse.class)
+        .expectBody(CreateAccountResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -230,7 +230,7 @@ class AccountControllerIntegrationTest {
         .body(expectedRequest)
         .exchange()
         .expectStatus().isEqualTo(HttpStatus.CONFLICT.value())
-        .expectBody(ProblemResponse.class)
+        .expectBody(ProblemResponseDto.class)
         .returnResult()
         .getResponseBody();
 
@@ -250,11 +250,11 @@ class AccountControllerIntegrationTest {
         "x", "X",
         "y", "Y"));
 
-    var expectedResponse = AccountResponse.builder()
+    var expectedResponse = AccountResponseDto.builder()
         .id(generatedAccountId)
         .email(null)
         .phoneNumber(null)
-        .deviceKey(EcJwkResponse.builder()
+        .deviceKey(EcJwkResponseDto.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();
@@ -272,20 +272,20 @@ class AccountControllerIntegrationTest {
   private UUID stubAccountCreation() throws Exception {
     var generatedAccountId = UUID.randomUUID();
 
-    var expectedRequest = AccountRequest.builder()
+    var expectedRequest = AccountRequestDto.builder()
         .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
         .email(EMAIL_ADDRESS)
         .phoneNumber(TELEPHONE_NUMBER)
-        .deviceKey(EcJwkRequest.builder()
+        .deviceKey(EcJwkRequestDto.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();
 
-    var expectedResponse = AccountResponse.builder()
+    var expectedResponse = AccountResponseDto.builder()
         .id(generatedAccountId)
         .email(EMAIL_ADDRESS)
         .phoneNumber(TELEPHONE_NUMBER)
-        .deviceKey(EcJwkResponse.builder()
+        .deviceKey(EcJwkResponseDto.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
         .build();

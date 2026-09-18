@@ -32,7 +32,7 @@ import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequestDto;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -81,7 +81,7 @@ class AccountControllerAuthenticatedIntegrationTest {
 
   @Test
   void testAddWalletKey() throws Exception {
-    var expectedRequest = EcJwkRequest.builder()
+    var expectedRequest = EcJwkRequestDto.builder()
         .kty("KTY").kid("KID").alg("ALG").use("USE")
         .crv("CRV").x("X").y("Y")
         .build();
@@ -102,7 +102,7 @@ class AccountControllerAuthenticatedIntegrationTest {
   @Test
   void returnProblemWithStatus400WhenCreateWalletKeyLacksRequiredKid() throws Exception {
 
-    var emptyKeyRequest = EcJwkRequest.builder()
+    var emptyKeyRequest = EcJwkRequestDto.builder()
         .kid(null)
         .build();
 

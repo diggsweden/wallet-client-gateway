@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import se.digg.wallet.gateway.api.v0.AuthenticationApi;
-import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
-import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
-import se.digg.wallet.gateway.api.v0.model.SessionResponse;
+import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequestDto;
+import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponseDto;
+import se.digg.wallet.gateway.api.v0.model.SessionResponseDto;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.domain.service.AuthService;
@@ -29,17 +29,17 @@ public class AuthenticationController implements AuthenticationApi {
   }
 
   @Override
-  public ResponseEntity<AuthChallengeResponse> initChallenge(String accountId, String keyId) {
+  public ResponseEntity<AuthChallengeResponseDto> initChallenge(String accountId, String keyId) {
     var challenge = authService.initChallenge(accountId, keyId);
-    var response = AuthChallengeResponse.builder()
+    var response = AuthChallengeResponseDto.builder()
         .nonce(challenge.nonce())
         .build();
     return ResponseEntity.ok(response);
   }
 
   @Override
-  public ResponseEntity<SessionResponse> validateChallenge(
-      AuthChallengeRequest authChallengeRequest) {
+  public ResponseEntity<SessionResponseDto> validateChallenge(
+      AuthChallengeRequestDto authChallengeRequest) {
     var challengeRequest = new ValidateAuthChallengeRequestDto(authChallengeRequest.getSignedJwt());
     var validationResult = authService.validateChallenge(challengeRequest);
     if (validationResult.isPresent()) {
@@ -47,7 +47,7 @@ public class AuthenticationController implements AuthenticationApi {
           ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
       createAndSaveSession(req, validationResult.orElseThrow());
       String sessionId = req.getSession(false).getId();
-      var response = SessionResponse.builder()
+      var response = SessionResponseDto.builder()
           .sessionId(sessionId)
           .build();
       return ResponseEntity.ok(response);

@@ -16,7 +16,7 @@ import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
 import se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseDto;
-import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwk;
+import se.digg.wallet.gateway.client.hsm.v1.model.EcPublicJwkDto;
 import se.digg.wallet.gateway.client.hsm.v1.model.NewStateResponseDto;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder;
@@ -64,7 +64,7 @@ public class HsmAdapterTest {
         .devAuthorizationCode(devAuthorizationCode)
         .opaqueServerId(serverId)
         .status(status)
-        .serverJwsPublicKey(EcPublicJwk.builder()
+        .serverJwsPublicKey(EcPublicJwkDto.builder()
             .kid("kid")
             .kty("kty")
             .crv("crv")
@@ -93,7 +93,7 @@ public class HsmAdapterTest {
 
     var hsmResponse = AsyncResponseDto.builder()
         .correlationId(randomId)
-        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatus.COMPLETE)
+        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatusDto.COMPLETE)
         .result("the-result")
         .build();
 
@@ -163,7 +163,7 @@ public class HsmAdapterTest {
     var expectedResult = UUID.randomUUID().toString();
     var hsmResponse = AsyncResponseDto.builder()
         .correlationId(UUID.randomUUID())
-        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatus.COMPLETE)
+        .status(se.digg.wallet.gateway.client.hsm.v1.model.AsyncResponseStatusDto.COMPLETE)
         .result(expectedResult)
         .build();
     when(hsmApi.taskResponse(eq(randomId))).thenReturn(hsmResponse);

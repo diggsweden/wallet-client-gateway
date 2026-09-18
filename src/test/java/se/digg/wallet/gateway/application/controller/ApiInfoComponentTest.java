@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.context.WebApplicationContext;
-import se.digg.wallet.gateway.api.v0.model.ApiInfoResponse;
+import se.digg.wallet.gateway.api.v0.model.ApiInfoResponseDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -35,7 +35,7 @@ class ApiInfoComponentTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(ApiInfoResponse.class)
+        .expectBody(ApiInfoResponseDto.class)
         .returnResult()
         .getResponseBody();
 
