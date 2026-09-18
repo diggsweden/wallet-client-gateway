@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.5
+  version: 0.0.6
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -39,6 +39,8 @@ tags:
     description: Authentication operations
   - name: Wallet Unit Attestation
     description: Wallet Unit Attestation operations
+  - name: Wallet Provider
+    description: Wallet Provider operations
   - name: HSM
     description: Hardware Security Module operations
 
@@ -200,6 +202,7 @@ paths:
 
   /wua:
     post:
+      deprecated: true
       tags:
         - Wallet Unit Attestation
       summary: Request a Wallet Unit Attestation
@@ -222,6 +225,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WuaResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /wallet-provider/v0/key-attestation:
+    post:
+      tags:
+        - Wallet Provider
+      summary: Request a Key Attestation
+      description: |
+        This operation creates a Key Attestation towards the wallet-provider service. It creates a cryptographic proof
+        that the given keys are generated and protected inside a secure hardware or software boundary (HSM)
+        owned by the wallet provider.
+      operationId: createKeyAttestation
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyAttestationRequest'
+        required: true
+      responses:
+        '201':
+          description: Signed Key Attestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyAttestationResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -603,6 +639,31 @@ components:
         - CHANGE_PIN
         - SIGN
         - OTHER
+
+    KeyAttestationRequest:
+      type: object
+      description: Key Attestation request.
+      properties:
+        keys:
+          type: array
+          description: A set of Elliptic Curve JSON Web Keys to be attested.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/EcJwkRequest'
+        nonce:
+          description: Optional. Nonce from the Credential Issuer.
+          type: string
+      required:
+        - keys
+
+    KeyAttestationResponse:
+      type: object
+      properties:
+        jwt:
+          type: string
+          description: The signed Key Attestation as a compact JWT string.
+      required:
+        - jwt
 
     HsmRequest:
       type: object
