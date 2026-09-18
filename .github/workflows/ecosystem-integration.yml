@@ -20,7 +20,10 @@ concurrency:
 
 jobs:
   integration-test:
-    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@6234ba4aeafb2d60438c58c801ec3b771f0240f5 # main
+    # Pinned to a commit for supply-chain safety (an unpinned @main ref would execute
+    # whatever lands upstream, including a compromised commit, with no review gate).
+    # Renovate keeps this current via frequent, CI-gated automerge - see renovate.json.
+    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@c1a771b1a638892b4ebf9b8cde8c8f3c684fffa9 # main
     with:
       service-name: wallet-client-gateway
       service-repo: ${{ github.repository }}

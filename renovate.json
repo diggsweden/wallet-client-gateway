@@ -14,6 +14,11 @@
   ],
   "packageRules": [
     {
+      "description": "Maven dependencies - shorten commit message (long groupId:artifactId coordinates push past commit-lint limits)",
+      "matchManagers": ["maven"],
+      "commitMessageTopic": "{{depName}}"
+    },
+    {
       "description": "Node.js dependencies - Major updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["major"],
@@ -51,6 +56,26 @@
       "description": "Docker images",
       "matchManagers": ["dockerfile", "docker-compose"],
       "addLabels": ["docker", "infrastructure"]
+    },
+    {
+      "description": "wallet-ecosystem action is pinned to a commit for supply-chain safety (not a mutable @main ref). Check for updates on every run instead of only in the weekend schedule window, and require the commit to be at least 1 day old before automerging it - a buffer for something to surface (advisory, revert, CI failure elsewhere) before we adopt it automatically. Automerge is restricted to weekday working hours so a bad merge doesn't land unnoticed overnight or over a weekend.",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["diggsweden/wallet-ecosystem"],
+      "schedule": ["at any time"],
+      "minimumReleaseAge": "1 day",
+      "automerge": true,
+      "automergeSchedule": ["after 8am and before 6pm every weekday"],
+      "timezone": "Europe/Stockholm"
+    },
+    {
+      "description": "chainguard/jre is rebuilt roughly weekly, which can make the org default 7-day minimumReleaseAge race the next rebuild indefinitely. Shorten the buffer to 3 days - still a real delay before adopting a new build automatically - and automerge once satisfied, restricted to weekday working hours.",
+      "matchManagers": ["dockerfile"],
+      "matchPackageNames": ["cgr.dev/chainguard/jre"],
+      "schedule": ["at any time"],
+      "minimumReleaseAge": "3 days",
+      "automerge": true,
+      "automergeSchedule": ["after 8am and before 6pm every weekday"],
+      "timezone": "Europe/Stockholm"
     },
     {
       "description": "Mise dependencies - Major updates",
