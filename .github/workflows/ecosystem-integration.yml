@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   integration-test:
-    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@main
+    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@6234ba4aeafb2d60438c58c801ec3b771f0240f5 # main
     with:
       service-name: wallet-client-gateway
       service-repo: ${{ github.repository }}
