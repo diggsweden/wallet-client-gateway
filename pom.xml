@@ -101,7 +101,7 @@
       embedded in spring-boot-starter-parent 4.0.6 -->
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
-      <version>11.0.22</version>
+      <version>11.0.25</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
