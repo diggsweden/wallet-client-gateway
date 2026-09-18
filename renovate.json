@@ -68,6 +68,16 @@
       "timezone": "Europe/Stockholm"
     },
     {
+      "description": "chainguard/jre is rebuilt roughly weekly, which can make the org default 7-day minimumReleaseAge race the next rebuild indefinitely. Shorten the buffer to 3 days - still a real delay before adopting a new build automatically - and automerge once satisfied, restricted to weekday working hours.",
+      "matchManagers": ["dockerfile"],
+      "matchPackageNames": ["cgr.dev/chainguard/jre"],
+      "schedule": ["at any time"],
+      "minimumReleaseAge": "3 days",
+      "automerge": true,
+      "automergeSchedule": ["after 8am and before 6pm every weekday"],
+      "timezone": "Europe/Stockholm"
+    },
+    {
       "description": "Mise dependencies - Major updates",
       "matchManagers": ["mise"],
       "matchUpdateTypes": ["major"],
