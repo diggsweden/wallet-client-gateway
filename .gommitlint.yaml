@@ -3,5 +3,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 gommitlint:
+  conventional:
+    max_description_length: 100
   crypto_signature:
     required: true

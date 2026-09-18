@@ -14,6 +14,11 @@
   ],
   "packageRules": [
     {
+      "description": "Maven dependencies - shorten commit message (long groupId:artifactId coordinates push past commit-lint limits)",
+      "matchManagers": ["maven"],
+      "commitMessageTopic": "{{depName}}"
+    },
+    {
       "description": "Node.js dependencies - Major updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["major"],
