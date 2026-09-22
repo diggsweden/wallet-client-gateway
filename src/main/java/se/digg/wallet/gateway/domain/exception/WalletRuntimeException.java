@@ -9,4 +9,8 @@ public class WalletRuntimeException extends WalletException {
   public WalletRuntimeException(Throwable cause) {
     super(cause);
   }
+
+  public WalletRuntimeException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }
