@@ -28,8 +28,8 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
-import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
+import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
 import se.digg.wallet.gateway.domain.service.AccountService;
 
 import static org.assertj.core.api.Assertions.assertThat;

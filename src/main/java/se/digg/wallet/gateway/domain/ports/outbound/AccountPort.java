@@ -6,10 +6,10 @@ package se.digg.wallet.gateway.domain.ports.outbound;
 
 import java.util.UUID;
 import se.digg.wallet.gateway.domain.model.account.Account;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 public interface AccountPort {
 

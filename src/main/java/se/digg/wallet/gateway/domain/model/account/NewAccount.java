@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.domain.model.account;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 @RecordBuilder
 public record NewAccount(

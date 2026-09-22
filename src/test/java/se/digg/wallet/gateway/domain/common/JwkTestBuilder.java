@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.account;
+package se.digg.wallet.gateway.domain.common;
 
-import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
+import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
 
 public class JwkTestBuilder {
 

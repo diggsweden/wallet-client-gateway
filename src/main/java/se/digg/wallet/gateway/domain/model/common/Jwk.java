@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.domain.model.account;
+package se.digg.wallet.gateway.domain.model.common;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
 

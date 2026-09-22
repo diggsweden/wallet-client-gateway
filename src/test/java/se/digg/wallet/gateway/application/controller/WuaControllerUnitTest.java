@@ -20,20 +20,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.domain.model.wua.Wua;
-import se.digg.wallet.gateway.domain.service.WuaService;
+import se.digg.wallet.gateway.domain.model.walletprovider.Wua;
+import se.digg.wallet.gateway.domain.service.WalletProviderService;
 
 @ExtendWith(MockitoExtension.class)
 class WuaControllerUnitTest {
 
   @Mock
-  private WuaService wuaService;
+  private WalletProviderService walletProviderService;
 
   private WuaController wuaController;
 
   @BeforeEach
   void setUp() {
-    wuaController = new WuaController(wuaService);
+    wuaController = new WuaController(walletProviderService);
     SecurityContextHolder.setContext(
         SecurityContextHolder.createEmptyContext());
   }
@@ -47,7 +47,7 @@ class WuaControllerUnitTest {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNull();
-    verify(wuaService, never()).createWua(anyString(), anyString());
+    verify(walletProviderService, never()).createWua(anyString(), anyString());
   }
 
   @Test
@@ -61,7 +61,7 @@ class WuaControllerUnitTest {
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNull();
-    verify(wuaService, never()).createWua(anyString(), anyString());
+    verify(walletProviderService, never()).createWua(anyString(), anyString());
   }
 
   @Test
@@ -75,7 +75,7 @@ class WuaControllerUnitTest {
         new ChallengeResponseAuthentication(accountId));
 
     Wua expectedWua = new Wua(expectedJwt);
-    when(wuaService.createWua(accountId, nonce)).thenReturn(expectedWua);
+    when(walletProviderService.createWua(accountId, nonce)).thenReturn(expectedWua);
 
     // Act
     var response = wuaController.createWua(Optional.of(nonce));
@@ -84,7 +84,7 @@ class WuaControllerUnitTest {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     var actualJwt = response.getBody().getJwt();
     assertEquals(expectedJwt, actualJwt);
-    verify(wuaService).createWua(accountId, nonce);
+    verify(walletProviderService).createWua(accountId, nonce);
   }
 
   @Test
@@ -97,7 +97,7 @@ class WuaControllerUnitTest {
         new ChallengeResponseAuthentication(accountId));
 
     Wua expectedWua = new Wua(expectedJwt);
-    when(wuaService.createWua(accountId, "")).thenReturn(expectedWua);
+    when(walletProviderService.createWua(accountId, "")).thenReturn(expectedWua);
 
     // Act
     var response = wuaController.createWua(Optional.empty());
@@ -106,6 +106,6 @@ class WuaControllerUnitTest {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     var actualJwt = response.getBody().getJwt();
     assertEquals(expectedJwt, actualJwt);
-    verify(wuaService).createWua(accountId, "");
+    verify(walletProviderService).createWua(accountId, "");
   }
 }

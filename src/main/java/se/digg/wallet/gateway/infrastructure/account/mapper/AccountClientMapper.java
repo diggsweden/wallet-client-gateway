@@ -8,18 +8,18 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
+import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
 import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
-import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
-import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
+import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
 
 @Component
 public class AccountClientMapper {

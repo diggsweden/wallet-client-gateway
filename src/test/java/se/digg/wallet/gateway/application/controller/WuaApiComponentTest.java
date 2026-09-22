@@ -27,8 +27,8 @@ import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.WuaResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
-import se.digg.wallet.gateway.domain.model.wua.Wua;
-import se.digg.wallet.gateway.domain.service.WuaService;
+import se.digg.wallet.gateway.domain.model.walletprovider.Wua;
+import se.digg.wallet.gateway.domain.service.WalletProviderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +42,7 @@ public class WuaApiComponentTest {
   private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
 
   @MockitoBean
-  private WuaService wuaService;
+  private WalletProviderService walletProviderService;
 
   private RestTestClient client;
 
@@ -91,7 +91,7 @@ public class WuaApiComponentTest {
         HttpStatus.NOT_FOUND,
         HttpStatus.NOT_FOUND.getReasonPhrase(),
         null, null, null);
-    when(wuaService.createWua(any(), any())).thenThrow(restClientResponseException);
+    when(walletProviderService.createWua(any(), any())).thenThrow(restClientResponseException);
 
     ChallengeResponseAuthentication mockAuth = new ChallengeResponseAuthentication(ACCOUNT_ID);
 
@@ -117,7 +117,7 @@ public class WuaApiComponentTest {
         httpStatus,
         httpStatus.getReasonPhrase(),
         null, null, null);
-    when(wuaService.createWua(any(), any())).thenThrow(restClientResponseException);
+    when(walletProviderService.createWua(any(), any())).thenThrow(restClientResponseException);
 
     authenticateByChallenge();
     var problemResponse = client.post()
@@ -137,7 +137,7 @@ public class WuaApiComponentTest {
 
     final var message = "The cause error message";
     var testException = new UnexpectedException(message);
-    when(wuaService.createWua(any(), any())).thenThrow(testException);
+    when(walletProviderService.createWua(any(), any())).thenThrow(testException);
 
     authenticateByChallenge();
     var problemResponse = client.post()
@@ -169,7 +169,7 @@ public class WuaApiComponentTest {
 
     var jwt = "the.response.jwt";
     var wuaDto = new Wua(jwt);
-    when(wuaService.createWua(any(), any())).thenReturn(wuaDto);
+    when(walletProviderService.createWua(any(), any())).thenReturn(wuaDto);
 
     var wuaResponse = client.post()
         .uri("/wua?{0}", queryString)

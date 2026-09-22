@@ -13,7 +13,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.nimbusds.jose.jwk.ECKey;
 import com.redis.testcontainers.RedisContainer;
 
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ import se.digg.wallet.gateway.application.controller.util.AuthUtil;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.controller.util.WalletProviderMock;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

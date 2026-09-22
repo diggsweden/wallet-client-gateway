@@ -13,6 +13,7 @@ import se.digg.wallet.gateway.client.account.v0.model.EcJwkItemsResponse;
 import se.digg.wallet.gateway.client.account.v0.model.EcJwkResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeResponse;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
+import se.digg.wallet.gateway.domain.common.JwkTestBuilder;
 import se.digg.wallet.gateway.domain.model.account.NewAccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper;

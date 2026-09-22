@@ -15,8 +15,8 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.service.AccountService;
 
 @RestController

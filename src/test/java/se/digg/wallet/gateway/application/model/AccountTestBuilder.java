@@ -7,7 +7,7 @@ package se.digg.wallet.gateway.application.model;
 import com.nimbusds.jose.jwk.ECKey;
 import java.util.UUID;
 import se.digg.wallet.gateway.domain.model.account.AccountBuilder;
-import se.digg.wallet.gateway.domain.model.account.JwkBuilder;
+import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
 
 public class AccountTestBuilder {
 
