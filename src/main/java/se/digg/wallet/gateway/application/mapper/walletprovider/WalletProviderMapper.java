@@ -11,7 +11,7 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationResponse;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
-import se.digg.wallet.gateway.domain.model.walletprovider.KeyAttestation;
+import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
 
 @Component
 public class WalletProviderMapper {

@@ -11,14 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.domain.model.walletprovider.KeyAttestation;
-import se.digg.wallet.gateway.domain.model.walletprovider.Wua;
+import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
+import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
 
 @Service
-public class WalletProviderService {
-  private final Logger logger = LoggerFactory.getLogger(WalletProviderService.class);
+public class AttestationService {
+  private final Logger logger = LoggerFactory.getLogger(AttestationService.class);
 
   @Autowired
   private AccountPort accountPort;

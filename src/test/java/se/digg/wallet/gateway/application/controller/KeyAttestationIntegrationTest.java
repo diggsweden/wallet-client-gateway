@@ -106,7 +106,7 @@ public class KeyAttestationIntegrationTest {
         .build();
 
     unauthenticatedClient.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .exchange()
         .expectStatus().isForbidden();
   }
@@ -124,7 +124,7 @@ public class KeyAttestationIntegrationTest {
         .build();
 
     var problemResponse = restClient.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(keyAttestationRequest)
         .exchange()
         .expectStatus()
@@ -153,7 +153,7 @@ public class KeyAttestationIntegrationTest {
         .build();
 
     var keyAttestationResponse = restClient.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(keyAttestationRequest)
         .exchange()
         .expectStatus()

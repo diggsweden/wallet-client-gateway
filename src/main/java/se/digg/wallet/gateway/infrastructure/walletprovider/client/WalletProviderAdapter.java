@@ -16,9 +16,9 @@ import se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationItem;
 import se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationRequest;
 import se.digg.wallet.gateway.client.provider.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.domain.model.walletprovider.KeyAttestation;
-import se.digg.wallet.gateway.domain.model.walletprovider.Wua;
-import se.digg.wallet.gateway.domain.model.walletprovider.WuaBuilder;
+import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
+import se.digg.wallet.gateway.domain.model.attestation.Wua;
+import se.digg.wallet.gateway.domain.model.attestation.WuaBuilder;
 import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
 
 @Component

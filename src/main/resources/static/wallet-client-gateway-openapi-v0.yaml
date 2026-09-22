@@ -39,8 +39,8 @@ tags:
     description: Authentication operations
   - name: Wallet Unit Attestation
     description: Wallet Unit Attestation operations
-  - name: Wallet Provider
-    description: Wallet Provider operations
+  - name: Wallet Attestation
+    description: Wallet Attestation operations
   - name: HSM
     description: Hardware Security Module operations
 
@@ -230,10 +230,10 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
-  /wallet-provider/v0/key-attestations:
+  /attestation/v0/key-attestations:
     post:
       tags:
-        - Wallet Provider
+        - Wallet Attestation
       summary: Request a Key Attestation
       description: |
         This operation creates a Key Attestation towards the wallet-provider service. It creates a cryptographic proof

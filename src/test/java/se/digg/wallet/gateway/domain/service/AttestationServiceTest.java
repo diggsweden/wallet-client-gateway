@@ -16,8 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.domain.common.JwkTestBuilder;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.domain.model.walletprovider.KeyAttestationBuilder;
-import se.digg.wallet.gateway.domain.model.walletprovider.Wua;
+import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
+import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
 
@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class WalletProviderServiceTest {
+class AttestationServiceTest {
 
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
 
@@ -38,7 +38,7 @@ class WalletProviderServiceTest {
   private AccountPort accountPort;
 
   @InjectMocks
-  private WalletProviderService walletProviderService;
+  private AttestationService attestationService;
 
   @Test
   void serves_wallet_unit_attestation() {
@@ -52,7 +52,7 @@ class WalletProviderServiceTest {
         .thenReturn(expectedWua);
 
     // When
-    var actualWuaDto = walletProviderService.createWua(ACCOUNT_ID.toString(), nonce);
+    var actualWuaDto = attestationService.createWua(ACCOUNT_ID.toString(), nonce);
 
     // Then
     assertEquals(expectedWua, actualWuaDto);
@@ -74,7 +74,7 @@ class WalletProviderServiceTest {
     when(walletProviderPort.createKeyAttestation(any(), any())).thenReturn(keyAttestation);
     var keys = List.of(JwkTestBuilder.withDefaults().build());
 
-    var result = walletProviderService.createKeyAttestation(keys, nonce);
+    var result = attestationService.createKeyAttestation(keys, nonce);
 
     assertThat(result).isNotNull();
     assertThat(result.jwt()).isEqualTo(expectedResultJwt);

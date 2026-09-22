@@ -7,8 +7,8 @@ package se.digg.wallet.gateway.domain.ports.outbound;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.domain.model.walletprovider.KeyAttestation;
-import se.digg.wallet.gateway.domain.model.walletprovider.Wua;
+import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
+import se.digg.wallet.gateway.domain.model.attestation.Wua;
 
 public interface WalletProviderPort {
 

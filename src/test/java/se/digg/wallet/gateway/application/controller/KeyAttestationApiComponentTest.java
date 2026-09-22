@@ -29,8 +29,8 @@ import se.digg.wallet.gateway.api.v0.model.KeyAttestationResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
-import se.digg.wallet.gateway.domain.model.walletprovider.KeyAttestationBuilder;
-import se.digg.wallet.gateway.domain.service.WalletProviderService;
+import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
+import se.digg.wallet.gateway.domain.service.AttestationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +46,7 @@ public class KeyAttestationApiComponentTest {
   private static final String JWT = "the.result.jwt";
 
   @MockitoBean
-  private WalletProviderService walletProviderService;
+  private AttestationService attestationService;
 
   private RestTestClient client;
 
@@ -95,11 +95,11 @@ public class KeyAttestationApiComponentTest {
         httpStatus,
         httpStatus.getReasonPhrase(),
         null, null, null);
-    when(walletProviderService.createKeyAttestation(any(), any()))
+    when(attestationService.createKeyAttestation(any(), any()))
         .thenThrow(restClientResponseException);
 
     var problemResponse = client.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(KeyAttestationRequest.builder()
             .keys(List.of(EcJwkRequestTestBuilder.withDefaults().build()))
             .nonce(null)
@@ -120,10 +120,10 @@ public class KeyAttestationApiComponentTest {
 
     final var message = "The cause error message";
     var testException = new KeyAttestationApiComponentTest.UnexpectedException(message);
-    when(walletProviderService.createKeyAttestation(any(), any())).thenThrow(testException);
+    when(attestationService.createKeyAttestation(any(), any())).thenThrow(testException);
 
     var problemResponse = client.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(KeyAttestationRequest.builder()
             .keys(List.of(EcJwkRequestTestBuilder.withDefaults().build()))
             .nonce(null)
@@ -143,7 +143,7 @@ public class KeyAttestationApiComponentTest {
   void informs_client_of_missing_keys_problem(List<EcJwkRequest> invalidKeys) {
 
     var problemResponse = client.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(KeyAttestationRequest.builder()
             .keys(invalidKeys)
             .nonce(null)
@@ -162,11 +162,11 @@ public class KeyAttestationApiComponentTest {
   @MethodSource("validSetOfEcJwkRequests")
   void serves_key_attestation_without_nonce(List<EcJwkRequest> validKeys) {
 
-    when(walletProviderService.createKeyAttestation(any(), any()))
+    when(attestationService.createKeyAttestation(any(), any()))
         .thenReturn(KeyAttestationBuilder.builder().jwt(JWT).build());
 
     var keyAttestationResponse = client.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(KeyAttestationRequest.builder()
             .keys(validKeys)
             .nonce(null)
@@ -186,11 +186,11 @@ public class KeyAttestationApiComponentTest {
   @MethodSource("validSetOfEcJwkRequests")
   void serves_key_attestation_with_nonce(List<EcJwkRequest> validKeys) {
 
-    when(walletProviderService.createKeyAttestation(any(), any()))
+    when(attestationService.createKeyAttestation(any(), any()))
         .thenReturn(KeyAttestationBuilder.builder().jwt(JWT).build());
 
     var keyAttestationResponse = client.post()
-        .uri("/wallet-provider/v0/key-attestations")
+        .uri("/attestation/v0/key-attestations")
         .body(KeyAttestationRequest.builder()
             .keys(validKeys)
             .nonce(NONCE)
