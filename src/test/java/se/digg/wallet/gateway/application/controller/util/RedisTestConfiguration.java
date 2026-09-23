@@ -10,7 +10,7 @@ import org.testcontainers.utility.DockerImageName;
 public abstract class RedisTestConfiguration {
 
   public static RedisContainer redisContainer() {
-    return new RedisContainer(DockerImageName.parse("valkey/valkey:9.0.0-alpine"));
+    return new RedisContainer(DockerImageName.parse("valkey/valkey:9.1.1-alpine"));
   }
 
 }
