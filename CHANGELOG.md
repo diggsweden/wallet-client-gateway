@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.11] - 2026-09-23
+
+### Added
+
+- Add key attestation operation in api-spec (#185)
+- Add account key operations in api-spec (#182)
+
+### Changed
+
+- Update java non-major (#190)
+- Key attestation implementation (#192)
+- Update github actions (#189)
+- Update dependency prettier to v3.9.7 (#188)
+- Update cgr.dev/chainguard/jre:latest docker digest to df582a7 (#45)
+- Pin diggsweden/wallet-ecosystem action to 6234ba4 (#144)
+- Update tomcat-embed-core to v11.0.25 [security] (#180)
+
+### Fixed
+
+- Raise commit description length limit and shorten maven commit (#186)
+- Revoke account key operations in api-spec (#184)
+
 ## [0.6.10] - 2026-09-14
 
 ### Added
@@ -14,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Hsm retry on recoverable failure (#181)
+
 
 ## [0.6.9] - 2026-08-28
 
@@ -714,6 +737,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.11]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.10..v0.6.11
 [0.6.10]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.9..v0.6.10
 [0.6.9]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.8..v0.6.9
 [0.6.8]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.7..v0.6.8
