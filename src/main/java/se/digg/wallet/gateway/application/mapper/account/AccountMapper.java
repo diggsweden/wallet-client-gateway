@@ -9,9 +9,9 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.domain.model.account.Account;
-import se.digg.wallet.gateway.domain.model.account.Jwk;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.NewAccountBuilder;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 @Component
 public class AccountMapper {
