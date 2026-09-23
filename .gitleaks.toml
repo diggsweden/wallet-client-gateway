@@ -93,5 +93,7 @@ regexes = [
     '''INSERT_''',
     '''REPLACE_''',
     '''<.*>''',
-    '''\$\{.*\}'''
+    '''\$\{.*\}''',
+    # openapi-generator-maven-plugin.version in pom.xml, re-flagged on every version bump
+    '''api-generator-maven-plugin'''
 ]

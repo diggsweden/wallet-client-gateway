@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.6</version>
+    <version>4.1.1</version>
     <relativePath />
   </parent>
 
@@ -63,14 +63,14 @@
     
     <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>13.4.1</checkstyle.version>
+    <checkstyle.version>13.11.0</checkstyle.version>
     <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
-    <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.10.4.1</spotbugs-maven-plugin.version>
     <record-builder.version>52</record-builder.version>
-    <openapi-generator-maven-plugin.version>7.21.0</openapi-generator-maven-plugin.version>
-    <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+    <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
+    <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
-    <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
 
 
     <wallet-account-spec.repo>diggsweden/wallet-account</wallet-account-spec.repo>
@@ -101,7 +101,7 @@
       embedded in spring-boot-starter-parent 4.0.6 -->
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
-      <version>11.0.25</version>
+      <version>11.0.26</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -114,7 +114,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>3.0.1</version>
+      <version>3.1.1</version>
     </dependency>
     <dependency>
       <groupId>org.openapitools</groupId>
@@ -129,7 +129,7 @@
     <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>nimbus-jose-jwt</artifactId>
-      <version>10.7</version>
+      <version>10.9.1</version>
     </dependency>
     <dependency>
       <groupId>io.micrometer</groupId>
@@ -181,7 +181,7 @@
     <dependency>
       <groupId>org.wiremock.integrations</groupId>
       <artifactId>wiremock-spring-boot</artifactId>
-      <version>4.0.9</version>
+      <version>4.2.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -234,7 +234,7 @@
           <plugin>
             <groupId>com.googlecode.maven-download-plugin</groupId>
             <artifactId>download-maven-plugin</artifactId>
-            <version>1.9.0</version>
+            <version>1.13.0</version>
             <executions>
               <execution>
                 <id>fetch-wallet-account-spec</id>
@@ -292,7 +292,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.4</version>
+        <version>3.6.0</version>
       </plugin>
 
       <!-- JaCoCo plugin -->
