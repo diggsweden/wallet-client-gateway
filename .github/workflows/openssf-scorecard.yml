@@ -21,6 +21,8 @@ jobs:
       security-events: write
       id-token: write
     uses: diggsweden/reusable-ci/.github/workflows/security-openssf-scorecard.yml@617cb32268cb6aefdfa4117b4159d37e3b47d7b3 # v2.8.3
-    secrets: inherit # SARIF_UPLOAD_TOKEN for uploading results to Code Scanning
+    # SARIF_UPLOAD_TOKEN is needed for the Code Scanning upload, but the reusable workflow
+    # does not declare it under workflow_call.secrets, so it cannot be passed explicitly.
+    secrets: inherit # nosemgrep: yaml.github-actions.security.secrets-inherit.secrets-inherit
     with:
       publish-results: true
