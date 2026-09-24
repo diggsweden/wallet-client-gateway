@@ -71,6 +71,7 @@ public class HsmMapper {
     return RegisterStateResponse.builder()
         .serverJwsPublicKey(serverJwsPublicKeyResponse)
         .status(result.status())
+        .clientId(result.clientId())
         .opaqueServerId(result.opaqueServerId())
         .devAuthorizationCode(result.devAuthorizationCode())
         .build();
