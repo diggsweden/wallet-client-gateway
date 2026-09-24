@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 SPDX-License-Identifier: CC0-1.0
 -->
 <FindBugsFilter>
-    <!-- Accepting mutable fields such as an injected RedisTemplate in component clasees -->
+    <!-- Accepting mutable fields such as an injected RedisTemplate in component classes -->
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
         <Class name="se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache"/>
@@ -24,6 +24,22 @@ SPDX-License-Identifier: CC0-1.0
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
         <Class name="se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter"/>
+    </Match>
+
+    <!-- Accepting constructor to throw exception -->
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+        <Class name="se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication"/>
+    </Match>
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+        <Class name="se.digg.wallet.gateway.application.config.SecurityConfig"/>
+    </Match>
+
+    <!-- Accepting null pointer on some path from return value -->
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+        <Class name="se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper"/>
     </Match>
 
     <!-- Accept expose of internal representations and mutable fields in request and response model classes
