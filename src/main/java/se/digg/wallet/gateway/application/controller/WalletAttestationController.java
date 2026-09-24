@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.WalletAttestationApi;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationResponse;
+import se.digg.wallet.gateway.api.v0.model.WalletInstanceAttestationRequest;
+import se.digg.wallet.gateway.api.v0.model.WalletInstanceAttestationResponse;
 import se.digg.wallet.gateway.application.mapper.walletprovider.WalletProviderMapper;
 import se.digg.wallet.gateway.domain.service.AttestationService;
 
@@ -33,5 +35,12 @@ public class WalletAttestationController implements WalletAttestationApi {
     var response = mapper.toResponse(keyAttestation);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  @Override
+  public ResponseEntity<WalletInstanceAttestationResponse> createWalletInstanceAttestation(
+      WalletInstanceAttestationRequest walletInstanceAttestationRequest) {
+
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 }

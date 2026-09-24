@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.7
+  version: 0.0.8
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -236,9 +236,8 @@ paths:
         - Wallet Attestation
       summary: Request a Key Attestation
       description: |
-        This operation creates a Key Attestation towards the wallet-provider service. It creates a cryptographic proof
-        that the given keys are generated and protected inside a secure hardware or software boundary (HSM)
-        owned by the wallet provider.
+        This operation issues a Key Attestation. A cryptographic proof that given keys are generated and protected
+        inside a secure hardware or software boundary (HSM) owned by the wallet provider.
       operationId: createKeyAttestation
       parameters:
         - $ref: '#/components/parameters/Wallet-Device-OS'
@@ -258,6 +257,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KeyAttestationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /attestation/v0/wallet-instance-attestations:
+    post:
+      tags:
+        - Wallet Attestation
+      summary: Request a Wallet Instance Attestation
+      description: |
+        This operation issues a Wallet Instance Attestation as a cryptographic proof. The wallet can then present
+        this WIA to external PID Providers to prove it is a legitimate, untampered, and compliant EUDI wallet instance
+        before pulling down citizens' identities.
+      operationId: createWalletInstanceAttestation
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletInstanceAttestationRequest'
+        required: true
+      responses:
+        '201':
+          description: Signed Wallet Instance Attestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletInstanceAttestationResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -662,6 +694,27 @@ components:
         jwt:
           type: string
           description: The signed Key Attestation as a compact JWT string.
+      required:
+        - jwt
+
+    WalletInstanceAttestationRequest:
+      type: object
+      description: Wallet Instance Attestation request.
+      properties:
+        key:
+          $ref: '#/components/schemas/EcJwkRequest'
+        nonce:
+          description: Optional. Nonce from the Credential Issuer.
+          type: string
+      required:
+        - key
+
+    WalletInstanceAttestationResponse:
+      type: object
+      properties:
+        jwt:
+          type: string
+          description: The signed Wallet Instance Attestation as a compact JWT string.
       required:
         - jwt
 
