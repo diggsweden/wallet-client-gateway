@@ -723,8 +723,6 @@ components:
       properties:
         status:
           type: string
-        clientId:
-          type: string
         devAuthorizationCode:
           type: string
         serverJwsPublicKey:
