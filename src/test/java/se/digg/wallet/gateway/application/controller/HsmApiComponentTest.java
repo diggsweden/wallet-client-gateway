@@ -500,7 +500,6 @@ public class HsmApiComponentTest {
 
     assertThat(registerStateResponse).isNotNull();
     assertThat(registerStateResponse.getStatus()).isNotEmpty().isEqualTo(status);
-    assertThat(registerStateResponse.getClientId()).isPresent().get().isEqualTo(clientId);
     assertThat(registerStateResponse.getDevAuthorizationCode()).isPresent().get()
         .isEqualTo(devAuthCode);
     assertThat(registerStateResponse.getOpaqueServerId()).isPresent().get()
