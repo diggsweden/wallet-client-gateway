@@ -4,7 +4,6 @@
 
 [settings]
 experimental = true
-paranoid = true
 
 [env]
 HTTP_PROXY = "{{ get_env(name='HTTP_PROXY', default='') }}"
