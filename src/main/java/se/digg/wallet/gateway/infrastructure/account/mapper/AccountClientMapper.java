@@ -4,7 +4,9 @@
 
 package se.digg.wallet.gateway.infrastructure.account.mapper;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
@@ -50,11 +52,11 @@ public class AccountClientMapper {
   }
 
   public SecurityEnvelopes toDomain(SecurityEnvelopesResponse response) {
-    List<SecurityEnvelope> items = response.getItems() == null
-        ? List.of()
-        : response.getItems().stream()
-            .map(e -> new SecurityEnvelope(e.getContent()))
-            .toList();
+    var responseItems = response.getItems();
+    List<SecurityEnvelope> items = Stream.ofNullable(responseItems)
+        .flatMap(Collection::stream)
+        .map(responseItem -> new SecurityEnvelope(responseItem.getContent()))
+        .toList();
     return new SecurityEnvelopes(items);
   }
 
@@ -81,9 +83,11 @@ public class AccountClientMapper {
   }
 
   public Jwk toDomainJwk(EcJwkItemsResponse response) {
-    if (response.getItems() == null || response.getItems().isEmpty()) {
-      throw new IllegalStateException("No wallet key found for account");
-    }
-    return toDomain(response.getItems().getFirst());
+    var keysResponse = response.getItems();
+    return Stream.ofNullable(keysResponse)
+        .flatMap(Collection::stream)
+        .findFirst()
+        .map(this::toDomain)
+        .orElseThrow(() -> new IllegalStateException("No wallet key found for account"));
   }
 }
