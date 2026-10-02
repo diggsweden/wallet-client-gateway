@@ -67,13 +67,7 @@ paths:
       tags:
         - Client config
       summary: Get client configuration
-      description: |
-        Get remote configuration for the calling client: whether to reset its local cache and which
-        features are enabled. Values may be targeted on the Wallet-Device-* and Wallet-App-Version
-        headers.
-
-        Responses carry an ETag. Clients should send it back in If-None-Match to get an empty 304
-        when the configuration is unchanged.
+      description: Get cache generation and enabled features, targeted on the Wallet-* headers.
       operationId: getClientConfig
       security:
         - ApiKeyScheme: []
@@ -84,7 +78,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-App-Version'
         - name: If-None-Match
           in: header
-          description: ETag from a previous response. Returns 304 if the configuration is unchanged.
+          description: ETag from a previous response.
           required: false
           schema:
             type: string
@@ -94,12 +88,10 @@ paths:
           description: Client configuration
           headers:
             ETag:
-              description: Identifies this version of the configuration.
               schema:
                 type: string
                 example: '"0a1b2c3d4e5f"'
             Cache-Control:
-              description: How long the client may cache this configuration.
               schema:
                 type: string
                 example: 'max-age=300'
@@ -108,7 +100,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClientConfigResponse'
         '304':
-          description: Configuration unchanged since the ETag given in If-None-Match.
+          description: Not modified
         'default':
           $ref: '#/components/responses/default'
 
@@ -544,15 +536,13 @@ components:
       type: object
       properties:
         cacheGeneration:
-          description: |
-            Generation of the client's local cache. Clients store the last value they have seen and
-            must reset their local cache when this value is greater. Starts at 0.
+          description: Clients reset their local cache when this is greater than the last value seen.
           type: integer
           format: int32
           minimum: 0
           example: 3
         features:
-          description: Enabled state per client feature, keyed by feature name.
+          description: Enabled state per feature name.
           type: object
           additionalProperties:
             type: boolean
