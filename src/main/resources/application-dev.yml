@@ -9,6 +9,8 @@ spring:
       file: ./docker-compose/docker-compose.yml
 
 properties:
+  feature-flags:
+    file-path: ./docker-compose/feature-flags.json
   logging-filter:
     enabled: true
     max-payload-length: 1000

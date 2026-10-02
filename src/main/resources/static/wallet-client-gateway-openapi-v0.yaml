@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.8
+  version: 0.0.9
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -33,6 +33,8 @@ security:
 tags:
   - name: API-info
     description: Information about the API
+  - name: Client config
+    description: Remote configuration for wallet clients
   - name: Account
     description: Account operations
   - name: Authentication
@@ -59,6 +61,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiInfoResponse'
+
+  /v0/client-config:
+    get:
+      tags:
+        - Client config
+      summary: Get client configuration
+      description: Get cache generation and enabled features, targeted on the Wallet-* headers.
+      operationId: getClientConfig
+      security:
+        - ApiKeyScheme: []
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+        - name: If-None-Match
+          in: header
+          description: ETag from a previous response.
+          required: false
+          schema:
+            type: string
+            example: '"0a1b2c3d4e5f"'
+      responses:
+        '200':
+          description: Client configuration
+          headers:
+            ETag:
+              schema:
+                type: string
+                example: '"0a1b2c3d4e5f"'
+            Cache-Control:
+              schema:
+                type: string
+                example: 'max-age=300'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientConfigResponse'
+        '304':
+          description: Not modified
+        'default':
+          $ref: '#/components/responses/default'
 
   /v0/accounts:
     post:
@@ -487,6 +531,26 @@ components:
         - version
         - releaseDate
         - status
+
+    ClientConfigResponse:
+      type: object
+      properties:
+        cacheGeneration:
+          description: Clients reset their local cache when this is greater than the last value seen.
+          type: integer
+          format: int32
+          minimum: 0
+          example: 3
+        features:
+          description: Enabled state per feature name.
+          type: object
+          additionalProperties:
+            type: boolean
+          example:
+            example: false
+      required:
+        - cacheGeneration
+        - features
 
     ProblemResponse:
       type: object
