@@ -19,6 +19,7 @@ properties:
   # Paths that require a valid API key (but not challenge-response auth)
   api-key-paths:
     - "/v0/accounts"
+    - "/v0/client-config"
   walletprovider:
     baseurl: http://
   walletaccount:
@@ -27,6 +28,13 @@ properties:
     baseurl: http://
   challenge-cache:
     ttl-seconds: 30
+  # flagd flag definition file, polled for changes (mount e.g. a ConfigMap here)
+  feature-flags:
+    file-path: /etc/wallet-client-gateway/feature-flags.json
+  client-config:
+    cache-max-age: 5m
+    # Only these features are evaluated (as client.feature.<name>) and returned to clients
+    features: []
   logging-filter:
     enabled: true
     max-payload-length: 10000

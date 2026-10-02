@@ -132,6 +132,16 @@
       <version>10.10</version>
     </dependency>
     <dependency>
+      <groupId>dev.openfeature</groupId>
+      <artifactId>sdk</artifactId>
+      <version>1.23.0</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.openfeature.contrib.providers</groupId>
+      <artifactId>flagd</artifactId>
+      <version>0.14.2</version>
+    </dependency>
+    <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-tracing-bridge-brave</artifactId>
     </dependency>
@@ -438,7 +448,7 @@
                 <generateBuilders>true</generateBuilders>
                 <useOptional>true</useOptional>
                 <includeHttpRequestContext>false</includeHttpRequestContext>
-                <implicitHeadersRegex>^(Wallet-Device-OS|Wallet-Device-OS-Version|Wallet-Device-Model|Wallet-App-Version)$</implicitHeadersRegex>
+                <implicitHeadersRegex>^(Wallet-Device-OS|Wallet-Device-OS-Version|Wallet-Device-Model|Wallet-App-Version|If-None-Match)$</implicitHeadersRegex>
               </configOptions>
             </configuration>
           </execution>

@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.8
+  version: 0.0.9
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -33,6 +33,8 @@ security:
 tags:
   - name: API-info
     description: Information about the API
+  - name: Client config
+    description: Remote configuration for wallet clients
   - name: Account
     description: Account operations
   - name: Authentication
@@ -59,6 +61,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiInfoResponse'
+
+  /v0/client-config:
+    get:
+      tags:
+        - Client config
+      summary: Get client configuration
+      description: |
+        Get remote configuration for the calling client: whether to reset its local cache and which
+        features are enabled. Values may be targeted on the Wallet-Device-* and Wallet-App-Version
+        headers.
+
+        Responses carry an ETag. Clients should send it back in If-None-Match to get an empty 304
+        when the configuration is unchanged.
+      operationId: getClientConfig
+      security:
+        - ApiKeyScheme: []
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+        - name: If-None-Match
+          in: header
+          description: ETag from a previous response. Returns 304 if the configuration is unchanged.
+          required: false
+          schema:
+            type: string
+            example: '"0a1b2c3d4e5f"'
+      responses:
+        '200':
+          description: Client configuration
+          headers:
+            ETag:
+              description: Identifies this version of the configuration.
+              schema:
+                type: string
+                example: '"0a1b2c3d4e5f"'
+            Cache-Control:
+              description: How long the client may cache this configuration.
+              schema:
+                type: string
+                example: 'max-age=300'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientConfigResponse'
+        '304':
+          description: Configuration unchanged since the ETag given in If-None-Match.
+        'default':
+          $ref: '#/components/responses/default'
 
   /v0/accounts:
     post:
@@ -487,6 +539,28 @@ components:
         - version
         - releaseDate
         - status
+
+    ClientConfigResponse:
+      type: object
+      properties:
+        cacheGeneration:
+          description: |
+            Generation of the client's local cache. Clients store the last value they have seen and
+            must reset their local cache when this value is greater. Starts at 0.
+          type: integer
+          format: int32
+          minimum: 0
+          example: 3
+        features:
+          description: Enabled state per client feature, keyed by feature name.
+          type: object
+          additionalProperties:
+            type: boolean
+          example:
+            example: false
+      required:
+        - cacheGeneration
+        - features
 
     ProblemResponse:
       type: object
