@@ -23,7 +23,7 @@ jobs:
     # Pinned to a commit for supply-chain safety (an unpinned @main ref would execute
     # whatever lands upstream, including a compromised commit, with no review gate).
     # Renovate keeps this current via frequent, CI-gated automerge - see renovate.json.
-    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@c1a771b1a638892b4ebf9b8cde8c8f3c684fffa9 # main
+    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@20de1ba5b579f68a79f09691c6f54e0110a26186 # main
     with:
       service-name: wallet-client-gateway
       service-repo: ${{ github.repository }}
