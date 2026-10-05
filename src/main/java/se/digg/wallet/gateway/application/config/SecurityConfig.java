@@ -8,7 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
-import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,12 +25,14 @@ import org.springframework.security.config.annotation.web.configurers.RequestCac
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+  private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
   public static final String API_KEY_HEADER = "X-API-KEY";
 
   private final byte[] apiSecret;
@@ -38,9 +41,13 @@ public class SecurityConfig {
   private final List<String> apiKeyPaths;
   private final AntPathMatcher pathMatcher;
 
-  public SecurityConfig(
-      ApplicationConfig applicationConfig) {
-    this.apiSecret = toBytes(Objects.requireNonNull(applicationConfig.apisecret()));
+  public SecurityConfig(ApplicationConfig applicationConfig) {
+    var apiSecret = applicationConfig.apisecret();
+    if (!StringUtils.hasLength(apiSecret)) {
+      logger.warn("apisecret is empty or not set, please check configuration settings");
+    }
+
+    this.apiSecret = toBytes(apiSecret);
     this.oldApiSecret = toBytes(applicationConfig.oldapisecret());
     this.publicPaths = applicationConfig.publicPaths();
     this.apiKeyPaths = applicationConfig.apiKeyPaths();

@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.application.auth;
 
+import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +18,9 @@ public class ChallengeResponseAuthentication extends AbstractAuthenticationToken
   /* digg account id */
   private final String accountId;
 
-  public ChallengeResponseAuthentication(String accountId) {
+  public ChallengeResponseAuthentication(@NotNull String accountId) {
     super(List.of());
-    this.accountId = Objects.requireNonNull(accountId);
+    this.accountId = accountId;
     setAuthenticated(true);
   }
 
