@@ -102,25 +102,6 @@ When making changes to the API-specification, backward compatibility is crucial 
 > **_Important!_**
 > If breaking the API backwards compatibility, a new major version of the API-specification must be implemented.
 
-This project utilizes the tool [openapi-diff](https://github.com/OpenAPITools/openapi-diff) configured as a
-maven plugin. On `mvn test` the API-specification in the project (newSpec) is compared with the current
-(oldSpec) preferably from production/sandbox. An error will be thrown if the backwards compatibility
-is broken.
-
-Configuration parameters with the openapi-diff-maven plugin in pom.xml:
-
-| Configuration parameter | Description                                                                               |
-|-------------------------|-------------------------------------------------------------------------------------------|
-| oldSpec                 | Path to the reference API-specification (production/sandbox).                             |
-| newSpec                 | Path to the project API-specification.                                                    |
-| failOnIncompatible      | true = fail only if API changes broke backward compatibility.                             |
-| failOnChanged           | true = fail if API changed but is backward compatible. Should preferably be set to false. |
-| consoleOutputFileName   | File path for console output.                                                             |
-| jsonOutputFileName      | File path for json output.                                                                |
-| markdownOutputFileName  | File path for markdown output.                                                            |
-
-Any detected changes will be presented in the configured output files.
-
 ## Contributing
 
 Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting any contributions.
