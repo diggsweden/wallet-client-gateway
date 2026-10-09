@@ -56,6 +56,10 @@ Target directory for generated sources (java classes):
 
 The plugins used with the openapi-generator along with configuration is defined in pom.xml.
 
+The client config `features` object only contains client-visible boolean switches. More complex
+feature-flag values are evaluated by the backend and exposed through explicit response fields when
+needed, such as `cacheGeneration` or `maintenance`.
+
 ### Utilize REST API-profile linter
 
 The API should be compliant with the REST API-profile on an acceptable level. To highlight any compliance issues,

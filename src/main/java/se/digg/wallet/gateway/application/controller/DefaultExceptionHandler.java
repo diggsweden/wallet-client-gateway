@@ -41,6 +41,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
+import se.digg.wallet.gateway.domain.exception.UnavailableDueToMaintenanceException;
 
 @RestControllerAdvice
 public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
@@ -219,6 +220,19 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     logWarn("Account already exists", method, path, e);
     return createResponseEntity(problemResponse);
+  }
+
+  @ExceptionHandler(UnavailableDueToMaintenanceException.class)
+  public ResponseEntity<ProblemDetail> handleUnavailableDueToMaintenanceException(
+      UnavailableDueToMaintenanceException e) {
+
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+
+    logWarn("Service under maintenance", method, path, e);
+    return ResponseEntity.status(e.getStatusCode())
+        .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+        .body(e.getBody());
   }
 
   /*
