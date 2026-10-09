@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.controller;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 
 import java.net.URI;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,12 @@ public enum ProblemType {
       "Resource already exists",
       URI.create("/problem-details/resource-already-exists"),
       "A resource with the same unique identifier already exists."),
+
+  MAINTENANCE(
+      SERVICE_UNAVAILABLE,
+      "Service under maintenance",
+      URI.create("/problem-details/maintenance"),
+      "The service is unavailable during a planned maintenance window."),
 
   INTERNAL(
       INTERNAL_SERVER_ERROR,

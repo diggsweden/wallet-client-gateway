@@ -104,6 +104,27 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
+  /util/v0/maintenance-windows:
+    get:
+      tags:
+        - Client Utils
+      summary: Get maintenance window
+      description: Get the upcoming or active maintenance window, if one is planned.
+      operationId: getMaintenanceWindow
+      security:
+        - ApiKeyScheme: []
+      responses:
+        '200':
+          description: Upcoming or active maintenance window
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceWindow'
+        '204':
+          description: No maintenance window is planned
+        'default':
+          $ref: '#/components/responses/default'
+
   /v0/accounts:
     post:
       tags:
@@ -548,9 +569,32 @@ components:
             type: boolean
           example:
             example: false
+        maintenance:
+          $ref: '#/components/schemas/MaintenanceWindow'
       required:
         - cacheGeneration
         - features
+
+    MaintenanceWindow:
+      description: Upcoming or active maintenance. Null when none is planned.
+      type: object
+      required:
+        - active
+      properties:
+        startsAt:
+          description: Null when maintenance was switched on without a planned window.
+          type: string
+          format: date-time
+          example: '2026-10-03T20:00:00Z'
+        endsAt:
+          description: Expected end. Null when unknown.
+          type: string
+          format: date-time
+          example: '2026-10-03T22:00:00Z'
+        active:
+          description: Whether the window is active according to the server clock.
+          type: boolean
+          example: false
 
     ProblemResponse:
       type: object

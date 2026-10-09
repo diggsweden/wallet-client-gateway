@@ -33,6 +33,11 @@ public class OpenFeatureAdapter implements FeatureFlagPort {
     return client.getIntegerValue(key, defaultValue, toEvaluationContext(context));
   }
 
+  @Override
+  public String getString(String key, String defaultValue, ClientContext context) {
+    return client.getStringValue(key, defaultValue, toEvaluationContext(context));
+  }
+
   static EvaluationContext toEvaluationContext(ClientContext context) {
     var result = new MutableContext();
     putIfPresent(result, ClientContext.OS_ATTRIBUTE, context.os());

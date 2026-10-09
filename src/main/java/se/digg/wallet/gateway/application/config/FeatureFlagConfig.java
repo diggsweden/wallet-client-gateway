@@ -9,15 +9,14 @@ import dev.openfeature.contrib.providers.flagd.FlagdOptions;
 import dev.openfeature.contrib.providers.flagd.FlagdProvider;
 import dev.openfeature.sdk.OpenFeatureAPI;
 import dev.openfeature.sdk.exceptions.OpenFeatureError;
+import java.time.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.ShallowEtagHeaderFilter;
-import se.digg.wallet.gateway.api.v0.ClientUtilsApi;
 import se.digg.wallet.gateway.domain.ports.outbound.FeatureFlagPort;
 import se.digg.wallet.gateway.domain.service.ClientConfigService;
+import se.digg.wallet.gateway.domain.service.MaintenanceService;
 import se.digg.wallet.gateway.infrastructure.featureflag.OpenFeatureAdapter;
 
 /**
@@ -55,20 +54,16 @@ public class FeatureFlagConfig {
   }
 
   @Bean
-  public ClientConfigService clientConfigService(
-      FeatureFlagPort featureFlagPort, ApplicationConfig applicationConfig) {
-    return new ClientConfigService(
-        featureFlagPort, applicationConfig.clientConfig().features());
+  public MaintenanceService maintenanceService(FeatureFlagPort featureFlagPort) {
+    return new MaintenanceService(featureFlagPort, Clock.systemUTC());
   }
 
-  /**
-   * Lets clients revalidate the client config cheaply: a request with a matching If-None-Match gets
-   * an empty 304. Runs after Spring Security, so unauthorized requests are still rejected.
-   */
   @Bean
-  public FilterRegistrationBean<ShallowEtagHeaderFilter> clientConfigEtagFilter() {
-    var registration = new FilterRegistrationBean<>(new ShallowEtagHeaderFilter());
-    registration.addUrlPatterns(ClientUtilsApi.PATH_GET_CLIENT_CONFIG);
-    return registration;
+  public ClientConfigService clientConfigService(
+      FeatureFlagPort featureFlagPort,
+      MaintenanceService maintenanceService,
+      ApplicationConfig applicationConfig) {
+    return new ClientConfigService(
+        featureFlagPort, maintenanceService, applicationConfig.clientConfig().features());
   }
 }

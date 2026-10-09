@@ -22,6 +22,7 @@ properties:
   api-key-paths:
     - "/v0/accounts"
     - "/util/v0/client-configs"
+    - "/util/v0/maintenance-windows"
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port:0}
   walletaccount:
@@ -37,6 +38,13 @@ properties:
     features:
       - example
       - unset-feature
+
+  maintenance:
+    # Served during a maintenance window; everything else gets 503 with Retry-After
+    allowed-paths:
+      - "/actuator/**"
+      - "/util/v0/client-configs"
+      - "/util/v0/maintenance-windows"
 
   logging-filter:
     enabled: true

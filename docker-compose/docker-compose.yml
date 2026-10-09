@@ -5,7 +5,7 @@ services:
   valkey:
     image: valkey/valkey:9.1.2@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
     ports:
-      - "6379:6379"
+      - "${VALKEY_PORT:-6380}:6379"
     networks:
       - wallet-network
 
