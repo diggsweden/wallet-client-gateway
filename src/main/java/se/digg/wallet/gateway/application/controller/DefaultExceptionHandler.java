@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
+import static se.digg.wallet.gateway.application.controller.ProblemType.MAINTENANCE;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
 import static se.digg.wallet.gateway.application.controller.ProblemType.RESOURCE_ALREADY_EXISTS;
@@ -223,16 +224,19 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(UnavailableDueToMaintenanceException.class)
-  public ResponseEntity<ProblemDetail> handleUnavailableDueToMaintenanceException(
-      UnavailableDueToMaintenanceException e) {
+  public ResponseEntity<Object> handleUnavailableDueToMaintenanceException(
+      UnavailableDueToMaintenanceException e,
+      HttpServletRequest request) {
 
-    var method = httpServletRequest.getMethod();
-    var path = httpServletRequest.getServletPath();
+    var method = request.getMethod();
+    var path = request.getServletPath();
+    var problemResponse = buildProblemResponse(MAINTENANCE)
+        .detail(MAINTENANCE.getDescription())
+        .instance(path)
+        .build();
 
     logWarn("Service under maintenance", method, path, e);
-    return ResponseEntity.status(e.getStatusCode())
-        .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-        .body(e.getBody());
+    return createResponseEntity(problemResponse);
   }
 
   /*
