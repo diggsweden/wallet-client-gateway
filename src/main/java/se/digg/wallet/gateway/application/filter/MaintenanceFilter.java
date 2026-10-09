@@ -4,8 +4,6 @@
 
 package se.digg.wallet.gateway.application.filter;
 
-import static se.digg.wallet.gateway.application.controller.ProblemType.MAINTENANCE;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -74,7 +72,6 @@ public class MaintenanceFilter extends OncePerRequestFilter {
       return;
     }
 
-    response.setStatus(MAINTENANCE.getHttpStatus().value());
     maintenanceService.retryAfterSeconds(active.get())
         .ifPresent(seconds -> response.setHeader(HttpHeaders.RETRY_AFTER, seconds.toString()));
     response.setHeader(HttpHeaders.CACHE_CONTROL, CacheControl.noStore().getHeaderValue());
