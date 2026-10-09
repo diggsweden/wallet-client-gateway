@@ -24,7 +24,8 @@ public record ApplicationConfig(
     @NotNull ChallengeCache challengeCache,
     @NotNull WalletR2ps walletR2ps,
     @NotNull FeatureFlags featureFlags,
-    @NotNull ClientConfig clientConfig) {
+    @NotNull ClientConfig clientConfig,
+    @NotNull Maintenance maintenance) {
 
   public ApplicationConfig {
     publicPaths = List.copyOf(publicPaths);
@@ -63,6 +64,16 @@ public record ApplicationConfig(
   public record ClientConfig(@NotNull Duration cacheMaxAge, List<String> features) {
     public ClientConfig {
       features = features == null ? List.of() : List.copyOf(features);
+    }
+  }
+
+  /**
+   * @param allowedPaths paths still served during a maintenance window, so clients can read the
+   *        window from the client config and probes keep working
+   */
+  public record Maintenance(@NotEmpty List<String> allowedPaths) {
+    public Maintenance {
+      allowedPaths = List.copyOf(allowedPaths);
     }
   }
 

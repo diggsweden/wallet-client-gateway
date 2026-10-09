@@ -3,8 +3,25 @@
   "flags": {
     "client.cache-generation": {
       "state": "ENABLED",
-      "variants": { "current": 0 },
+      "variants": { "current": 3 },
       "defaultVariant": "current"
+    },
+    "client.feature.example": {
+      "state": "ENABLED",
+      "variants": { "on": true, "off": false },
+      "defaultVariant": "off",
+      "targeting": {
+        "if": [
+          {
+            "and": [
+              { "==": [{ "var": "os" }, "Android"] },
+              { "sem_ver": [{ "var": "appVersion" }, ">=", "2.0.0"] }
+            ]
+          },
+          "on",
+          "off"
+        ]
+      }
     }
   }
 }

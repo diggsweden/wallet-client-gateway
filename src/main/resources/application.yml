@@ -20,6 +20,7 @@ properties:
   api-key-paths:
     - "/v0/accounts"
     - "/util/v0/client-configs"
+    - "/util/v0/maintenance-windows"
   walletprovider:
     baseurl: http://
   walletaccount:
@@ -35,6 +36,12 @@ properties:
     cache-max-age: 5m
     # Only these features are evaluated (as client.feature.<name>) and returned to clients
     features: []
+  maintenance:
+    # Served during a maintenance window; everything else gets 503 with Retry-After
+    allowed-paths:
+      - "/actuator/**"
+      - "/util/v0/client-configs"
+      - "/util/v0/maintenance-windows"
   logging-filter:
     enabled: true
     max-payload-length: 10000

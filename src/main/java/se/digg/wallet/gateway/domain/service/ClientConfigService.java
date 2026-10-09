@@ -26,18 +26,24 @@ public class ClientConfigService {
   private final Logger logger = LoggerFactory.getLogger(ClientConfigService.class);
 
   private final FeatureFlagPort featureFlagPort;
+  private final MaintenanceService maintenanceService;
   private final List<String> features;
 
   /**
    * @param features the feature names exposed to clients; only these are evaluated and returned
    */
-  public ClientConfigService(FeatureFlagPort featureFlagPort, List<String> features) {
+  public ClientConfigService(
+      FeatureFlagPort featureFlagPort,
+      MaintenanceService maintenanceService,
+      List<String> features) {
     this.featureFlagPort = featureFlagPort;
+    this.maintenanceService = maintenanceService;
     this.features = List.copyOf(features);
   }
 
   public ClientConfig getClientConfig(ClientContext context) {
-    return new ClientConfig(cacheGeneration(context), evaluatedFeatures(context));
+    return new ClientConfig(cacheGeneration(context), evaluatedFeatures(context),
+        maintenanceService.status().orElse(null));
   }
 
   /**
