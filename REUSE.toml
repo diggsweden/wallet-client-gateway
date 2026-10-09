@@ -26,6 +26,15 @@ SPDX-License-Identifier = "CC0-1.0"
 
 [[annotations]]
 path = [
+  "docker-compose/feature-flags.json",
+  "src/test/resources/feature-flags.json",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Digg - Agency for Digital Government"
+SPDX-License-Identifier = "EUPL-1.2"
+
+[[annotations]]
+path = [
   "GOVERNANCE.md",
 ]
 precedence = "aggregate"
