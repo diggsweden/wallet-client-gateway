@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.12] - 2026-10-12
+
+### Added
+
+- Add maintenance window handling (#208)
+- Add client config endpoint (#203)
+- Add wia operation in api-spec (#196)
+
+### Changed
+
+- Update org.openapitools:jackson-databind-nullable to v0.2.12 (#212)
+- Update diggsweden/wallet-ecosystem digest to 91e6dd6 (#194)
+- Update actions/checkout action to v7 (#207)
+- Satisfy java spotbugs (#202)
+- Update valkey/valkey docker tag to v9.1.2 (#206)
+- Update java non-major (#205)
+- Update dependency prettier to v3.9.9 (#199)
+- Update java non-major (#198)
+- Merge pull request #197 from diggsweden/revert/expose-hsm-client-id
+- Include clientId in device-states response
+- Update valkey to 9.1.1 (#193)
+- Update eclipse-temurin 25-jdk-alpine digest to 541729c (#102)
+
+### Fixed
+
+- Use jackson3 with openapi client generator (#201)
+- Include clientId in device-states response (#195)
+
+### Removed
+
+- Remove api diff from maven lifecycle due to ssl issues with env(#210)
+- Remove mise paranoid setting (#200)
+
 ## [0.6.11] - 2026-09-23
 
 ### Added
@@ -26,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Raise commit description length limit and shorten maven commit (#186)
 - Revoke account key operations in api-spec (#184)
+
 
 ## [0.6.10] - 2026-09-14
 
@@ -737,6 +771,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.12]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.11..v0.6.12
 [0.6.11]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.10..v0.6.11
 [0.6.10]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.9..v0.6.10
 [0.6.9]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.8..v0.6.9
