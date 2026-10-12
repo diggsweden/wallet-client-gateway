@@ -5,12 +5,19 @@ spring:
     import: classpath:application.yml
   docker:
     compose:
-      enabled: true
+      enabled: ${SPRING_DOCKER_COMPOSE_ENABLED:false}
       file: ./docker-compose/docker-compose.yml
+  data:
+    redis:
+      port: ${VALKEY_PORT:6380}
 
 properties:
   feature-flags:
     file-path: ./docker-compose/feature-flags.json
+  client-config:
+    features:
+      - example
+      - unset-feature
   logging-filter:
     enabled: true
     max-payload-length: 1000

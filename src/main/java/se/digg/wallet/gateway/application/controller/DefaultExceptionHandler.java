@@ -5,6 +5,7 @@
 package se.digg.wallet.gateway.application.controller;
 
 import static se.digg.wallet.gateway.application.controller.ProblemType.INTERNAL;
+import static se.digg.wallet.gateway.application.controller.ProblemType.MAINTENANCE;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
 import static se.digg.wallet.gateway.application.controller.ProblemType.RESOURCE_ALREADY_EXISTS;
@@ -41,6 +42,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.exception.RemoteResourceNotFoundException;
+import se.digg.wallet.gateway.domain.exception.UnavailableDueToMaintenanceException;
 
 @RestControllerAdvice
 public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
@@ -218,6 +220,22 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .build();
 
     logWarn("Account already exists", method, path, e);
+    return createResponseEntity(problemResponse);
+  }
+
+  @ExceptionHandler(UnavailableDueToMaintenanceException.class)
+  public ResponseEntity<Object> handleUnavailableDueToMaintenanceException(
+      UnavailableDueToMaintenanceException e,
+      HttpServletRequest request) {
+
+    var method = request.getMethod();
+    var path = request.getServletPath();
+    var problemResponse = buildProblemResponse(MAINTENANCE)
+        .detail(MAINTENANCE.getDescription())
+        .instance(path)
+        .build();
+
+    logWarn("Service under maintenance", method, path, e);
     return createResponseEntity(problemResponse);
   }
 

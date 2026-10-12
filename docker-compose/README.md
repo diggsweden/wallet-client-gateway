@@ -8,14 +8,14 @@ Does not enable successfully calling endpoints as underlying services are missin
 When that is done you can test the application with
 
 ```bash
-docker-compose up -d
+podman compose up -d
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-or to let spring boot start the containers you can run
+or with Docker installed, to let Spring Boot start the containers you can run
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev -Denv=dev
+SPRING_DOCKER_COMPOSE_ENABLED=true mvn spring-boot:run -Dspring-boot.run.profiles=dev -Denv=dev
 ```
 
 ## Notes

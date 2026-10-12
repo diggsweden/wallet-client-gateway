@@ -15,4 +15,6 @@ public interface FeatureFlagPort {
   boolean getBoolean(String key, boolean defaultValue, ClientContext context);
 
   int getInteger(String key, int defaultValue, ClientContext context);
+
+  String getString(String key, String defaultValue, ClientContext context);
 }

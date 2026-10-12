@@ -69,6 +69,16 @@ class ClientConfigComponentTest {
   }
 
   @Test
+  void returnsNoContentWhenNoMaintenanceWindowIsPlanned() {
+    client.get()
+        .uri(ClientUtilsApi.PATH_GET_MAINTENANCE_WINDOW)
+        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
+        .exchange()
+        .expectStatus().isNoContent()
+        .expectBody().isEmpty();
+  }
+
+  @Test
   void rejectsRequestWithoutApiKey() {
     client.get()
         .uri(ClientUtilsApi.PATH_GET_CLIENT_CONFIG)

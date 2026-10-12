@@ -11,25 +11,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.ClientUtilsApi;
 import se.digg.wallet.gateway.api.v0.model.ClientConfigResponse;
+import se.digg.wallet.gateway.api.v0.model.MaintenanceWindow;
 import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.mapper.clientconfig.ClientConfigMapper;
 import se.digg.wallet.gateway.application.mapper.clientconfig.ClientContextMapper;
 import se.digg.wallet.gateway.domain.service.ClientConfigService;
+import se.digg.wallet.gateway.domain.service.MaintenanceService;
 
 @RestController
 public class ClientUtilsController implements ClientUtilsApi {
 
   private final ClientConfigService clientConfigService;
+  private final MaintenanceService maintenanceService;
   private final ClientConfigMapper clientConfigMapper;
   private final ApplicationConfig applicationConfig;
   private final HttpServletRequest request;
 
   public ClientUtilsController(
       ClientConfigService clientConfigService,
+      MaintenanceService maintenanceService,
       ClientConfigMapper clientConfigMapper,
       ApplicationConfig applicationConfig,
       HttpServletRequest request) {
     this.clientConfigService = clientConfigService;
+    this.maintenanceService = maintenanceService;
     this.clientConfigMapper = clientConfigMapper;
     this.applicationConfig = applicationConfig;
     this.request = request;
@@ -46,5 +51,13 @@ public class ClientUtilsController implements ClientUtilsApi {
             .cachePrivate())
         .header(HttpHeaders.VARY, ClientContextMapper.VARY_HEADERS.toArray(String[]::new))
         .body(clientConfigMapper.toResponse(clientConfig));
+  }
+
+  @Override
+  public ResponseEntity<MaintenanceWindow> getMaintenanceWindow() {
+    return maintenanceService.status()
+        .map(clientConfigMapper::toMaintenanceWindow)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.noContent().build());
   }
 }
