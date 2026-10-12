@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
 import se.digg.wallet.gateway.client.hsm.v1.api.HandlersApi;
 import se.digg.wallet.gateway.client.provider.v0.api.KeyAttestationApi;
+import se.digg.wallet.gateway.client.provider.v0.api.WalletInstanceAttestationApi;
 import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
 
 @Configuration
@@ -50,7 +51,7 @@ public class RestClientConfig {
   /**
    * Creates a client bean to be used for remote calls to the Wallet Provider API.
    *
-   * @return an WalletUnitAttestationAPI instance.
+   * @return a WalletUnitAttestationAPI instance.
    */
   @Bean
   public WalletUnitAttestationApi walletUnitAttestationApi(
@@ -64,9 +65,9 @@ public class RestClientConfig {
   }
 
   /**
-   * Creates a client bean to be used for remote calls to the Wallet Provider API.
+   * Creates a Key Attestation API client.
    *
-   * @return an KeyAttestationAPI instance.
+   * @return a KeyAttestationAPI instance.
    */
   @Bean
   public KeyAttestationApi keyAttestationApi(
@@ -77,5 +78,21 @@ public class RestClientConfig {
         .setBasePath(basePath);
 
     return keyAttestationApi;
+  }
+
+  /**
+   * Creates a Wallet Instance Attestation API client.
+   *
+   * @return a WalletInstanceAttestationAPI instance.
+   */
+  @Bean
+  public WalletInstanceAttestationApi walletInstanceAttestationApi(
+      @Value("${properties.walletprovider.baseurl}") String basePath) {
+
+    var walletInstanceAttestationApi = new WalletInstanceAttestationApi();
+    walletInstanceAttestationApi.getApiClient()
+        .setBasePath(basePath);
+
+    return walletInstanceAttestationApi;
   }
 }

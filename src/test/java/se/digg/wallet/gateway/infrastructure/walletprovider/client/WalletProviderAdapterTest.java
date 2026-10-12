@@ -15,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.digg.wallet.gateway.client.provider.v0.api.KeyAttestationApi;
+import se.digg.wallet.gateway.client.provider.v0.api.WalletInstanceAttestationApi;
+import se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationResponse;
+import se.digg.wallet.gateway.client.provider.v0.model.WalletInstanceAttestationResponse;
 import se.digg.wallet.gateway.domain.common.JwkTestBuilder;
 import se.digg.wallet.gateway.domain.exception.WalletRuntimeException;
 import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
@@ -35,6 +38,8 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 public class WalletProviderAdapterTest {
 
+  private static final String JWT = "the.result.jwt";
+
   @MockitoBean
   private ObjectMapper objectMapper;
 
@@ -43,6 +48,9 @@ public class WalletProviderAdapterTest {
 
   @MockitoBean
   private KeyAttestationApi keyAttestationApi;
+
+  @MockitoBean
+  private WalletInstanceAttestationApi walletInstanceAttestationApi;
 
   @Autowired
   private WalletProviderAdapter adapter;
@@ -66,7 +74,7 @@ public class WalletProviderAdapterTest {
     }
 
     assertThrows(WalletRuntimeException.class,
-        () -> adapter.createWalletUnitAttestation(defaultWalletKey(), null));
+        () -> adapter.createWalletUnitAttestation(defaultJwk(), null));
 
     verify(walletUnitAttestationApi, never()).postWalletUnitAttestation(any());
   }
@@ -75,29 +83,27 @@ public class WalletProviderAdapterTest {
   @NullAndEmptySource
   void serves_wallet_unit_attestation_without_nonce(String nonce) {
 
-    final var expectedJwt = "123456";
-    when(walletUnitAttestationApi.postWalletUnitAttestation(any())).thenReturn(expectedJwt);
+    when(walletUnitAttestationApi.postWalletUnitAttestation(any())).thenReturn(JWT);
 
     var wua =
-        assertDoesNotThrow(() -> adapter.createWalletUnitAttestation(defaultWalletKey(), nonce));
+        assertDoesNotThrow(() -> adapter.createWalletUnitAttestation(defaultJwk(), nonce));
 
     verify(walletUnitAttestationApi, times(1)).postWalletUnitAttestation(any());
     assertThat(wua).isNotNull();
-    assertThat(wua.jwt()).isEqualTo(expectedJwt);
+    assertThat(wua.jwt()).isEqualTo(JWT);
   }
 
   @Test
   void serves_wallet_unit_attestation_with_nonce() {
 
-    final var expectedJwt = "123456";
-    when(walletUnitAttestationApi.postWalletUnitAttestation(any())).thenReturn(expectedJwt);
+    when(walletUnitAttestationApi.postWalletUnitAttestation(any())).thenReturn(JWT);
 
     var wua = assertDoesNotThrow(
-        () -> adapter.createWalletUnitAttestation(defaultWalletKey(), "some-nonce"));
+        () -> adapter.createWalletUnitAttestation(defaultJwk(), "some-nonce"));
 
     verify(walletUnitAttestationApi, times(1)).postWalletUnitAttestation(any());
     assertThat(wua).isNotNull();
-    assertThat(wua.jwt()).isEqualTo(expectedJwt);
+    assertThat(wua.jwt()).isEqualTo(JWT);
   }
 
   @Test
@@ -116,7 +122,7 @@ public class WalletProviderAdapterTest {
     when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
     assertThrows(WalletRuntimeException.class,
-        () -> adapter.createKeyAttestation(List.of(defaultWalletKey()), null));
+        () -> adapter.createKeyAttestation(List.of(defaultJwk()), null));
 
     verify(keyAttestationApi, never()).postKeyAttestation(any());
   }
@@ -150,15 +156,54 @@ public class WalletProviderAdapterTest {
     assertThat(result.jwt()).isEqualTo(keyAttestationResponse.getKeyAttestation());
   }
 
-  private static Jwk defaultWalletKey() {
+  @Test
+  void serving_wallet_instance_attestation_without_key_throws_illegal_argument_exception() {
+
+    assertThrows(IllegalArgumentException.class,
+        () -> adapter.createWalletInstanceAttestation(null));
+
+    verify(walletInstanceAttestationApi, never()).postWalletInstanceAttestation(any());
+  }
+
+  @Test
+  void json_processing_failure_with_wallet_instance_attestation_throws_wallet_runtime_exception() {
+
+    try {
+      when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+    } catch (JsonProcessingException e) {
+      fail(e);
+    }
+
+    assertThrows(WalletRuntimeException.class,
+        () -> adapter.createWalletInstanceAttestation(defaultJwk()));
+
+    verify(walletInstanceAttestationApi, never()).postWalletInstanceAttestation(any());
+  }
+
+  @Test
+  void serves_wallet_instance_attestation() {
+
+    final var response = WalletInstanceAttestationResponse.builder()
+        .walletInstanceAttestation(JWT)
+        .build();
+    when(walletInstanceAttestationApi.postWalletInstanceAttestation(any())).thenReturn(response);
+
+    var wia = adapter.createWalletInstanceAttestation(defaultJwk());
+
+    verify(walletInstanceAttestationApi, times(1)).postWalletInstanceAttestation(any());
+    assertThat(wia).isNotNull();
+    assertThat(wia.jwt()).isEqualTo(JWT);
+  }
+
+  private static Jwk defaultJwk() {
     return JwkBuilder.builder()
         .kid("some-kid")
         .build();
   }
 
   private static se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationResponse defaultKeyAttestationResponse() {
-    return se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationResponse.builder()
-        .keyAttestation("123456")
+    return KeyAttestationResponse.builder()
+        .keyAttestation(JWT)
         .build();
   }
 }

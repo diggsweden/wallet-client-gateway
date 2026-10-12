@@ -30,6 +30,8 @@ info:
 servers:
   - url: '/'
 tags:
+  - name: Wallet Instance Attestation
+    description: Operations related to Wallet Instance Attestation (WIA)
   - name: Key Attestation
     description: Operations related to Key Attestation (KA)
   - name: Wallet Unit Attestation
@@ -37,6 +39,36 @@ tags:
   - name: API Info
     description: Information about the API
 paths:
+  /v0/wallet-instance-attestations:
+    post:
+      tags:
+        - Wallet Instance Attestation
+      summary: Create Wallet Instance Attestation
+      description: |
+        Creates a signed Wallet Instance Attestation for OAuth client attestation during credential issuance.
+        This prototype checks only the supplied public JWK. It does not verify app integrity, key ownership,
+        hardware attestation, or revocation status. Wallet metadata and status references are configured
+        placeholders; no live status list or attestation persistence is provided.
+      operationId: postWalletInstanceAttestation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletInstanceAttestationRequest'
+      responses:
+        "200":
+          description: Successfully created Wallet Instance Attestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletInstanceAttestationResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
   /v0/key-attestations:
     post:
       tags:
@@ -139,6 +171,27 @@ paths:
                 $ref: '#/components/schemas/ProblemResponse'
 components:
   schemas:
+    WalletInstanceAttestationRequest:
+      type: object
+      required:
+        - jwk
+      properties:
+        jwk:
+          type: string
+          minLength: 1
+          description: A public elliptic curve JWK encoded as a JSON string, used as the WIA proof-of-possession key.
+      example:
+        jwk: '{"kty":"EC","crv":"P-256","x":"18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM","y":"-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"}'
+
+    WalletInstanceAttestationResponse:
+      type: object
+      required:
+        - wallet_instance_attestation
+      properties:
+        wallet_instance_attestation:
+          type: string
+          description: The signed WIA as a compact JWT with type oauth-client-attestation+jwt and a lifetime below 24 hours.
+
     KeyAttestationRequest:
       type: object
       required:

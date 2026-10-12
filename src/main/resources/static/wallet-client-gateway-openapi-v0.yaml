@@ -811,9 +811,6 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/EcJwkRequest'
-        nonce:
-          description: Optional. Nonce from the Credential Issuer.
-          type: string
       required:
         - key
 

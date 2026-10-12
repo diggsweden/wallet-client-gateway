@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.domain.common.JwkTestBuilder;
+import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestationBuilder;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.Wua;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.*;
 class AttestationServiceTest {
 
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
+  private static final String JWT = "123456";
 
   @Mock
   private WalletProviderPort walletProviderPort;
@@ -67,9 +69,8 @@ class AttestationServiceTest {
   @ValueSource(strings = {"the-nonce-value"})
   void serves_key_attestation(String nonce) {
 
-    var expectedResultJwt = "123456";
     var keyAttestation = KeyAttestationBuilder.builder()
-        .jwt(expectedResultJwt)
+        .jwt(JWT)
         .build();
     when(walletProviderPort.createKeyAttestation(any(), any())).thenReturn(keyAttestation);
     var keys = List.of(JwkTestBuilder.withDefaults().build());
@@ -77,6 +78,21 @@ class AttestationServiceTest {
     var result = attestationService.createKeyAttestation(keys, nonce);
 
     assertThat(result).isNotNull();
-    assertThat(result.jwt()).isEqualTo(expectedResultJwt);
+    assertThat(result.jwt()).isEqualTo(JWT);
+  }
+
+  @Test
+  void serves_wallet_instance_attestation() {
+
+    var wia = WalletInstanceAttestationBuilder.builder()
+        .jwt(JWT)
+        .build();
+    when(walletProviderPort.createWalletInstanceAttestation(any())).thenReturn(wia);
+    var key = JwkTestBuilder.withDefaults().build();
+
+    var result = attestationService.createWalletInstanceAttestation(key);
+
+    assertThat(result).isNotNull();
+    assertThat(result.jwt()).isEqualTo(JWT);
   }
 }

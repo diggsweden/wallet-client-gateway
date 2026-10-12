@@ -6,9 +6,10 @@ package se.digg.wallet.gateway.domain.ports.outbound;
 
 import jakarta.annotation.Nullable;
 import java.util.List;
-import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
+import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestation;
 import se.digg.wallet.gateway.domain.model.attestation.Wua;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 public interface WalletProviderPort {
 
@@ -16,4 +17,5 @@ public interface WalletProviderPort {
 
   KeyAttestation createKeyAttestation(List<Jwk> keys, @Nullable String nonce);
 
+  WalletInstanceAttestation createWalletInstanceAttestation(Jwk key);
 }
