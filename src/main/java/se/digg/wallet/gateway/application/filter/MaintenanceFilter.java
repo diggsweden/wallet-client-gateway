@@ -39,8 +39,7 @@ public class MaintenanceFilter extends OncePerRequestFilter {
   @Autowired
   public MaintenanceFilter(
       MaintenanceService maintenanceService,
-      @Qualifier("handlerExceptionResolver")
-      HandlerExceptionResolver exceptionResolver,
+      @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver,
       ApplicationConfig applicationConfig) {
     this(maintenanceService, exceptionResolver, applicationConfig.maintenance());
   }
