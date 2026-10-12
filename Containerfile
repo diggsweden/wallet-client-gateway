@@ -22,6 +22,9 @@ COPY mvnw pom.xml ./
 RUN chmod +x ./mvnw && \
     ./mvnw dependency:go-offline -B
 
+# Copy formatter configuration required by the Maven validate phase
+COPY development/format ./development/format
+
 # Copy source code
 COPY src ./src
 
