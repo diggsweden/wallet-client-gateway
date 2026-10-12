@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.13] - 2026-10-12
+
+### Changed
+
+- Move formatter to validate step (#215)
+
 ## [0.6.12] - 2026-10-12
 
 ### Added
@@ -37,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove api diff from maven lifecycle due to ssl issues with env(#210)
 - Remove mise paranoid setting (#200)
+
 
 ## [0.6.11] - 2026-09-23
 
@@ -771,6 +778,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.13]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.12..v0.6.13
 [0.6.12]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.11..v0.6.12
 [0.6.11]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.10..v0.6.11
 [0.6.10]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.9..v0.6.10
