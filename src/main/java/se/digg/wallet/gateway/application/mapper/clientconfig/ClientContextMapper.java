@@ -21,8 +21,7 @@ public final class ClientContextMapper {
       DEVICE_MODEL,
       APP_VERSION);
 
-  private ClientContextMapper() {
-  }
+  private ClientContextMapper() {}
 
   public static ClientContext from(HttpServletRequest request) {
     return new ClientContext(
