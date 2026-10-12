@@ -1,0 +1,10 @@
+{
+  "$schema": "https://flagd.dev/schema/v0/flags.json",
+  "flags": {
+    "client.cache-generation": {
+      "state": "ENABLED",
+      "variants": { "current": 0 },
+      "defaultVariant": "current"
+    }
+  }
+}

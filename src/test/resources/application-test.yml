@@ -21,6 +21,7 @@ properties:
     - "/public/**"
   api-key-paths:
     - "/v0/accounts"
+    - "/util/v0/client-configs"
   walletprovider:
     baseurl: http://localhost:${wiremock.provider.port:0}
   walletaccount:
@@ -29,6 +30,13 @@ properties:
     baseurl: http://localhost:${wiremock.r2ps.port:0}
   challenge-cache:
     ttl-seconds: 10
+  feature-flags:
+    file-path: src/test/resources/feature-flags.json
+  client-config:
+    cache-max-age: 5m
+    features:
+      - example
+      - unset-feature
 
   logging-filter:
     enabled: true

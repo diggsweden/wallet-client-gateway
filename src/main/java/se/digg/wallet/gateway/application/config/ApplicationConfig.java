@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.config;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +22,9 @@ public record ApplicationConfig(
     @NotNull Walletprovider walletprovider,
     @NotNull Walletaccount walletaccount,
     @NotNull ChallengeCache challengeCache,
-    @NotNull WalletR2ps walletR2ps) {
+    @NotNull WalletR2ps walletR2ps,
+    @NotNull FeatureFlags featureFlags,
+    @NotNull ClientConfig clientConfig) {
 
   public ApplicationConfig {
     publicPaths = List.copyOf(publicPaths);
@@ -47,6 +50,20 @@ public record ApplicationConfig(
   }
 
   public record ChallengeCache(@NotBlank int ttlSeconds) {
+  }
+
+  public record FeatureFlags(@NotBlank String filePath) {
+  }
+
+  /**
+   * @param cacheMaxAge how long clients may cache the client config response
+   * @param features feature names exposed to clients, evaluated from flags named
+   *        {@code client.feature.<name>}. Flags not listed here are never returned.
+   */
+  public record ClientConfig(@NotNull Duration cacheMaxAge, List<String> features) {
+    public ClientConfig {
+      features = features == null ? List.of() : List.copyOf(features);
+    }
   }
 
 }
