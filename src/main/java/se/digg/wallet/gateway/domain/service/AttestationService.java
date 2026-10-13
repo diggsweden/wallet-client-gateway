@@ -10,9 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
+import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestation;
 import se.digg.wallet.gateway.domain.model.attestation.Wua;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
 
@@ -37,5 +38,10 @@ public class AttestationService {
   public KeyAttestation createKeyAttestation(List<Jwk> keys, @Nullable String nonce) {
 
     return walletProviderPort.createKeyAttestation(keys, nonce);
+  }
+
+  public WalletInstanceAttestation createWalletInstanceAttestation(Jwk key) {
+
+    return walletProviderPort.createWalletInstanceAttestation(key);
   }
 }

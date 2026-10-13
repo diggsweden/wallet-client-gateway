@@ -41,6 +41,12 @@ public class WalletAttestationController implements WalletAttestationApi {
   public ResponseEntity<WalletInstanceAttestationResponse> createWalletInstanceAttestation(
       WalletInstanceAttestationRequest walletInstanceAttestationRequest) {
 
-    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+    var key = mapper.toDomain(walletInstanceAttestationRequest.getKey());
+    var walletInstanceAttestation = attestationService.createWalletInstanceAttestation(key);
+    var response = WalletInstanceAttestationResponse.builder()
+        .jwt(walletInstanceAttestation.jwt())
+        .build();
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 }
