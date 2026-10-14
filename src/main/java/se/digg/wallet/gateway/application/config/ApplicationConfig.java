@@ -7,6 +7,7 @@ package se.digg.wallet.gateway.application.config;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,11 +26,13 @@ public record ApplicationConfig(
     @NotNull WalletR2ps walletR2ps,
     @NotNull FeatureFlags featureFlags,
     @NotNull ClientConfig clientConfig,
-    @NotNull Maintenance maintenance) {
+    @NotNull Maintenance maintenance,
+    List<LoteProviderItem> loteProviders) {
 
   public ApplicationConfig {
     publicPaths = List.copyOf(publicPaths);
     apiKeyPaths = List.copyOf(apiKeyPaths);
+    loteProviders = loteProviders != null ? List.copyOf(loteProviders) : null;
   }
 
   public record Walletprovider(@NotBlank String baseurl, @NotBlank String wuaPath) {
@@ -77,4 +80,6 @@ public record ApplicationConfig(
     }
   }
 
+  public record LoteProviderItem(String id, URI url) {
+  }
 }
