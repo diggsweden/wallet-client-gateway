@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.15] - 2026-10-15
+
+### Added
+
+- Add lote-providers api operation (#221)
+
+### Changed
+
+- Bump openapi-generator-maven-plugin to 7.26.0 (#216)
+
 ## [0.6.14] - 2026-10-13
 
 ### Changed
@@ -12,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement wallet instance attestation (#214)
 - Update org.wiremock.integrations:wiremock-spring-boot to v4.4.3 (#217)
 - Update actions/setup-java action to v6 (#213)
+
 
 ## [0.6.13] - 2026-10-12
 
@@ -787,6 +798,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.15]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.14..v0.6.15
 [0.6.14]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.13..v0.6.14
 [0.6.13]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.12..v0.6.13
 [0.6.12]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.11..v0.6.12
