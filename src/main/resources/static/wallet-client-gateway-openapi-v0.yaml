@@ -45,6 +45,8 @@ tags:
     description: Wallet Attestation operations
   - name: HSM
     description: Hardware Security Module operations
+  - name: Trust
+    description: Trust source operation
 
 paths:
   /api-info:
@@ -465,6 +467,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterStateResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /trust/v0/lote-providers:
+    get:
+      tags:
+        - trust
+      summary: Get list of LoTE providers
+      description: |
+        Get the list of LoTE (List of Trusted Entities) providers to be used with the wallet.
+      operationId: getLoteProviders
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+      responses:
+        '200':
+          description: LoTE providers.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoteProvidersResponse'
         'default':
           $ref: '#/components/responses/default'
 
@@ -895,6 +920,31 @@ components:
       properties:
         nonce:
           type: string
+
+    LoteProviderItemResponse:
+      type: object
+      description: A LoTE (List of Trusted Entities) provider item.
+      properties:
+        id:
+          type: string
+          description: The LoTE provider identifier
+        url:
+          type: string
+          description: Service endpoint URL
+          format: uri
+      required:
+        - id
+        - url
+
+    LoteProvidersResponse:
+      type: object
+      description: LoTE (List of Trusted Entities) providers response.
+      properties:
+        items:
+          type: array
+          description: List of LoTE providers.
+          items:
+            $ref: '#/components/schemas/LoteProviderItemResponse'
 
   securitySchemes:
     ApiKeyScheme:
