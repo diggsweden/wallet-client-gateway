@@ -27,7 +27,7 @@ public class AttestationService {
   @Autowired
   private WalletProviderPort walletProviderPort;
 
-  public Wua createWua(String accountId, String nonce) {
+  public Wua createWua(String accountId, @Nullable String nonce) {
 
     logger.info("Create WUA for accountId: {}, nonce: {}", accountId, nonce);
     var walletKey = accountPort.getWalletKey(accountId);

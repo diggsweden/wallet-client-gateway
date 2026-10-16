@@ -25,9 +25,9 @@ public class AccountMapper {
 
   public NewAccount toDomain(CreateAccountRequest request) {
     return NewAccountBuilder.builder()
-        .personalIdentityNumber(request.getPersonalIdentityNumber().orElse(null))
-        .email(request.getEmail().orElse(request.getEmailAdress().orElse(null)))
-        .phoneNumber(request.getTelephoneNumber().orElse(null))
+        .personalIdentityNumber(request.getPersonalIdentityNumber())
+        .email(request.getEmail())
+        .phoneNumber(request.getTelephoneNumber())
         .deviceKey(toDomain(request.getDeviceKey()))
         .build();
   }
@@ -36,8 +36,8 @@ public class AccountMapper {
     return new Jwk(
         request.getKty(),
         request.getKid(),
-        request.getAlg().orElse(null),
-        request.getUse().orElse(null),
+        request.getAlg(),
+        request.getUse(),
         request.getCrv(),
         request.getX(),
         request.getY());

@@ -5,10 +5,10 @@
 package se.digg.wallet.gateway.domain.model.hsm;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
-import java.util.Optional;
+import jakarta.annotation.Nullable;
 
 @RecordBuilder
 public record DeviceStateRegistration(
     EcPublicJwk walletKey,
-    Optional<String> ttl) {
+    @Nullable String ttl) {
 }

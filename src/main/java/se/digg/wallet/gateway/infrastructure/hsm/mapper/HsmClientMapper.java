@@ -37,7 +37,7 @@ public class HsmClientMapper {
     return NewStateRequestDto.builder()
         .publicKey(clientPublicKey)
         .overwrite(true)
-        .ttl(request.ttl().orElse(null))
+        .ttl(request.ttl())
         .build();
   }
 

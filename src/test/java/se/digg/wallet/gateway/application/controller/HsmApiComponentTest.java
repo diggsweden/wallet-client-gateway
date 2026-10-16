@@ -4,10 +4,7 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import jakarta.annotation.Nullable;
-import java.util.Objects;
 import java.util.UUID;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +27,6 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.EcJwkResponse;
 import se.digg.wallet.gateway.api.v0.model.HsmRequest;
 import se.digg.wallet.gateway.api.v0.model.HsmResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
@@ -45,6 +41,7 @@ import se.digg.wallet.gateway.domain.service.HsmService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAssertion.assertProblemDetails;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -88,8 +85,8 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE,
-        "outerRequestJws");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "outerRequestJws");
   }
 
   @ParameterizedTest
@@ -116,7 +113,7 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @Test
@@ -138,7 +135,7 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @Test
@@ -171,8 +168,8 @@ public class HsmApiComponentTest {
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
         se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.ERROR);
-    assertThat(hsmResponse.getResult()).isEmpty();
-    assertThat(hsmResponse.getResultUrl().isEmpty());
+    assertThat(hsmResponse.getResult()).isNull();
+    assertThat(hsmResponse.getResultUrl()).isNull();
   }
 
   @Test
@@ -205,8 +202,8 @@ public class HsmApiComponentTest {
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
         se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.PENDING);
-    assertThat(hsmResponse.getResult()).isEmpty();
-    assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
+    assertThat(hsmResponse.getResult()).isNull();
+    assertThat(hsmResponse.getResultUrl()).contains(REQUEST_ID.toString());
   }
 
   @Test
@@ -240,8 +237,8 @@ public class HsmApiComponentTest {
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
         se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.COMPLETE);
-    assertThat(hsmResponse.getResult()).isPresent().get().isEqualTo(result);
-    assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
+    assertThat(hsmResponse.getResult()).isNotNull().isEqualTo(result);
+    assertThat(hsmResponse.getResultUrl()).contains(REQUEST_ID.toString());
   }
 
   @Test
@@ -271,7 +268,7 @@ public class HsmApiComponentTest {
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
         se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.ERROR);
-    assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
+    assertThat(hsmResponse.getResultUrl()).contains(REQUEST_ID.toString());
   }
 
   @Test
@@ -301,7 +298,7 @@ public class HsmApiComponentTest {
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
         se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.PENDING);
-    assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
+    assertThat(hsmResponse.getResultUrl()).contains(REQUEST_ID.toString());
   }
 
   @Test
@@ -332,7 +329,7 @@ public class HsmApiComponentTest {
     assertThat(hsmResponse.getId()).isNotNull().isEqualTo(REQUEST_ID);
     assertThat(hsmResponse.getStatus()).isNotNull().isEqualTo(
         se.digg.wallet.gateway.api.v0.model.HsmAsyncStatus.COMPLETE);
-    assertThat(hsmResponse.getResultUrl().get()).contains(REQUEST_ID.toString());
+    assertThat(hsmResponse.getResultUrl()).contains(REQUEST_ID.toString());
   }
 
   @Test
@@ -350,7 +347,8 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "deviceKey");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "deviceKey");
   }
 
   @ParameterizedTest
@@ -375,8 +373,8 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE,
-        invalidProperty);
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, invalidProperty);
   }
 
   @ParameterizedTest
@@ -403,7 +401,8 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "ttl");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "ttl");
   }
 
   @ParameterizedTest
@@ -430,7 +429,7 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @Test
@@ -452,7 +451,7 @@ public class HsmApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @ParameterizedTest
@@ -500,11 +499,11 @@ public class HsmApiComponentTest {
 
     assertThat(registerStateResponse).isNotNull();
     assertThat(registerStateResponse.getStatus()).isNotEmpty().isEqualTo(status);
-    assertThat(registerStateResponse.getDevAuthorizationCode()).isPresent().get()
+    assertThat(registerStateResponse.getDevAuthorizationCode()).isNotNull()
         .isEqualTo(devAuthCode);
-    assertThat(registerStateResponse.getOpaqueServerId()).isPresent().get()
+    assertThat(registerStateResponse.getOpaqueServerId()).isNotNull()
         .isEqualTo(opaqueServerId);
-    assertThat(registerStateResponse.getServerJwsPublicKey()).isPresent().get()
+    assertThat(registerStateResponse.getServerJwsPublicKey()).isNotNull()
         .isEqualTo(toKeyResponse(serverJwsPublicKey));
   }
 
@@ -538,38 +537,5 @@ public class HsmApiComponentTest {
         .x(jwkDto.x())
         .y(jwkDto.y())
         .build();
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus) {
-
-    assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus,
-      @Nullable String expectedType,
-      @Nullable String expectedInvalidParameterProperty) {
-
-    assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getStatus()).isEqualTo(expectedHttpStatus.value());
-    assertThat(problemResponse.getTitle()).isNotEmpty();
-    assertThat(problemResponse.getDetail()).isPresent();
-    assertThat(problemResponse.getInstance()).isNotEmpty();
-    assertThat(problemResponse.getType()).isPresent();
-    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
-    if (expectedType != null) {
-      assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
-    }
-
-    if (expectedInvalidParameterProperty != null) {
-      assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
-      assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
-          .stream()
-          .map(ProblemParameterResponse::getProperty)
-          .map(value -> value.orElse(null))
-          .filter(Objects::nonNull)
-          .toList());
-    }
   }
 }
