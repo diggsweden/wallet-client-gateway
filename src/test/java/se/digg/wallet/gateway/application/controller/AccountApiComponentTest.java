@@ -4,10 +4,7 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import java.util.Objects;
 import java.util.UUID;
-
-import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +23,6 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
@@ -35,6 +31,7 @@ import se.digg.wallet.gateway.domain.service.AccountService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAssertion.assertProblemDetails;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -80,7 +77,8 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "deviceKey");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "deviceKey");
   }
 
   @ParameterizedTest
@@ -105,8 +103,8 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE,
-        invalidProperty);
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, invalidProperty);
   }
 
   @ParameterizedTest
@@ -133,7 +131,8 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "email");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "email");
   }
 
   @Test
@@ -155,7 +154,8 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.CONFLICT, RESOURCE_EXISTS, null);
+    assertProblemDetails(problemResponse, HttpStatus.CONFLICT, TRANSACTION_ID,
+        RESOURCE_EXISTS, null);
   }
 
   @ParameterizedTest
@@ -182,7 +182,7 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @Test
@@ -204,7 +204,7 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @Test
@@ -338,39 +338,6 @@ public class AccountApiComponentTest {
 
     public UnexpectedException(String message) {
       super(message);
-    }
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus) {
-
-    assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus,
-      @Nullable String expectedType,
-      @Nullable String expectedInvalidParameterProperty) {
-
-    assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getStatus()).isEqualTo(expectedHttpStatus.value());
-    assertThat(problemResponse.getTitle()).isNotEmpty();
-    assertThat(problemResponse.getDetail()).isPresent();
-    assertThat(problemResponse.getInstance()).isNotEmpty();
-    assertThat(problemResponse.getType()).isPresent();
-    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
-    if (expectedType != null) {
-      assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
-    }
-
-    if (expectedInvalidParameterProperty != null) {
-      assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
-      assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
-          .stream()
-          .map(ProblemParameterResponse::getProperty)
-          .map(value -> value.orElse(null))
-          .filter(Objects::nonNull)
-          .toList());
     }
   }
 }

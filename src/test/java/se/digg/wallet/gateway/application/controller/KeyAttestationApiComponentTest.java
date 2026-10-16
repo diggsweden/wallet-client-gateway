@@ -7,8 +7,6 @@ package se.digg.wallet.gateway.application.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +33,7 @@ import se.digg.wallet.gateway.domain.service.AttestationService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAssertion.assertProblemDetails;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -111,7 +110,8 @@ public class KeyAttestationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertThat(problemResponse).isNotNull();
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
     assertThat(problemResponse.getDetail()).isNotEmpty().contains("Remote service failure");
   }
 
@@ -135,7 +135,7 @@ public class KeyAttestationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @ParameterizedTest
@@ -155,7 +155,8 @@ public class KeyAttestationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "keys");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "keys");
   }
 
   @ParameterizedTest
@@ -210,39 +211,6 @@ public class KeyAttestationApiComponentTest {
 
     public UnexpectedException(String message) {
       super(message);
-    }
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus) {
-
-    assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus,
-      @Nullable String expectedType,
-      @Nullable String expectedInvalidParameterProperty) {
-
-    assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getStatus()).isEqualTo(expectedHttpStatus.value());
-    assertThat(problemResponse.getTitle()).isNotEmpty();
-    assertThat(problemResponse.getDetail()).isPresent();
-    assertThat(problemResponse.getInstance()).isNotEmpty();
-    assertThat(problemResponse.getType()).isPresent();
-    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
-    if (expectedType != null) {
-      assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
-    }
-
-    if (expectedInvalidParameterProperty != null) {
-      assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
-      assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
-          .stream()
-          .map(ProblemParameterResponse::getProperty)
-          .map(value -> value.orElse(null))
-          .filter(Objects::nonNull)
-          .toList());
     }
   }
 }

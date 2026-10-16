@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.infrastructure.hsm.mapper;
 
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,7 @@ public class HsmClientMapperTest {
     var y = "y";
 
     var request = DeviceStateRegistrationBuilder.builder()
-        .ttl(Optional.of(ttl))
+        .ttl(ttl)
         .walletKey(
             se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder.builder()
                 .kid(kid)
