@@ -71,11 +71,15 @@
     <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
 
+    <account-apispec.repo>diggsweden/wallet-account</account-apispec.repo>
+    <account-apispec.ref>refs/heads/main/src/main/resources/static</account-apispec.ref>
+    <account-apispec.file>wallet-account-openapi-v0.yaml</account-apispec.file>
+    <account-apispec.path>src/main/resources/static/${wallet-account-spec.file}</account-apispec.path>
 
-    <wallet-account-spec.repo>diggsweden/wallet-account</wallet-account-spec.repo>
-    <wallet-account-spec.ref>78f7591424f8dc17e320dec9c8764514e865da19</wallet-account-spec.ref>
-    <wallet-account-spec.path>src/main/resources/static/wallet-account-openapi-v0.yaml</wallet-account-spec.path>
-    <wallet-account-origin-spec.path>src/main/resources/static/wallet-account-openapi-origin.yaml</wallet-account-origin-spec.path>
+    <attestation-issuer-apispec.repo>diggsweden/wallet-attestation-issuer</attestation-issuer-apispec.repo>
+    <attestation-issuer-apispec.ref>refs/heads/main/src/main/resources/static</attestation-issuer-apispec.ref>
+    <attestation-issuer-apispec.file>wallet-attestation-issuer-openapi-v0.yaml</attestation-issuer-apispec.file>
+    <attestation-issuer-apispec.path>src/main/resources/static/${attestation-issuer-apispec.file}</attestation-issuer-apispec.path>
   </properties>
 
   <dependencies>
@@ -232,33 +236,37 @@
       </dependencies>
     </profile>
     <profile>
-      <id>update-account-spec</id>
+      <id>update-client-apispec</id>
       <build>
         <plugins>
           <plugin>
-            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <groupId>io.github.download-maven-plugin</groupId>
             <artifactId>download-maven-plugin</artifactId>
-            <version>1.13.0</version>
+            <version>2.1.0</version>
             <executions>
               <execution>
-                <id>fetch-wallet-account-spec</id>
-                <phase>generate-resources</phase>
-                <goals><goal>wget</goal></goals>
+                <id>fetch-wallet-account-apispec</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
                 <configuration>
-                  <url>https://raw.githubusercontent.com/${wallet-account-spec.repo}/${wallet-account-spec.ref}/${wallet-account-spec.path}</url>
-                  <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
-                  <outputFileName>wallet-account-openapi-v0.yaml</outputFileName>
-                  <overwrite>true</overwrite>
-                </configuration>
+                <url>https://raw.githubusercontent.com/${account-apispec.repo}/${account-apispec.ref}/${account-apispec.file}</url>
+                <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
+                <outputFileName>${account-apispec.file}</outputFileName>
+                <overwrite>true</overwrite>
+              </configuration>
               </execution>
               <execution>
-                <id>fetch-wallet-account-origin-spec</id>
-                <phase>generate-resources</phase>
-                <goals><goal>wget</goal></goals>
+                <id>fetch-wallet-attestation-issuer-apispec</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
                 <configuration>
-                  <url>https://raw.githubusercontent.com/${wallet-account-spec.repo}/${wallet-account-spec.ref}/${wallet-account-origin-spec.path}</url>
+                  <url>https://raw.githubusercontent.com/${attestation-issuer-apispec.repo}/${attestation-issuer-apispec.ref}/${attestation-issuer-apispec.file}</url>
                   <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
-                  <outputFileName>wallet-account-openapi-origin.yaml</outputFileName>
+                  <outputFileName>${attestation-issuer-apispec.file}</outputFileName>
                   <overwrite>true</overwrite>
                 </configuration>
               </execution>
