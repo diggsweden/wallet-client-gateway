@@ -46,8 +46,6 @@ properties:
   lote-providers:
     - id: DIGG Sandbox
       url: https://wallet.sandbox.digg.se/trust-source/signed/trusted-entities.json
-    - id: WE BUILD WP4 Trust Group
-      url: https://webuild-consortium.github.io/wp4-trust-group/list_of_trusted_lists.json
     - id: Launchpad Wallet Providers
       url: https://development.trust.tech.ec.europa.eu/lists/eudiw/wallet-providers.json
     - id: Launchpad PID Providers
