@@ -118,7 +118,7 @@ Remote REST API-specifications are located in:
 
 With `mvn clean generate-sources` or `mvn clean compile`, java code classes (clients and models) are created
 in the target folder. The generated code is owned entirely by the API specification and must not be
-committed to the git repository. 
+committed to the git repository.
 
 Target directory for generated sources (java classes):
 
