@@ -219,7 +219,7 @@ class HsmControllerIntegrationTest {
     assertThat(problemResponse).isNotNull();
     assertThat(problemResponse.getTitle()).isNotEmpty();
     assertThat(problemResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    assertThat(problemResponse.getDetail()).hasValueSatisfying(detail -> {
+    assertThat(problemResponse.getDetail()).satisfies(detail -> {
       assertThat(detail).contains(paramType);
       assertThat(detail).contains(unknownType);
     });
@@ -300,7 +300,7 @@ class HsmControllerIntegrationTest {
     var invalidParameters = problemResponse.getInvalidParameters();
     assertThat(invalidParameters).isNotEmpty().hasSize(1);
     var invalidProperty = invalidParameters.get(0).getProperty();
-    assertThat(invalidProperty).isNotEmpty().get().isEqualTo("ttl");
+    assertThat(invalidProperty).isNotEmpty().isEqualTo("ttl");
   }
 
   @Test
@@ -374,10 +374,11 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
+    assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isEqualTo(requestId);
     assertThat(hsmResponse.getStatus()).isEqualTo(PENDING);
-    assertThat(hsmResponse.getResult()).isEmpty();
-    assertThat(hsmResponse.getResultUrl()).hasValueSatisfying(url -> {
+    assertThat(hsmResponse.getResult()).isNull();
+    assertThat(hsmResponse.getResultUrl()).satisfies(url -> {
       assertThat(url).startsWith("http");
       assertThat(url).endsWith("/" + requestId);
     });
@@ -420,7 +421,9 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
-    URI resultUrl = URI.create(hsmResponse.getResultUrl().orElseThrow());
+    assertThat(hsmResponse).isNotNull();
+    assertThat(hsmResponse.getResultUrl()).isNotNull();
+    URI resultUrl = URI.create(hsmResponse.getResultUrl());
     var resultUrlHsmResponse = restClient.get()
         .uri(resultUrl)
         .exchange()
@@ -430,9 +433,10 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
+    assertThat(resultUrlHsmResponse).isNotNull();
     assertThat(resultUrlHsmResponse.getId()).isEqualTo(requestId);
     assertThat(resultUrlHsmResponse.getStatus()).isEqualTo(PENDING);
-    assertThat(resultUrlHsmResponse.getResult()).isEmpty();
+    assertThat(resultUrlHsmResponse.getResult()).isNull();
   }
 
   @Test
@@ -458,14 +462,14 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
+    assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isEqualTo(requestId);
     assertThat(hsmResponse.getStatus()).isEqualTo(PENDING);
-    assertThat(hsmResponse.getResult()).isEmpty();
-    assertThat(hsmResponse.getResultUrl())
-        .hasValueSatisfying(url -> {
-          assertThat(url).startsWith("http");
-          assertThat(url).endsWith("/" + requestId);
-        });
+    assertThat(hsmResponse.getResult()).isNull();
+    assertThat(hsmResponse.getResultUrl()).satisfies(url -> {
+      assertThat(url).startsWith("http");
+      assertThat(url).endsWith("/" + requestId);
+    });
   }
 
   @Test
@@ -491,6 +495,7 @@ class HsmControllerIntegrationTest {
         .returnResult()
         .getResponseBody();
 
+    assertThat(hsmResponse).isNotNull();
     assertThat(hsmResponse.getId()).isEqualTo(requestId);
     assertThat(hsmResponse.getStatus()).isEqualTo(COMPLETE);
     assertThat(hsmResponse.getResult()).isNotEmpty();

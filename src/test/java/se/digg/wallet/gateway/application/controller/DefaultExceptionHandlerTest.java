@@ -67,7 +67,8 @@ public class DefaultExceptionHandlerTest {
     assertThat(responseEntity).isNotNull();
     assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
     var problemResponse = (ProblemResponse) responseEntity.getBody();
-    assertThat(problemResponse.getTransactionId()).isEmpty();
+    assertThat(problemResponse).isNotNull();
+    assertThat(problemResponse.getTransactionId()).isNull();
   }
 
   @Test
@@ -86,7 +87,8 @@ public class DefaultExceptionHandlerTest {
     assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
     var problemResponse = (ProblemResponse) responseEntity.getBody();
 
-    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(transactionId);
+    assertThat(problemResponse).isNotNull();
+    assertThat(problemResponse.getTransactionId()).isNotEmpty().isEqualTo(transactionId);
   }
 
   private static void assertProblemDetails(ProblemResponse problemResponse,
@@ -95,8 +97,8 @@ public class DefaultExceptionHandlerTest {
     assertThat(problemResponse).isNotNull();
     assertThat(problemResponse.getStatus()).isEqualTo(expectedHttpStatus.value());
     assertThat(problemResponse.getTitle()).isNotEmpty();
-    assertThat(problemResponse.getDetail()).isPresent();
-    assertThat(problemResponse.getInstance()).isPresent();
-    assertThat(problemResponse.getType()).isPresent();
+    assertThat(problemResponse.getDetail()).isNotEmpty();
+    assertThat(problemResponse.getInstance()).isNotNull();
+    assertThat(problemResponse.getType()).isNotEmpty();
   }
 }

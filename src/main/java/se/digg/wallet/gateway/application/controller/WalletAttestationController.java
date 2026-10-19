@@ -30,7 +30,7 @@ public class WalletAttestationController implements WalletAttestationApi {
       KeyAttestationRequest keyAttestationRequest) {
 
     var keys = mapper.toDomain(keyAttestationRequest.getKeys());
-    var nonce = keyAttestationRequest.getNonce().orElse(null);
+    var nonce = keyAttestationRequest.getNonce();
     var keyAttestation = attestationService.createKeyAttestation(keys, nonce);
     var response = mapper.toResponse(keyAttestation);
 

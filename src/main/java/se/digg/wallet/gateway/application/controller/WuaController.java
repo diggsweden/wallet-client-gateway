@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class WuaController implements WalletUnitAttestationApi {
   }
 
   @Override
-  public ResponseEntity<WuaResponse> createWua(Optional<String> nonce) {
+  public ResponseEntity<WuaResponse> createWua(String nonce) {
 
     var challengeResponseAuthentication = getChallengeResponseAuthentication();
 
@@ -35,15 +34,14 @@ public class WuaController implements WalletUnitAttestationApi {
       logger.warn("Received request with empty challenge response authentication");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    if (nonce.isPresent() && nonce.get().isBlank()) {
+    if (nonce != null && nonce.isBlank()) {
       logger.warn("Received request with empty nonce");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     var accountId = challengeResponseAuthentication.getAccountId();
-    logger.debug("Received request from account id: {}, nonce: {}",
-        accountId, nonce.orElse(""));
-    var wuaDto = attestationService.createWua(accountId, nonce.orElse(""));
+    logger.debug("Received request from account id: {}, nonce: {}", accountId, nonce);
+    var wuaDto = attestationService.createWua(accountId, nonce);
     var wuaResponse = WuaResponse.builder().jwt(wuaDto.jwt()).build();
     return ResponseEntity.status(HttpStatus.CREATED).body(wuaResponse);
   }

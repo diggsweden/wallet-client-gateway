@@ -244,7 +244,7 @@ class WuaControllerIntegrationTest {
   }
 
   @Test
-  void testValidation_nullNonce() {
+  void testValidation_nullStringValueNonce() {
     providerServer.stubFor(post(WUA_URL)
         .withRequestBody(equalToJson("""
             {
@@ -272,7 +272,7 @@ class WuaControllerIntegrationTest {
         .withRequestBody(equalToJson("""
             {
               "jwk": "%s",
-              "nonce": ""
+              "nonce": null
             }
             """.formatted(WALLET_JWK_STRING)))
         .willReturn(aResponse()

@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,10 +24,13 @@ import se.digg.wallet.gateway.domain.service.LoteProviderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAssertion.assertProblemDetails;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class LoteProviderApiComponentTest {
+
+  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
 
   @MockitoBean
   private LoteProviderService loteProviderService;
@@ -36,6 +40,7 @@ class LoteProviderApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) {
     client = RestTestClient.bindToApplicationContext(context).build();
+    MDC.put("transactionId", TRANSACTION_ID);
   }
 
   @Test
@@ -77,16 +82,13 @@ class LoteProviderApiComponentTest {
   void informs_client_of_unexpected_server_error_problem() {
     when(loteProviderService.getLoteProviders()).thenThrow(new RuntimeException("failure"));
 
-    var response = performRequest()
+    var problemResponse = performRequest()
         .expectStatus().is5xxServerError()
         .expectBody(ProblemResponse.class)
         .returnResult()
         .getResponseBody();
 
-    assertThat(response).isNotNull();
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    assertThat(response.getTitle()).isNotBlank();
-    assertThat(response.getDetail()).isPresent();
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   private RestTestClient.ResponseSpec performRequest() {

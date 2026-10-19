@@ -11,7 +11,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +42,7 @@ class WuaControllerUnitTest {
 
   @Test
   void testCreateWuaWithNullChallengeResponseAuthenticationReturnsBadRequest() {
-    var response = wuaController.createWua(Optional.of("test-nonce"));
+    var response = wuaController.createWua("test-nonce");
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNull();
@@ -56,7 +55,7 @@ class WuaControllerUnitTest {
     ChallengeResponseAuthentication auth = new ChallengeResponseAuthentication("test-account-id");
 
     // Act
-    var response = wuaController.createWua(Optional.of(""));
+    var response = wuaController.createWua("");
 
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -78,7 +77,7 @@ class WuaControllerUnitTest {
     when(attestationService.createWua(accountId, nonce)).thenReturn(expectedWua);
 
     // Act
-    var response = wuaController.createWua(Optional.of(nonce));
+    var response = wuaController.createWua(nonce);
 
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -97,15 +96,15 @@ class WuaControllerUnitTest {
         new ChallengeResponseAuthentication(accountId));
 
     Wua expectedWua = new Wua(expectedJwt);
-    when(attestationService.createWua(accountId, "")).thenReturn(expectedWua);
+    when(attestationService.createWua(accountId, null)).thenReturn(expectedWua);
 
     // Act
-    var response = wuaController.createWua(Optional.empty());
+    var response = wuaController.createWua(null);
 
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     var actualJwt = response.getBody().getJwt();
     assertEquals(expectedJwt, actualJwt);
-    verify(attestationService).createWua(accountId, "");
+    verify(attestationService).createWua(accountId, null);
   }
 }

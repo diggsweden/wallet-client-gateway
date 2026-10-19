@@ -4,7 +4,6 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +32,7 @@ public class HsmController implements HsmApi {
   }
 
   @Override
-  public ResponseEntity<HsmResponse> createRequest(HsmRequest hsmRequest,
-      Optional<HsmRequestType> type) {
+  public ResponseEntity<HsmResponse> createRequest(HsmRequest hsmRequest, HsmRequestType type) {
 
     var result = hsmService.submitAsync(mapper.toDomain(hsmRequest), currentAccount.id());
     var hsmResponse = mapper.toHsmResponse(result);

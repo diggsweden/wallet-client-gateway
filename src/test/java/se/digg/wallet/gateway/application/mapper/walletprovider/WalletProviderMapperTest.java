@@ -27,8 +27,8 @@ class WalletProviderMapperTest {
     assertThat(result).isNotNull();
     assertThat(result.kty()).isEqualTo(request.getKty());
     assertThat(result.kid()).isEqualTo(request.getKid());
-    assertThat(result.alg()).isEqualTo(request.getAlg().orElseThrow());
-    assertThat(result.use()).isEqualTo(request.getUse().orElseThrow());
+    assertThat(result.alg()).isEqualTo(request.getAlg());
+    assertThat(result.use()).isEqualTo(request.getUse());
     assertThat(result.crv()).isEqualTo(request.getCrv());
     assertThat(result.x()).isEqualTo(request.getX());
     assertThat(result.y()).isEqualTo(request.getY());

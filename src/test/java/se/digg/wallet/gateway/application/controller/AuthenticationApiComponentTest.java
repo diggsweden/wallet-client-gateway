@@ -4,11 +4,8 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import jakarta.annotation.Nullable;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +27,6 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.WebApplicationContext;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.SessionResponse;
 import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
@@ -39,6 +35,7 @@ import se.digg.wallet.gateway.domain.service.AuthService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAssertion.assertProblemDetails;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -96,7 +93,8 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, REQUEST_ARGUMENT_NOT_VALID, null);
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        REQUEST_ARGUMENT_NOT_VALID, null);
   }
 
   @ParameterizedTest
@@ -119,7 +117,7 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
   }
 
   @Test
@@ -138,8 +136,9 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    assertThat(problemResponse.getDetail()).get().isEqualTo(message);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertThat(problemResponse).isNotNull();
+    assertThat(problemResponse.getDetail()).isEqualTo(message);
   }
 
   @Test
@@ -159,7 +158,7 @@ public class AuthenticationApiComponentTest {
         .getResponseBody();
 
     assertThat(authChallengeResponse).isNotNull();
-    assertThat(authChallengeResponse.getNonce()).isPresent().get().isEqualTo(nonce);
+    assertThat(authChallengeResponse.getNonce()).isNotEmpty().isEqualTo(nonce);
   }
 
   @ParameterizedTest
@@ -179,7 +178,8 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, VALIDATION_FAILURE, "signedJwt");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+        VALIDATION_FAILURE, "signedJwt");
   }
 
   @Test
@@ -234,38 +234,5 @@ public class AuthenticationApiComponentTest {
 
     assertThat(sessionResponse).isNotNull();
     assertThat(sessionResponse.getSessionId()).isNotEmpty().isEqualTo(SESSION_ID);
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus) {
-
-    assertProblemDetails(problemResponse, expectedHttpStatus, null, null);
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus,
-      @Nullable String expectedType,
-      @Nullable String expectedInvalidParameterProperty) {
-
-    assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getStatus()).isEqualTo(expectedHttpStatus.value());
-    assertThat(problemResponse.getTitle()).isNotEmpty();
-    assertThat(problemResponse.getDetail()).isPresent();
-    assertThat(problemResponse.getInstance()).isNotEmpty();
-    assertThat(problemResponse.getType()).isPresent();
-    assertThat(problemResponse.getTransactionId()).isPresent().get().isEqualTo(TRANSACTION_ID);
-    if (expectedType != null) {
-      assertThat(problemResponse.getType()).get().isEqualTo(expectedType);
-    }
-
-    if (expectedInvalidParameterProperty != null) {
-      assertThat(problemResponse.getInvalidParameters()).isNotEmpty();
-      assertThat(expectedInvalidParameterProperty).isIn(problemResponse.getInvalidParameters()
-          .stream()
-          .map(ProblemParameterResponse::getProperty)
-          .map(value -> value.orElse(null))
-          .filter(Objects::nonNull)
-          .toList());
-    }
   }
 }
