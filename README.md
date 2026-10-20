@@ -9,15 +9,15 @@
 
 A secure API gateway service for the European Digital Identity Wallet ecosystem.
 
-## Development
-
-To run the application locally, see docker-compose/README.md
-
-### Client Config
+## Client Config
 
 The client config `features` object only contains client-visible boolean switches. More complex
 feature-flag values are evaluated by the backend and exposed through explicit response fields when
 needed, such as `cacheGeneration` or `maintenance`.
+
+## Development
+
+To run the application locally, see docker-compose/README.md
 
 ### Java Code Coverage Reports
 
@@ -132,7 +132,7 @@ This is handled by the `build-helper-maven-plugin`.
 The plugins used with the openapi-generator along with configuration is defined in `pom.xml`.
 
 Remote services that expose an OpenAPI specification file (yaml- or json) can be updated by a manual copy-paste or
-run `mvn initialize -P update-client-apispec` to fetch the most recent specification files automatically.
+run `just update-client-apispec` to fetch the most recent specification files automatically.
 
 ## Contributing
 

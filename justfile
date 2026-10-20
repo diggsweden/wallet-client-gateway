@@ -240,14 +240,26 @@ clean:
 # SPECS - External API specs
 # ==================================================================================== #
 
-# ▪ Update wallet-account OpenAPI spec (fetches pinned ref from pom.xml)
+# ▪ Update external client OpenAPI specs (fetches pinned source ref from pom.xml)
 [group('specs')]
-update-account-spec:
+update-client-apispec:
     #!/usr/bin/env bash
     source "{{colors}}"
-    just_header "Updating wallet-account spec" "mvn -Pupdate-account-spec"
-    mvn {{maven_opts}} generate-resources -Pupdate-account-spec
-    just_success "wallet-account spec updated — review 'git diff' before committing"
+    profile="update-client-apispec"
+    if mvn enforcer:enforce -Denforcer.rules=requireProfileIdsExist -P $profile > /dev/null 2>&1; then
+        just_header "Updating client OpenAPI specs" "mvn initialize -P $profile"
+        if mvn {{maven_opts}} initialize -P $profile; then
+            echo Client API-spec may have been updated in project
+            echo run 'git diff' to review updates
+            echo run 'mvn clean compile' to update the generated client api code
+            echo changes made in the updated API-spec may need appropriate code changes
+            just_success "client api specs updated — "
+        else
+            print_warning "update failed"
+        fi
+    else
+        print_error "maven profile '$profile' not found in pom.xml - update external client OpenAPI specs skipped"
+    fi
 
 # ==================================================================================== #
 # INTERNAL
