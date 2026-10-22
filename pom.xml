@@ -71,16 +71,17 @@
     <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+    <download-maven-plugin.version>2.1.0</download-maven-plugin.version>
 
-    <account-apispec.repo>diggsweden/wallet-account</account-apispec.repo>
-    <account-apispec.ref>refs/heads/main/src/main/resources/static</account-apispec.ref>
-    <account-apispec.file>wallet-account-openapi-v0.yaml</account-apispec.file>
-    <account-apispec.path>src/main/resources/static/${wallet-account-spec.file}</account-apispec.path>
-
-    <attestation-issuer-apispec.repo>diggsweden/wallet-attestation-issuer</attestation-issuer-apispec.repo>
-    <attestation-issuer-apispec.ref>refs/heads/main/src/main/resources/static</attestation-issuer-apispec.ref>
-    <attestation-issuer-apispec.file>wallet-attestation-issuer-openapi-v0.yaml</attestation-issuer-apispec.file>
-    <attestation-issuer-apispec.path>src/main/resources/static/${attestation-issuer-apispec.file}</attestation-issuer-apispec.path>
+    <external-apispec.path>${project.basedir}/src/main/resources/external-apispec</external-apispec.path>
+    <account-apispec.filename>wallet-account-openapi-v0.yaml</account-apispec.filename>
+    <account-apispec.url>
+      https://raw.githubusercontent.com/diggsweden/wallet-account/refs/heads/main/src/main/resources/static/${account-apispec.filename}
+    </account-apispec.url>
+    <attestation-issuer-apispec.filename>wallet-attestation-issuer-openapi-v0.yaml</attestation-issuer-apispec.filename>
+    <attestation-issuer-apispec.url>
+      https://raw.githubusercontent.com/diggsweden/wallet-attestation-issuer/refs/heads/main/src/main/resources/static/${attestation-issuer-apispec.filename}
+    </attestation-issuer-apispec.url>
   </properties>
 
   <dependencies>
@@ -243,31 +244,33 @@
           <plugin>
             <groupId>io.github.download-maven-plugin</groupId>
             <artifactId>download-maven-plugin</artifactId>
-            <version>2.1.0</version>
+            <version>${download-maven-plugin.version}</version>
             <executions>
               <execution>
-                <id>fetch-wallet-account-apispec</id>
+                <id>fetch-wallet-account-client-apispec</id>
                 <phase>initialize</phase>
                 <goals>
                   <goal>wget</goal>
                 </goals>
                 <configuration>
-                <url>https://raw.githubusercontent.com/${account-apispec.repo}/${account-apispec.ref}/${account-apispec.file}</url>
-                <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
-                <outputFileName>${account-apispec.file}</outputFileName>
+                <url>${account-apispec.url}</url>
+                <outputDirectory>${external-apispec.path}</outputDirectory>
+                <outputFileName>${account-apispec.filename}</outputFileName>
+                <skipCache>true</skipCache>
                 <overwrite>true</overwrite>
               </configuration>
               </execution>
               <execution>
-                <id>fetch-wallet-attestation-issuer-apispec</id>
+                <id>fetch-wallet-attestation-issuer-client-apispec</id>
                 <phase>initialize</phase>
                 <goals>
                   <goal>wget</goal>
                 </goals>
                 <configuration>
-                  <url>https://raw.githubusercontent.com/${attestation-issuer-apispec.repo}/${attestation-issuer-apispec.ref}/${attestation-issuer-apispec.file}</url>
-                  <outputDirectory>${project.basedir}/src/main/resources/external-apispec</outputDirectory>
-                  <outputFileName>${attestation-issuer-apispec.file}</outputFileName>
+                  <url>${attestation-issuer-apispec.url}</url>
+                  <outputDirectory>${external-apispec.path}</outputDirectory>
+                  <outputFileName>${attestation-issuer-apispec.filename}</outputFileName>
+                  <skipCache>true</skipCache>
                   <overwrite>true</overwrite>
                 </configuration>
               </execution>
@@ -466,9 +469,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>
-                ${project.basedir}/src/main/resources/external-apispec/wallet-account-openapi-v0.yaml
-              </inputSpec>
+              <inputSpec>${external-apispec.path}/${account-apispec.filename}</inputSpec>
               <generatorName>java</generatorName>
               <configOptions>
                 <apiPackage>se.digg.wallet.gateway.client.account.v0.api</apiPackage>
@@ -489,7 +490,7 @@
             <configuration>
               <skipValidateSpec>true</skipValidateSpec>
               <inputSpec>
-                ${project.basedir}/src/main/resources/external-apispec/wallet-hsm-openapi-v1.json
+                ${external-apispec.path}/wallet-hsm-openapi-v1.json
               </inputSpec>
               <generatorName>java</generatorName>
               <configOptions>
@@ -509,9 +510,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>
-                ${project.basedir}/src/main/resources/external-apispec/wallet-provider-openapi-v0.yaml
-              </inputSpec>
+              <inputSpec>${external-apispec.path}/${attestation-issuer-apispec.filename}</inputSpec>
               <generatorName>java</generatorName>
               <configOptions>
                 <apiPackage>se.digg.wallet.gateway.client.provider.v0.api</apiPackage>
