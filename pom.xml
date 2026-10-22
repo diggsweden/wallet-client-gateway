@@ -69,6 +69,7 @@
     <record-builder.version>53</record-builder.version>
     <openapi-generator-maven-plugin.version>7.26.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
+    <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
 
     <account-apispec.repo>diggsweden/wallet-account</account-apispec.repo>
@@ -554,6 +555,28 @@
               <sources>
                 <source>${project.basedir}/target/generated-sources/openapi/src/test/java</source>
               </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openapitools.openapidiff</groupId>
+        <artifactId>openapi-diff-maven</artifactId>
+        <version>${openapi-diff-maven.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>diff</goal>
+            </goals>
+            <configuration>
+              <oldSpec>https://raw.githubusercontent.com/diggsweden/wallet-client-gateway/refs/heads/main/src/main/resources/static/wallet-client-gateway-openapi-v0.yaml</oldSpec>
+              <newSpec>${project.basedir}/target/classes/static/wallet-client-gateway-openapi-v0.yaml</newSpec>
+              <failOnIncompatible>false</failOnIncompatible>
+              <failOnChanged>false</failOnChanged>
+              <consoleOutputFileName>${project.basedir}/target/openapi-diff.txt</consoleOutputFileName>
+              <jsonOutputFileName>${project.basedir}/target/openapi-diff.json</jsonOutputFileName>
+              <markdownOutputFileName>${project.basedir}/target/openapi-diff.md</markdownOutputFileName>
             </configuration>
           </execution>
         </executions>
