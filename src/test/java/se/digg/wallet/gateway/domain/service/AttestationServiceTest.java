@@ -20,7 +20,7 @@ import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
-import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
+import se.digg.wallet.gateway.domain.ports.outbound.AttestationIssuerPort;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +34,7 @@ class AttestationServiceTest {
   private static final String JWT = "123456";
 
   @Mock
-  private WalletProviderPort walletProviderPort;
+  private AttestationIssuerPort attestationIssuerPort;
 
   @Mock
   private AccountPort accountPort;
@@ -50,7 +50,7 @@ class AttestationServiceTest {
     var expectedWua = new Wua("my dummy jwt");
 
     when(accountPort.getWalletKey(ACCOUNT_ID.toString())).thenReturn(walletKey);
-    when(walletProviderPort.createWalletUnitAttestation(eq(walletKey), eq(nonce)))
+    when(attestationIssuerPort.createWalletUnitAttestation(eq(walletKey), eq(nonce)))
         .thenReturn(expectedWua);
 
     // When
@@ -60,8 +60,8 @@ class AttestationServiceTest {
     assertEquals(expectedWua, actualWuaDto);
     verify(accountPort).getWalletKey(any(String.class));
     verifyNoMoreInteractions(accountPort);
-    verify(walletProviderPort).createWalletUnitAttestation(any(Jwk.class), any(String.class));
-    verifyNoMoreInteractions(walletProviderPort);
+    verify(attestationIssuerPort).createWalletUnitAttestation(any(Jwk.class), any(String.class));
+    verifyNoMoreInteractions(attestationIssuerPort);
   }
 
   @ParameterizedTest
@@ -72,7 +72,7 @@ class AttestationServiceTest {
     var keyAttestation = KeyAttestationBuilder.builder()
         .jwt(JWT)
         .build();
-    when(walletProviderPort.createKeyAttestation(any(), any())).thenReturn(keyAttestation);
+    when(attestationIssuerPort.createKeyAttestation(any(), any())).thenReturn(keyAttestation);
     var keys = List.of(JwkTestBuilder.withDefaults().build());
 
     var result = attestationService.createKeyAttestation(keys, nonce);
@@ -87,7 +87,7 @@ class AttestationServiceTest {
     var wia = WalletInstanceAttestationBuilder.builder()
         .jwt(JWT)
         .build();
-    when(walletProviderPort.createWalletInstanceAttestation(any())).thenReturn(wia);
+    when(attestationIssuerPort.createWalletInstanceAttestation(any())).thenReturn(wia);
     var key = JwkTestBuilder.withDefaults().build();
 
     var result = attestationService.createWalletInstanceAttestation(key);

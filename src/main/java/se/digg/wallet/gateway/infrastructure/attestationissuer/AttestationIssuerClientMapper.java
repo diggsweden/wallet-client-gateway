@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.walletprovider.client;
+package se.digg.wallet.gateway.infrastructure.attestationissuer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,7 @@ import se.digg.wallet.gateway.domain.exception.WalletRuntimeException;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 @Component
-public class WalletProviderClientMapper {
+public class AttestationIssuerClientMapper {
 
   @Autowired
   private ObjectMapper objectMapper;
