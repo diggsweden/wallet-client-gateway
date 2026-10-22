@@ -7,19 +7,24 @@ package se.digg.wallet.gateway.application.filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility for masking sensitive data in logs. Prevents accidental exposure of passwords, tokens and
- * personal data.
+ * Masks headers and bodies before they are logged. Only explicitly allowed header and JSON field
+ * names are logged in clear; everything else is masked, so new fields are never logged by accident.
  */
 @Component
 public class SensitiveDataMasker {
@@ -27,20 +32,37 @@ public class SensitiveDataMasker {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Value("${properties.logging-filter.sensitive-data-mask.headers:}")
-  private List<String> sensitiveHeaders;
+  @Value("${properties.logging-filter.sensitive-data-mask.allowed-headers:}")
+  private List<String> allowedHeaders;
 
-  @Value("${properties.logging-filter.sensitive-data-mask.body-json-fields:}")
-  private List<String> sensitiveFields;
+  @Value("${properties.logging-filter.sensitive-data-mask.allowed-body-json-fields:}")
+  private List<String> allowedFields;
 
   @Value("${properties.logging-filter.sensitive-data-mask.mask-value:***MASKED***}")
   private String mask;
 
+  private Set<String> normalizedAllowedHeaders;
+
+  private Set<String> normalizedAllowedFields;
+
   private static final Pattern EMAIL_PATTERN =
       Pattern.compile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
 
+  @PostConstruct
+  void normalizeConfiguration() {
+    // Lookups are made with lower case keys, so configured names must be lower case as well
+    normalizedAllowedHeaders = toLowerCase(allowedHeaders);
+    normalizedAllowedFields = toLowerCase(allowedFields);
+  }
+
+  private static Set<String> toLowerCase(List<String> values) {
+    return values.stream()
+        .map(value -> value.trim().toLowerCase(Locale.ROOT))
+        .collect(Collectors.toUnmodifiableSet());
+  }
+
   /**
-   * Masks sensitive headers in a map.
+   * Masks the value of every header that is not allowed.
    */
   public Map<String, String> maskHeaders(Map<String, String> headers) {
 
@@ -50,20 +72,15 @@ public class SensitiveDataMasker {
 
     Map<String, String> maskedHeaders = new HashMap<>();
 
-    headers.forEach((key, value) -> {
-      if (sensitiveHeaders.contains(key.toLowerCase(Locale.getDefault()))) {
-        // Mask the value but show first few characters
-        maskedHeaders.put(key, maskValue(value));
-      } else {
-        maskedHeaders.put(key, value);
-      }
-    });
+    headers.forEach((key, value) -> maskedHeaders.put(key,
+        normalizedAllowedHeaders.contains(key.toLowerCase(Locale.ROOT)) ? value : mask));
 
     return maskedHeaders;
   }
 
   /**
-   * Masks sensitive fields in a JSON body.
+   * Masks every value in a JSON body whose field name is not allowed. A body that is not a JSON
+   * object or array is masked entirely.
    */
   public String maskJsonBody(String jsonBody) {
     if (jsonBody == null || jsonBody.isEmpty()) {
@@ -72,16 +89,19 @@ public class SensitiveDataMasker {
 
     try {
       JsonNode rootNode = objectMapper.readTree(jsonBody);
+      if (rootNode == null || !rootNode.isContainerNode()) {
+        return mask;
+      }
       maskJsonNode(rootNode);
       return objectMapper.writeValueAsString(rootNode);
     } catch (JsonProcessingException e) {
-      // Not valid JSON, apply pattern-based masking
-      return maskPatterns(jsonBody);
+      return mask;
     }
   }
 
-  /**
-   * Recursively masks sensitive fields in a JSON node.
+  /*
+   * Containers are always traversed so their allowed fields stay readable. A scalar value is only
+   * kept when its field name is allowed; values in arrays have no name of their own and are masked.
    */
   private void maskJsonNode(JsonNode node) {
     if (node.isObject()) {
@@ -89,24 +109,44 @@ public class SensitiveDataMasker {
       objectNode.fieldNames().forEachRemaining(fieldName -> {
         JsonNode childNode = objectNode.get(fieldName);
 
-        if (sensitiveFields.contains(fieldName.toLowerCase(Locale.getDefault()))) {
-          // Mask the entire value
-          objectNode.put(fieldName, mask);
-        } else if (childNode.isObject() || childNode.isArray()) {
-          // Recurse into nested structures
+        if (normalizedAllowedFields.contains(fieldName.toLowerCase(Locale.ROOT))) {
+          objectNode.set(fieldName, maskPatterns(childNode));
+        } else if (childNode.isContainerNode()) {
           maskJsonNode(childNode);
-        } else if (childNode.isTextual()) {
-          // Check for patterns in string values
-          String value = childNode.asText();
-          String maskedValue = maskPatterns(value);
-          if (!value.equals(maskedValue)) {
-            objectNode.put(fieldName, maskedValue);
-          }
+        } else if (!childNode.isNull()) {
+          objectNode.put(fieldName, mask);
         }
       });
     } else if (node.isArray()) {
-      node.forEach(this::maskJsonNode);
+      ArrayNode arrayNode = (ArrayNode) node;
+      for (int i = 0; i < arrayNode.size(); i++) {
+        JsonNode childNode = arrayNode.get(i);
+        if (childNode.isContainerNode()) {
+          maskJsonNode(childNode);
+        } else if (!childNode.isNull()) {
+          arrayNode.set(i, mask);
+        }
+      }
     }
+  }
+
+  /*
+   * Values of allowed fields are logged in clear, but any e-mail address found inside their text is
+   * still masked, e.g. a problem detail like "invalid value test@test.xx".
+   */
+  private JsonNode maskPatterns(JsonNode node) {
+    if (node.isTextual()) {
+      return TextNode.valueOf(maskPatterns(node.asText()));
+    }
+    if (node.isObject()) {
+      node.properties().forEach(field -> field.setValue(maskPatterns(field.getValue())));
+    } else if (node.isArray()) {
+      ArrayNode arrayNode = (ArrayNode) node;
+      for (int i = 0; i < arrayNode.size(); i++) {
+        arrayNode.set(i, maskPatterns(arrayNode.get(i)));
+      }
+    }
+    return node;
   }
 
   /**
@@ -123,15 +163,5 @@ public class SensitiveDataMasker {
       }
       return String.format("%s@%s", mask, email.substring(atIndex + 1));
     });
-  }
-
-  /**
-   * Masks a value showing only first few characters.
-   */
-  private String maskValue(String value) {
-    if (value == null || value.length() <= 4) {
-      return mask;
-    }
-    return value.substring(0, 4) + "..." + mask;
   }
 }

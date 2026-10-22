@@ -4,27 +4,23 @@
 
 package se.digg.wallet.gateway.application.filter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(properties = {
-    "properties.logging-filter.sensitive-data-mask.headers=sensitive,secret",
-    "properties.logging-filter.sensitive-data-mask.body-json-fields=sensitive,secret",
+    "properties.logging-filter.sensitive-data-mask.allowed-headers=content-type,Mixed-Case-Header",
+    "properties.logging-filter.sensitive-data-mask.allowed-body-json-fields=status,mixedCaseField,allowedObject",
     "properties.logging-filter.sensitive-data-mask.mask-value=***MASKED***"
 })
 @ActiveProfiles("test")
@@ -47,80 +43,35 @@ public class SensitiveDataMaskerTest {
   @Test
   void emptyHeadersShouldReturnEmpty() {
 
-    var emptyHeaders = new HashMap<String, String>();
-
-    var maskedHeaders = masker.maskHeaders(emptyHeaders);
-
-    assertThat(maskedHeaders).isEmpty();
+    assertThat(masker.maskHeaders(new HashMap<>())).isEmpty();
   }
 
   @Test
-  void nonSensitiveHeadersShouldReturnOrigin() {
+  void allowedHeadersShouldReturnOrigin() {
 
-    var expectedHeaders = new HashMap<String, String>();
-    expectedHeaders.put("FirstHeader", randomString());
-    expectedHeaders.put("AnotherHeader", randomString());
+    var headers = Map.of(
+        "Content-Type", "application/json",
+        "mixed-case-header", "some value");
 
-    var actualHeaders = masker.maskHeaders(expectedHeaders);
+    assertThat(masker.maskHeaders(headers)).isEqualTo(headers);
+  }
 
-    assertEquals(expectedHeaders.size(), actualHeaders.size());
-    expectedHeaders.forEach((key, value) -> {
-      assertTrue(actualHeaders.containsKey(key));
-      assertEquals(value, actualHeaders.get(key));
-    });
+  @ParameterizedTest
+  @ValueSource(strings = {"SESSION", "X-API-KEY", "Authorization", "Some-New-Header"})
+  void headersNotAllowedShouldBeMasked(String header) {
+
+    var maskedHeaders = masker.maskHeaders(Map.of(header, "3f2e7c0b-91d2-4a7e-9f34-0d8d9a5a9e77"));
+
+    assertThat(maskedHeaders).containsEntry(header, MASKED);
   }
 
   @Test
-  void sensitiveHeaderShouldReturnMaskedValue() {
+  void nullHeaderValueNotAllowedShouldBeMasked() {
 
-    var sensitiveHeader = "sensitive";
-    var unmaskedValue = randomString();
+    var headers = new HashMap<String, String>();
+    headers.put("SESSION", null);
 
-    var unmaskedHeaders = new HashMap<String, String>();
-    unmaskedHeaders.put(sensitiveHeader, unmaskedValue);
-
-    var maskedHeaders = masker.maskHeaders(unmaskedHeaders);
-
-    assertEquals(unmaskedHeaders.size(), maskedHeaders.size());
-    assertThat(maskedHeaders).containsKey(sensitiveHeader);
-    var maskedValue = maskedHeaders.get(sensitiveHeader);
-    assertThat(unmaskedValue).isNotEqualTo(maskedValue);
-    assertThat(maskedValue).contains(MASKED);
-  }
-
-  @Test
-  void shortSensitiveHeaderShouldReturnMaskedValue() {
-
-    var sensitiveHeader = "sensitive";
-    var unmaskedValue = "A";
-
-    var unmaskedHeaders = new HashMap<String, String>();
-    unmaskedHeaders.put(sensitiveHeader, unmaskedValue);
-
-    var maskedHeaders = masker.maskHeaders(unmaskedHeaders);
-
-    assertEquals(unmaskedHeaders.size(), maskedHeaders.size());
-    assertThat(maskedHeaders).containsKey(sensitiveHeader);
-    var maskedValue = maskedHeaders.get(sensitiveHeader);
-    assertThat(unmaskedValue).isNotEqualTo(maskedValue);
-    assertThat(maskedValue).isEqualTo(MASKED);
-  }
-
-  @Test
-  void nullSensitiveHeaderShouldReturnMaskedValue() {
-
-    var sensitiveHeader = "sensitive";
-
-    var unmaskedHeaders = new HashMap<String, String>();
-    unmaskedHeaders.put(sensitiveHeader, null);
-
-    var maskedHeaders = masker.maskHeaders(unmaskedHeaders);
-
-    assertEquals(unmaskedHeaders.size(), maskedHeaders.size());
-    assertThat(maskedHeaders).containsKey(sensitiveHeader);
-    var maskedValue = maskedHeaders.get(sensitiveHeader);
-    assertNotNull(maskedValue);
-    assertThat(maskedValue).isEqualTo(MASKED);
+    assertThat(masker.maskHeaders(headers)).containsEntry("SESSION", MASKED);
   }
 
   @Test
@@ -136,149 +87,95 @@ public class SensitiveDataMaskerTest {
   }
 
   @Test
-  void simpleBodyShouldReturnOriginBody() throws JsonProcessingException {
+  void allowedFieldsShouldReturnOriginValues() throws Exception {
 
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("StringValue", randomString());
-    var expectedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
+    var masked = mask("""
+        {"status": "COMPLETE", "MIXEDCASEFIELD": 42}
+        """);
 
-    var actualOriginJsonBody = masker.maskJsonBody(expectedJsonBody);
-
-    assertEquals(expectedJsonBody, actualOriginJsonBody);
+    assertThat(masked.get("status").asText()).isEqualTo("COMPLETE");
+    assertThat(masked.get("MIXEDCASEFIELD").asInt()).isEqualTo(42);
   }
 
   @Test
-  void complexBodyShouldReturnOriginBody() throws JsonProcessingException {
+  void fieldsNotAllowedShouldBeMasked() throws Exception {
 
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("StringValue", randomString());
-    unmaskedAttributes.put("IntValue", 10);
-    unmaskedAttributes.put("DecimalValue", 10.7869F);
-    unmaskedAttributes.put("DateTimeValue", new Date());
-    unmaskedAttributes.put("StringArrayValue", new String[] {"A", "B", "C"});
-    unmaskedAttributes.put("IntArrayValue", new Integer[] {1, 2, 3});
-    unmaskedAttributes.put("ChildObject", Map.of("Key1", "v1", "key2", "v2"));
-    var expectedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
+    var masked = mask("""
+        {
+          "unknownField": "some value",
+          "sessionId": "3f2e7c0b-91d2-4a7e-9f34-0d8d9a5a9e77",
+          "pin": 1234,
+          "verified": true
+        }
+        """);
 
-    var actualOriginJsonBody = masker.maskJsonBody(expectedJsonBody);
-
-    assertEquals(expectedJsonBody, actualOriginJsonBody);
+    assertThat(masked.get("unknownField").asText()).isEqualTo(MASKED);
+    assertThat(masked.get("sessionId").asText()).isEqualTo(MASKED);
+    assertThat(masked.get("pin").asText()).isEqualTo(MASKED);
+    assertThat(masked.get("verified").asText()).isEqualTo(MASKED);
   }
 
   @Test
-  void sensitiveFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+  void nullValueShouldStayNull() throws Exception {
 
-    var sensitiveAttribute = "sensitive";
-    var unmaskedValue = "this is a sensitive value expected to be masked";
+    var masked = mask("""
+        {"jwt": null}
+        """);
 
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put(sensitiveAttribute, unmaskedValue);
-    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
-
-    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
-
-    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
-    assertThat(actualBody).containsKey(sensitiveAttribute);
-    var maskedValue = actualBody.get(sensitiveAttribute).toString();
-    assertThat(unmaskedValue).isNotEqualTo(maskedValue);
-    assertThat(maskedValue).contains(MASKED);
+    assertThat(masked.get("jwt").isNull()).isTrue();
   }
 
   @Test
-  void nullSensitiveFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+  void containersShouldBeTraversedAndOnlyAllowedFieldsKept() throws Exception {
 
-    var sensitiveAttribute = "sensitive";
+    var masked = mask("""
+        {
+          "result": {"status": "PENDING", "jwt": "eyJhbGciOiJFUzI1NiJ9.e30.c2ln"},
+          "items": [{"status": "ACTIVE", "secret": "s"}, "loose value", 7, null]
+        }
+        """);
 
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put(sensitiveAttribute, null);
-    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
-
-    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
-
-    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
-    assertThat(actualBody).containsKey(sensitiveAttribute);
-    var maskedValue = actualBody.get(sensitiveAttribute);
-    assertNotNull(maskedValue);
-    assertThat(maskedValue.toString()).isEqualTo(MASKED);
+    assertThat(masked.at("/result/status").asText()).isEqualTo("PENDING");
+    assertThat(masked.at("/result/jwt").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/items/0/status").asText()).isEqualTo("ACTIVE");
+    assertThat(masked.at("/items/0/secret").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/items/1").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/items/2").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/items/3").isNull()).isTrue();
   }
 
   @Test
-  void shortSensitiveFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+  void allowedContainerShouldBeLoggedWithEverythingBelowIt() throws Exception {
 
-    var sensitiveAttribute = "sensitive";
-    var unmaskedValue = "A";
+    var masked = mask("""
+        {"allowedObject": {"anyName": "value", "list": [1, 2]}}
+        """);
 
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("FirstValue", randomString());
-    unmaskedAttributes.put(sensitiveAttribute, unmaskedValue);
-    unmaskedAttributes.put("AnotherValue", randomString());
-    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
-
-    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
-
-    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
-    assertThat(actualBody).containsKey(sensitiveAttribute);
-    var maskedValue = actualBody.get(sensitiveAttribute).toString();
-    assertThat(unmaskedValue).isNotEqualTo(maskedValue);
-    assertThat(maskedValue).isEqualTo(MASKED);
+    assertThat(masked.at("/allowedObject/anyName").asText()).isEqualTo("value");
+    assertThat(masked.at("/allowedObject/list/1").asInt()).isEqualTo(2);
   }
 
   @Test
-  void emailAddressFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+  void emailAddressInAllowedFieldShouldBeMasked() throws Exception {
 
-    var emailAttribute = "email";
-    var expectedEmailDomain = "@test.domain.xx";
-    var unmaskedEmail = String.format("test.testsson%s", expectedEmailDomain);
+    var masked = mask("""
+        {"status": "sent to test.testsson@test.domain.xx"}
+        """);
 
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("FirstValue", randomString());
-    unmaskedAttributes.put(emailAttribute, unmaskedEmail);
-    unmaskedAttributes.put("AnotherValue", randomString());
-    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
-
-    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
-
-    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
-    assertThat(actualBody).containsKey(emailAttribute);
-    var maskedValue = actualBody.get(emailAttribute).toString();
-    assertThat(unmaskedEmail).isNotEqualTo(maskedValue);
-    assertThat(maskedValue).contains(MASKED);
-    assertThat(maskedValue).contains(expectedEmailDomain);
+    assertThat(masked.get("status").asText())
+        .doesNotContain("test.testsson")
+        .contains(MASKED)
+        .endsWith("@test.domain.xx");
   }
 
-  @Test
-  void shortEmailAddressFieldValueInBodyShouldBeReturnedAsMasked() throws JsonProcessingException {
+  @ParameterizedTest
+  @ValueSource(strings = {"not json at all", "\"a json string\"", "1234", "  "})
+  void bodyThatIsNotJsonObjectOrArrayShouldBeMaskedEntirely(String body) {
 
-    var emailAttribute = "email";
-    var expectedEmailDomain = "@test.domain.xx";
-    var unmaskedEmail = String.format("t%s", expectedEmailDomain);
-
-    var unmaskedAttributes = new HashMap<String, Object>();
-    unmaskedAttributes.put("FirstValue", randomString());
-    unmaskedAttributes.put(emailAttribute, unmaskedEmail);
-    unmaskedAttributes.put("AnotherValue", randomString());
-    var unmaskedJsonBody = objectMapper.writeValueAsString(unmaskedAttributes);
-
-    var actualJsonBody = masker.maskJsonBody(unmaskedJsonBody);
-
-    var actualBody = objectMapper.readValue(actualJsonBody, Map.class);
-    assertThat(actualBody).containsKey(emailAttribute);
-    var maskedValue = actualBody.get(emailAttribute).toString();
-    assertThat(unmaskedEmail).isNotEqualTo(maskedValue);
-    assertThat(maskedValue).contains(MASKED);
-    assertThat(maskedValue).contains(expectedEmailDomain);
+    assertThat(masker.maskJsonBody(body)).isEqualTo(MASKED);
   }
 
-  private static String randomString() {
-    int length = 20;
-    int leftLimit = 48; // numeral '0'
-    int rightLimit = 122; // letter 'z'
-    Random random = new Random();
-
-    return random.ints(leftLimit, rightLimit + 1)
-        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-        .limit(length)
-        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-        .toString();
+  private JsonNode mask(String body) throws Exception {
+    return objectMapper.readTree(masker.maskJsonBody(body));
   }
 }
