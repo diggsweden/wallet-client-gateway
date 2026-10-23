@@ -4,8 +4,8 @@
 
 openapi: 3.1.0
 info:
-  title: Wallet Provider API
-  description: European Digital Identity Wallet Provider.
+  title: Wallet Attestation Issuer API
+  description: European Digital Identity Wallet Attestation Issuer.
   version: 0.0.1
   termsOfService: https://www.digg.se/
   contact:

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.walletprovider.client;
+package se.digg.wallet.gateway.infrastructure.attestationissuer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
@@ -20,17 +20,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
-    WalletProviderClientMapper.class,
+    AttestationIssuerClientMapper.class,
     ObjectMapper.class
 })
 @ActiveProfiles("test")
-public class WalletProviderClientMapperTest {
+public class AttestationIssuerClientMapperTest {
 
   @MockitoBean
   private ObjectMapper objectMapper;
 
   @Autowired
-  private WalletProviderClientMapper mapper;
+  private AttestationIssuerClientMapper mapper;
 
   @Test
   void a_null_key_throws_illegal_argument_exception() {

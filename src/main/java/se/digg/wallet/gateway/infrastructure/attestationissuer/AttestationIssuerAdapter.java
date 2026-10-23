@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.walletprovider.client;
+package se.digg.wallet.gateway.infrastructure.attestationissuer;
 
 import jakarta.annotation.Nullable;
 import java.util.List;
@@ -24,13 +24,13 @@ import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestation
 import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.model.attestation.WuaBuilder;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.domain.ports.outbound.WalletProviderPort;
+import se.digg.wallet.gateway.domain.ports.outbound.AttestationIssuerPort;
 
 @Component
-public class WalletProviderAdapter implements WalletProviderPort {
+public class AttestationIssuerAdapter implements AttestationIssuerPort {
 
   @Autowired
-  private WalletProviderClientMapper mapper;
+  private AttestationIssuerClientMapper mapper;
 
   @Autowired
   private WalletUnitAttestationApi walletUnitAttestationApi;

@@ -249,16 +249,16 @@ update-client-apispec:
     if mvn enforcer:enforce -Denforcer.rules=requireProfileIdsExist -P $profile > /dev/null 2>&1; then
         just_header "Updating client OpenAPI specs" "mvn initialize -P $profile"
         if mvn {{maven_opts}} initialize -P $profile; then
-            echo Client API-spec may have been updated in project
-            echo run 'git diff' to review updates
-            echo run 'mvn clean compile' to update the generated client api code
-            echo changes made in the updated API-spec may need appropriate code changes
-            just_success "client api specs updated — "
+            just_success "update-client-apispec complete"
+            echo "A client API-spec may have been updated in project."
+            echo "- Run 'git diff' to review any updates."
+            echo "- Run 'mvn clean compile' to update the generated client api code."
+            echo "Changes made in the updated API-spec may need appropriate code changes."
         else
-            print_warning "update failed"
+            print_error "update-client-apispec failed"
         fi
     else
-        print_error "maven profile '$profile' not found in pom.xml - update external client OpenAPI specs skipped"
+        print_error "update-client-apispec failed: maven profile '$profile' not found in pom.xml"
     fi
 
 # ==================================================================================== #

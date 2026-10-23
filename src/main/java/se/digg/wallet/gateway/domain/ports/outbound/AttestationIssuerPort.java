@@ -11,7 +11,7 @@ import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestation
 import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 
-public interface WalletProviderPort {
+public interface AttestationIssuerPort {
 
   Wua createWalletUnitAttestation(Jwk walletKey, @Nullable String nonce);
 

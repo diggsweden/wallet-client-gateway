@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.walletprovider.client;
+package se.digg.wallet.gateway.infrastructure.attestationissuer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class WalletProviderAdapterTest {
+public class AttestationIssuerAdapterTest {
 
   private static final String JWT = "the.result.jwt";
 
@@ -53,7 +53,7 @@ public class WalletProviderAdapterTest {
   private WalletInstanceAttestationApi walletInstanceAttestationApi;
 
   @Autowired
-  private WalletProviderAdapter adapter;
+  private AttestationIssuerAdapter adapter;
 
   @Test
   void serving_wallet_unit_attestation_without_key_throws_illegal_argument_exception() {
