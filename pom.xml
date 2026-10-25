@@ -65,7 +65,7 @@
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <checkstyle.version>14.3.0</checkstyle.version>
     <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
-    <spotbugs-maven-plugin.version>4.10.4.1</spotbugs-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.10.5.0</spotbugs-maven-plugin.version>
     <record-builder.version>53</record-builder.version>
     <openapi-generator-maven-plugin.version>7.26.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
@@ -139,7 +139,7 @@
     <dependency>
       <groupId>dev.openfeature.contrib.providers</groupId>
       <artifactId>flagd</artifactId>
-      <version>0.14.2</version>
+      <version>0.15.0</version>
     </dependency>
     <dependency>
       <groupId>io.micrometer</groupId>
