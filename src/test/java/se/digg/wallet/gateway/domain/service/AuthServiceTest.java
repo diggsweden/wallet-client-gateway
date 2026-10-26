@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -32,7 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.application.model.AccountTestBuilder;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
-import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
+import se.digg.wallet.gateway.infrastructure.account.WalletAccountAdapter;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
 

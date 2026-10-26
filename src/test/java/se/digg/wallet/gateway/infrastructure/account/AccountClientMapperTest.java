@@ -16,7 +16,6 @@ import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopesResponse;
 import se.digg.wallet.gateway.domain.common.JwkTestBuilder;
 import se.digg.wallet.gateway.domain.model.account.NewAccountBuilder;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
-import se.digg.wallet.gateway.infrastructure.account.mapper.AccountClientMapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class AccountClientMapperTest {
 
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
-  private static final String PERSONAL_IDENTITY_NUMBER = "1910101010";
-  private static final String EMAIL = "test.testsson@test.test";
-  private static final String PHONE_NUMBER = "0700000000";
 
   private AccountClientMapper mapper;
 
@@ -41,23 +37,17 @@ public class AccountClientMapperTest {
   }
 
   @Test
-  void a_new_accounts_personal_details_and_device_key_are_mapped_to_client_request() {
+  void a_new_account_are_mapped_to_client_request() {
 
     var jwk = JwkTestBuilder.withDefaults().build();
 
     var newAccount = NewAccountBuilder.builder()
-        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
-        .email(EMAIL)
-        .phoneNumber(PHONE_NUMBER)
         .deviceKey(jwk)
         .build();
 
     var result = mapper.toClientRequest(newAccount);
 
     assertThat(result).isNotNull();
-    assertThat(result.getPersonalIdentityNumber()).isEqualTo(newAccount.personalIdentityNumber());
-    assertThat(result.getEmail()).isEqualTo(newAccount.email());
-    assertThat(result.getPhoneNumber()).isEqualTo(newAccount.phoneNumber());
     var resultKey = result.getDeviceKey();
     assertThat(resultKey).isNotNull();
     assertThat(resultKey.getKid()).isEqualTo(jwk.kid());
@@ -147,9 +137,6 @@ public class AccountClientMapperTest {
     var responseKey = EcJwkResponseTestBuilder.withDefaults().build();
     var response = AccountResponse.builder()
         .id(ACCOUNT_ID)
-        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
-        .email(EMAIL)
-        .phoneNumber(PHONE_NUMBER)
         .deviceKey(responseKey)
         .build();
 
@@ -157,9 +144,6 @@ public class AccountClientMapperTest {
 
     assertThat(result).isNotNull();
     assertThat(result.id()).isEqualTo(response.getId());
-    assertThat(result.personalIdentityNumber()).isEqualTo(response.getPersonalIdentityNumber());
-    assertThat(result.email()).isEqualTo(response.getEmail());
-    assertThat(result.phoneNumber()).isEqualTo(response.getPhoneNumber());
     var resultKey = result.deviceKey();
     assertThat(resultKey).isNotNull();
     assertThat(resultKey.kid()).isEqualTo(responseKey.getKid());

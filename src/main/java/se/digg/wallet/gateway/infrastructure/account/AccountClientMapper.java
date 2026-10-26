@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.gateway.infrastructure.account.mapper;
+package se.digg.wallet.gateway.infrastructure.account;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +28,6 @@ public class AccountClientMapper {
 
   public AccountRequest toClientRequest(NewAccount newAccount) {
     return AccountRequest.builder()
-        .email(newAccount.email())
-        .phoneNumber(newAccount.phoneNumber())
-        .personalIdentityNumber(newAccount.personalIdentityNumber())
         .deviceKey(toClientRequest(newAccount.deviceKey()))
         .build();
   }
@@ -62,9 +59,6 @@ public class AccountClientMapper {
 
   public Account toDomain(AccountResponse response) {
     return AccountBuilder.builder()
-        .personalIdentityNumber(response.getPersonalIdentityNumber())
-        .email(response.getEmail())
-        .phoneNumber(response.getPhoneNumber())
         .id(response.getId())
         .deviceKey(toDomain(response.getDeviceKey()))
         .build();

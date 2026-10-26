@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -53,9 +53,6 @@ public class AuthUtil {
             .withBody("""
                 {
                   "id": "%s",
-                  "personalIdentityNumber": "%s",
-                  "email": "%s",
-                  "phoneNumber": "%s",
                   "deviceKey": {
                     "kty": "%s",
                     "kid": "%s",
@@ -68,9 +65,6 @@ public class AuthUtil {
                 }
                 """.formatted(
                 accountId,
-                CreateAccountRequestTestBuilder.PERSONAL_IDENTITY_NUMBER,
-                "a@b.c",
-                "007 007",
                 generatedKeyPair.getKeyType().getValue(),
                 generatedKeyPair.getKeyID(),
                 generatedKeyPair.getAlgorithm().toString(),

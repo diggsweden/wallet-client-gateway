@@ -9,8 +9,5 @@ import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 @RecordBuilder
 public record NewAccount(
-    String personalIdentityNumber,
-    String email,
-    String phoneNumber,
     Jwk deviceKey) {
 }

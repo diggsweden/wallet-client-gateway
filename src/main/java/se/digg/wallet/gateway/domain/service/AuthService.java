@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -26,7 +26,7 @@ import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.infrastructure.account.client.WalletAccountAdapter;
+import se.digg.wallet.gateway.infrastructure.account.WalletAccountAdapter;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
 import se.digg.wallet.gateway.infrastructure.auth.model.AuthChallengeCacheValue;
 

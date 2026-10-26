@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -25,7 +25,6 @@ import com.nimbusds.jwt.SignedJWT;
 import com.redis.testcontainers.RedisContainer;
 import java.util.Date;
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -43,7 +42,6 @@ import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.config.SessionConfig;
 import se.digg.wallet.gateway.application.controller.util.RedisTestConfiguration;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
-import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
 import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.infrastructure.auth.cache.ChallengeCache;
@@ -155,9 +153,6 @@ class AuthControllerIntegrationTest {
             .withBody("""
                 {
                   "id": "%s",
-                  "personalIdentityNumber": "%s",
-                  "email": "%s",
-                  "phoneNumber": "%s",
                   "deviceKey": {
                     "kty": "%s",
                     "kid": "%s",
@@ -170,9 +165,6 @@ class AuthControllerIntegrationTest {
                 }
                 """.formatted(
                 ACCOUNT_ID,
-                CreateAccountRequestTestBuilder.PERSONAL_IDENTITY_NUMBER,
-                "a@b.c",
-                "007 007",
                 ecKey.getKeyType().getValue(),
                 ecKey.getKeyID(),
                 ecKey.getAlgorithm().toString(),

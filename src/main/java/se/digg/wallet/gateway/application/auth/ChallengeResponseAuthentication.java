@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
-public class ChallengeResponseAuthentication extends AbstractAuthenticationToken {
+public final class ChallengeResponseAuthentication extends AbstractAuthenticationToken {
 
   @Serial
   private static final long serialVersionUID = 1L;
@@ -21,7 +21,7 @@ public class ChallengeResponseAuthentication extends AbstractAuthenticationToken
   public ChallengeResponseAuthentication(@NotNull String accountId) {
     super(List.of());
     this.accountId = accountId;
-    setAuthenticated(true);
+    super.setAuthenticated(true);
   }
 
   @Override

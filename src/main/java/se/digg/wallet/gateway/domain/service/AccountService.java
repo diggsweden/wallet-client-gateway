@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -9,7 +9,6 @@ import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
-import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 
 @Service
@@ -23,10 +22,6 @@ public class AccountService {
 
   public Account createAccount(NewAccount request) {
     return accountPort.createAccount(request);
-  }
-
-  public void addAccountWalletKey(Jwk jwk, String accountId) {
-    accountPort.addWalletKey(jwk, accountId);
   }
 
   public void addAccountSecurityEnvelope(SecurityEnvelope securityEnvelope, String accountId) {
