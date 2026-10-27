@@ -62,11 +62,12 @@ properties:
         /actuator, /swagger, /v3/api-docs, .html, .png, .gif, .js, .yaml
     sensitive-data-mask:
       mask-value: "***MASKED***"
-      # enter values in lower case
-      headers: >
-        authorization, x-api-key, api-key, apikey, x-auth-token, cookie, set-cookie, x-csrf-token
-      body-json-fields: >
-        password, secret, token, accessToken, access_token, refreshToken, refresh_token, apiKey, api_key
+      # Only these names are logged in clear, every other value is masked. Matched case-insensitively.
+      # Container contents are checked individually against the allow-list.
+      allowed-headers: >
+        accept, accept-encoding, accept-language, content-type, content-length, host, user-agent, wallet-app-version, wallet-device-os, wallet-device-os-version, wallet-device-model
+      allowed-body-json-fields: >
+        accountid, id, status, title, type, instance, property, resulturl, name, version, releasedate, cachegeneration, startsat, endsat, active, url, kty, kid, alg, use, crv, x, y, serverjwspublickey, opaqueserverid, ttl
   resilience:
     retry-policy:
       max-retries: 2
