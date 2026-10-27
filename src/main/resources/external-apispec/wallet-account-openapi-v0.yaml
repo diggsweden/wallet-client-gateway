@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+# SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
 openapi: 3.0.3
 info:
   title: Wallet Account API
-  version: 0.0.4
+  version: 0.0.6
   description: |
     Wallet Account API tillhandahåller serveroperationer för hantering av plånbokskonton till den svenska
     statliga digitala identitetsplånboken. Detta API används endast internt.
@@ -106,11 +106,10 @@ paths:
     post:
       tags:
         - Account
-      summary: Add a wallet key to an account
-      description: |
-        This operation adds a public wallet key (typically owned by the HSM) to the associated account.
-        Currently, only one wallet key per account is supported. Any existing key will be replaced.
+      summary: Add a wallet key to an account (deprecated)
+      description: Deprecated. Wallet keys are owned by the HSM and no longer stored; this operation always returns 410.
       operationId: addAccountWalletKey
+      deprecated: true
       parameters:
         - $ref: '#/components/parameters/AccountId'
       requestBody:
@@ -120,23 +119,18 @@ paths:
               $ref: '#/components/schemas/EcJwkRequest'
         required: true
       responses:
-        '201':
-          description: Public key added to account
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EcJwkResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '410':
+          description: Gone. Wallet keys are no longer stored.
         'default':
           $ref: '#/components/responses/default'
 
     get:
       tags:
         - Account
-      summary: Get account wallet key
-      description: Get the public wallet key(s) (typically owned by the HSM) of a given account.
+      summary: Get account wallet key (deprecated)
+      description: Deprecated. Wallet keys are owned by the HSM and no longer stored; this operation always returns 410.
       operationId: getAccountWalletKey
+      deprecated: true
       parameters:
         - $ref: '#/components/parameters/AccountId'
         - name: kid
@@ -146,14 +140,8 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: The account wallet key(s) being returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EcJwkItemsResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '410':
+          description: Gone. Wallet keys are no longer stored.
         'default':
           $ref: '#/components/responses/default'
 
@@ -406,36 +394,12 @@ components:
           "deviceKey": {
             "kid": "1f3b6eeb-76dc-4686-82df-7d4709067dae",
             "kty": "EC",
-            "crv": "P-256,
+            "crv": "P-256",
             "x": "1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc",
             "y": "5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40"
           }
-          "personalIdentityNumber": "191010101010",
-          "email": "test.testsson@test.test",
-          "phoneNumber": "0700000000"
         }
       properties:
-        personalIdentityNumber:
-          type: string
-          minLength: 1
-          maxLength: 20
-          description: Optional. The personal identity number.
-          example: '201010101010'
-        email:
-          type: string
-          format: email
-          # The e-mail regex pattern originates from https://emailregex.com/index.html
-          # Modified to accept both lower and upper case letters.
-          pattern: (?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
-          minLength: 1
-          maxLength: 100
-          description: Optional. Account owner's e-mail address (RFC 5322 Internet Message Format).
-          example: 'test.testsson@test.xx'
-        phoneNumber:
-          type: string
-          maxLength: 20
-          description: Optional. Account owner's phone number.
-          example: '073-1234567'
         deviceKey:
           $ref: '#/components/schemas/EcJwkRequest'
       required:
@@ -450,13 +414,10 @@ components:
           "deviceKey": {
             "kid": "1f3b6eeb-76dc-4686-82df-7d4709067dae",
             "kty": "EC",
-            "crv": "P-256,
+            "crv": "P-256",
             "x": "1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc",
             "y": "5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40"
           }
-          "personalIdentityNumber": "191010101010",
-          "email": "test.testsson@test.test",
-          "phoneNumber": "0700000000"
         }
       allOf:
         - $ref: '#/components/schemas/AccountRequest'
@@ -480,7 +441,7 @@ components:
         {
           "kid": "1f3b6eeb-76dc-4686-82df-7d4709067dae",
           "kty": "EC",
-          "crv": "P-256,
+          "crv": "P-256",
           "x": "1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc",
           "y": "5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40"
         }
@@ -544,7 +505,7 @@ components:
         {
           "kid": "1f3b6eeb-76dc-4686-82df-7d4709067dae",
           "kty": "EC",
-          "crv": "P-256,
+          "crv": "P-256",
           "x": "1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc",
           "y": "5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40"
         }
@@ -560,7 +521,7 @@ components:
             {
               "kid": "1f3b6eeb-76dc-4686-82df-7d4709067dae",
               "kty": "EC",
-              "crv": "P-256,
+              "crv": "P-256",
               "x": "1fH0eqXgMMwCIafNaDc1axdCjLlw7zpTLvLWjpPvhEc",
               "y": "5qOejJs7BK-jLingaUTEhBrzP_YPyHfptS5yWE98I40"
             }

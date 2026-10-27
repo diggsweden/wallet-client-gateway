@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -14,8 +14,6 @@ public class AccountTestBuilder {
   public static AccountBuilder generateAccount(ECKey ecKey) {
     return AccountBuilder.builder()
         .id(UUID.randomUUID())
-        .email("dummy@test.test")
-        .personalIdentityNumber("191010101010")
         .deviceKey(JwkBuilder.builder()
             .kty(ecKey.getKeyType().getValue())
             .crv(ecKey.getCurve().toString())

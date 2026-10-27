@@ -25,9 +25,6 @@ public class AccountMapper {
 
   public NewAccount toDomain(CreateAccountRequest request) {
     return NewAccountBuilder.builder()
-        .personalIdentityNumber(request.getPersonalIdentityNumber())
-        .email(request.getEmail())
-        .phoneNumber(request.getTelephoneNumber())
         .deviceKey(toDomain(request.getDeviceKey()))
         .build();
   }

@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.9
+  version: 0.0.10
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -165,32 +165,6 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
-  /v0/accounts/wallet-keys:
-    post:
-      tags:
-        - Account
-      summary: Add a wallet key to an account
-      description: |
-        This operation adds a public wallet key (typically owned by the HSM) to the associated account.
-        Currently, only one wallet key per account is supported. Any existing key will be replaced.
-      operationId: addAccountWalletKey
-      parameters:
-        - $ref: '#/components/parameters/Wallet-Device-OS'
-        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
-        - $ref: '#/components/parameters/Wallet-Device-Model'
-        - $ref: '#/components/parameters/Wallet-App-Version'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EcJwkRequest'
-        required: true
-      responses:
-        '201':
-          description: Public wallet key added to account
-        'default':
-          $ref: '#/components/responses/default'
-
   /public/auth/session/challenge:
     get:
       tags:
@@ -262,36 +236,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        'default':
-          $ref: '#/components/responses/default'
-
-  /wua:
-    post:
-      deprecated: true
-      tags:
-        - Wallet Unit Attestation
-      summary: Request a Wallet Unit Attestation
-      description: Creates a Wallet Unit Attestation
-      operationId: createWua
-      parameters:
-        - $ref: '#/components/parameters/Wallet-Device-OS'
-        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
-        - $ref: '#/components/parameters/Wallet-Device-Model'
-        - $ref: '#/components/parameters/Wallet-App-Version'
-        - name: nonce
-          in: query
-          required: false
-          schema:
-            type: string
-      responses:
-        '201':
-          description: The Wallet Unit Attestation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WuaResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         'default':
@@ -682,16 +626,6 @@ components:
           description: Name of the property.
           example: deviceKey
 
-    WuaResponse:
-      type: object
-      properties:
-        jwt:
-          type: string
-          description: Wallet unit attestation
-          example: ey5359ddf330...
-      required:
-        - jwt
-
     AuthChallengeRequest:
       type: object
       properties:
@@ -714,30 +648,6 @@ components:
     CreateAccountRequest:
       type: object
       properties:
-        personalIdentityNumber:
-          type: string
-          description: Optional. Personal identity number.
-          example: '191010101010'
-        email:
-          type: string
-          format: email
-          # The e-mail regex pattern originates from https://emailregex.com/index.html
-          # Modified to accept both lower and upper case letters.
-          pattern: (?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
-          minLength: 1
-          maxLength: 100
-          description: Optional. Contact e-mail address (RFC 5322 Internet Message Format).
-          example: first.last@example.xx
-        emailAdress:
-          deprecated: true
-          type: string
-          format: email
-          description: Optional. Contact e-mail address. Misspelled attribute, will be removed.
-          example: first.last@example.xx
-        telephoneNumber:
-          type: string
-          description: Optional. Contact phone number.
-          example: '0701234567'
         deviceKey:
           $ref: '#/components/schemas/EcJwkRequest'
       required:

@@ -16,14 +16,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.digg.wallet.gateway.domain.common.JwkTestBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestationBuilder;
-import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
-import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.domain.ports.outbound.AttestationIssuerPort;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -41,28 +38,6 @@ class AttestationServiceTest {
 
   @InjectMocks
   private AttestationService attestationService;
-
-  @Test
-  void serves_wallet_unit_attestation() {
-    // Given
-    var nonce = "nonce";
-    var walletKey = new Jwk("kty", "kid", "alg", "use", "crv", "x", "y");
-    var expectedWua = new Wua("my dummy jwt");
-
-    when(accountPort.getWalletKey(ACCOUNT_ID.toString())).thenReturn(walletKey);
-    when(attestationIssuerPort.createWalletUnitAttestation(eq(walletKey), eq(nonce)))
-        .thenReturn(expectedWua);
-
-    // When
-    var actualWuaDto = attestationService.createWua(ACCOUNT_ID.toString(), nonce);
-
-    // Then
-    assertEquals(expectedWua, actualWuaDto);
-    verify(accountPort).getWalletKey(any(String.class));
-    verifyNoMoreInteractions(accountPort);
-    verify(attestationIssuerPort).createWalletUnitAttestation(any(Jwk.class), any(String.class));
-    verifyNoMoreInteractions(attestationIssuerPort);
-  }
 
   @ParameterizedTest
   @NullAndEmptySource

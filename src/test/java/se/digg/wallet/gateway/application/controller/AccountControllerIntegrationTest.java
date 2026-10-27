@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -9,16 +9,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder.EMAIL_ADDRESS;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder.PERSONAL_IDENTITY_NUMBER;
-import static se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder.TELEPHONE_NUMBER;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import java.util.Map;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +31,6 @@ import se.digg.wallet.gateway.application.config.ApplicationConfig;
 import se.digg.wallet.gateway.application.config.SecurityConfig;
 import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 import se.digg.wallet.gateway.application.model.CreateAccountRequestTestBuilder;
-import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
 import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.EcJwkRequest;
@@ -110,21 +104,6 @@ class AccountControllerIntegrationTest {
         .exchange();
 
     response.expectStatus().isForbidden();
-  }
-
-  @Test
-  void testCreateAccountWithEmptyEmailAndSsn() throws Exception {
-    var generatedAccountId = stubAccountCreationWithNullValues();
-    var accountWithEmptyEmailAndSsn = CreateAccountRequestTestBuilder.withDefaults()
-        .deviceKey(EcJwkRequestTestBuilder.withDefaults().build())
-        .build();
-    var response = restClient.post()
-        .uri("/v0/accounts")
-        .header(SecurityConfig.API_KEY_HEADER, applicationConfig.apisecret())
-        .body(accountWithEmptyEmailAndSsn)
-        .exchange();
-
-    expectCreatedWithAccountId(response, generatedAccountId);
   }
 
   @Test
@@ -238,44 +217,10 @@ class AccountControllerIntegrationTest {
     assertThat(problemResponse.getStatus()).isNotNull().isEqualTo(HttpStatus.CONFLICT.value());
   }
 
-  private UUID stubAccountCreationWithNullValues() throws Exception {
-    var generatedAccountId = UUID.randomUUID();
-
-    var expectedRequest = Map.of("deviceKey", Map.of(
-        "kty", "KTY",
-        "kid", "KID",
-        "alg", "ALG",
-        "use", "USE",
-        "crv", "CRV",
-        "x", "X",
-        "y", "Y"));
-
-    var expectedResponse = AccountResponse.builder()
-        .id(generatedAccountId)
-        .email(null)
-        .phoneNumber(null)
-        .deviceKey(EcJwkResponse.builder()
-            .kty("KTY").kid("KID").alg("ALG").use("USE")
-            .crv("CRV").x("X").y("Y").build())
-        .build();
-
-    server.stubFor(post("/v0/accounts")
-        .withRequestBody(equalToJson(objectMapper.writeValueAsString(expectedRequest), true, true))
-        .willReturn(aResponse()
-            .withStatus(201)
-            .withHeader("content-type", "application/json")
-            .withBody(objectMapper.writeValueAsString(expectedResponse))));
-
-    return generatedAccountId;
-  }
-
   private UUID stubAccountCreation() throws Exception {
     var generatedAccountId = UUID.randomUUID();
 
     var expectedRequest = AccountRequest.builder()
-        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
-        .email(EMAIL_ADDRESS)
-        .phoneNumber(TELEPHONE_NUMBER)
         .deviceKey(EcJwkRequest.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())
@@ -283,8 +228,6 @@ class AccountControllerIntegrationTest {
 
     var expectedResponse = AccountResponse.builder()
         .id(generatedAccountId)
-        .email(EMAIL_ADDRESS)
-        .phoneNumber(TELEPHONE_NUMBER)
         .deviceKey(EcJwkResponse.builder()
             .kty("KTY").kid("KID").alg("ALG").use("USE")
             .crv("CRV").x("X").y("Y").build())

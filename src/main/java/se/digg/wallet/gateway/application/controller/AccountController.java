@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -11,26 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.gateway.api.v0.AccountApi;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
-import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
-import se.digg.wallet.gateway.application.auth.CurrentAccount;
 import se.digg.wallet.gateway.application.mapper.account.AccountMapper;
 import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
-import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.service.AccountService;
 
 @RestController
 public class AccountController implements AccountApi {
   private final AccountService accountService;
   private final AccountMapper mapper;
-  private final CurrentAccount currentAccount;
 
-  public AccountController(AccountService accountService,
-      AccountMapper mapper,
-      CurrentAccount currentAccount) {
+  public AccountController(AccountService accountService, AccountMapper mapper) {
     this.accountService = accountService;
     this.mapper = mapper;
-    this.currentAccount = currentAccount;
   }
 
   @Override
@@ -43,16 +36,5 @@ public class AccountController implements AccountApi {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createAccountResponse);
-  }
-
-  @Override
-  public ResponseEntity<Void> addAccountWalletKey(@Valid EcJwkRequest keyRequest) {
-    Jwk jwk = mapper.toDomain(keyRequest);
-    var accountId = currentAccount.id();
-    accountService.addAccountWalletKey(jwk, accountId);
-
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .build();
   }
 }

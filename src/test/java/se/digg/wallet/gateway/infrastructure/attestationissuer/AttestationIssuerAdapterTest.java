@@ -26,7 +26,6 @@ import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -54,57 +53,6 @@ public class AttestationIssuerAdapterTest {
 
   @Autowired
   private AttestationIssuerAdapter adapter;
-
-  @Test
-  void serving_wallet_unit_attestation_without_key_throws_illegal_argument_exception() {
-
-    assertThrows(IllegalArgumentException.class,
-        () -> adapter.createWalletUnitAttestation(null, null));
-
-    verify(walletUnitAttestationApi, never()).postWalletUnitAttestation(any());
-  }
-
-  @Test
-  void json_processing_failure_with_wallet_unit_attestation_throws_wallet_runtime_exception() {
-
-    try {
-      when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-    } catch (JsonProcessingException e) {
-      fail(e);
-    }
-
-    assertThrows(WalletRuntimeException.class,
-        () -> adapter.createWalletUnitAttestation(defaultJwk(), null));
-
-    verify(walletUnitAttestationApi, never()).postWalletUnitAttestation(any());
-  }
-
-  @ParameterizedTest
-  @NullAndEmptySource
-  void serves_wallet_unit_attestation_without_nonce(String nonce) {
-
-    when(walletUnitAttestationApi.postWalletUnitAttestation(any())).thenReturn(JWT);
-
-    var wua =
-        assertDoesNotThrow(() -> adapter.createWalletUnitAttestation(defaultJwk(), nonce));
-
-    verify(walletUnitAttestationApi, times(1)).postWalletUnitAttestation(any());
-    assertThat(wua).isNotNull();
-    assertThat(wua.jwt()).isEqualTo(JWT);
-  }
-
-  @Test
-  void serves_wallet_unit_attestation_with_nonce() {
-
-    when(walletUnitAttestationApi.postWalletUnitAttestation(any())).thenReturn(JWT);
-
-    var wua = assertDoesNotThrow(
-        () -> adapter.createWalletUnitAttestation(defaultJwk(), "some-nonce"));
-
-    verify(walletUnitAttestationApi, times(1)).postWalletUnitAttestation(any());
-    assertThat(wua).isNotNull();
-    assertThat(wua.jwt()).isEqualTo(JWT);
-  }
 
   @Test
   void requesting_key_attestation_with_null_keys_throws_null_pointer_exception() {

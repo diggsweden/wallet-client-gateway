@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -37,9 +37,6 @@ import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAs
 @ActiveProfiles("test")
 public class AccountApiComponentTest {
 
-  private static final String PERSONAL_IDENTITY_NUMBER = "1910101010";
-  private static final String EMAIL = "test.testsson@test.test";
-  private static final String PHONE_NUMBER = "0700000000";
   private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
   private static final String RESOURCE_EXISTS = "/problem-details/resource-already-exists";
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
@@ -105,34 +102,6 @@ public class AccountApiComponentTest {
 
     assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
         VALIDATION_FAILURE, invalidProperty);
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = {
-      " ",
-      "test@domain",
-      "domain.xx",
-      "test.testsson#domain.xx",
-      "test.testsson@domain",
-      "test.testsson.domain.se"
-  })
-  void createAccountWithBadEmailFormatReturnsEmailProblem(String badFormattedEmailAddress) {
-
-    var problemResponse = client.post()
-        .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
-            .email(badFormattedEmailAddress)
-            .deviceKey(defaultKeyRequest().build())
-            .build())
-        .exchange()
-        .expectStatus()
-        .isBadRequest()
-        .expectBody(ProblemResponse.class)
-        .returnResult()
-        .getResponseBody();
-
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
-        VALIDATION_FAILURE, "email");
   }
 
   @Test
@@ -208,16 +177,13 @@ public class AccountApiComponentTest {
   }
 
   @Test
-  void createAccountWithoutOptionalsReturnsSavedValues() {
+  void createAccountReturnsSavedAccountWithAccountId() {
 
     final EcJwkRequest deviceKeyRequest = defaultKeyRequest().build();
     final Jwk deviceKeyDto = toPublicKeyDto(deviceKeyRequest);
 
     var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
         .id(ACCOUNT_ID)
-        .personalIdentityNumber(null)
-        .email(null)
-        .phoneNumber(null)
         .deviceKey(deviceKeyDto)
         .build();
     when(accountService.createAccount(any())).thenReturn(accountDto);
@@ -225,83 +191,6 @@ public class AccountApiComponentTest {
     var accountResponse = client.post()
         .uri("/v0/accounts")
         .body(CreateAccountRequest.builder()
-            .deviceKey(deviceKeyRequest)
-            .build())
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(CreateAccountResponse.class)
-        .returnResult()
-        .getResponseBody();
-
-    assertThat(accountResponse).isNotNull();
-    assertThat(accountResponse.getAccountId()).isNotNull().isEqualTo(ACCOUNT_ID);
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = {
-      "a@a.se",
-      "test@domain.com",
-      "test.testsson@domain.xx",
-      "test@domain.sub.eu",
-      "a-very-long-firstname.and.another-long-lasting-lastname@sub-department.the-domain.net",
-      "123@sub2.sub1.domain.com",
-      "First.Last@Mixed.Se",
-      "ONLY.CAPITAL.LETTERS@THE.DOMAIN.COM",
-      "100@100.se"
-  })
-  void acceptsCreateAccountRequestsWithValidEmail(String email) {
-
-    final EcJwkRequest deviceKeyRequest = defaultKeyRequest().build();
-    final Jwk deviceKeyDto = toPublicKeyDto(deviceKeyRequest);
-
-    var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
-        .id(ACCOUNT_ID)
-        .email(email)
-        .deviceKey(deviceKeyDto)
-        .build();
-    when(accountService.createAccount(any())).thenReturn(accountDto);
-
-    var accountResponse = client.post()
-        .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
-            .personalIdentityNumber(null)
-            .email(email)
-            .telephoneNumber(null)
-            .deviceKey(deviceKeyRequest)
-            .build())
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(CreateAccountResponse.class)
-        .returnResult()
-        .getResponseBody();
-
-    assertThat(accountResponse).isNotNull();
-    assertThat(accountResponse.getAccountId()).isNotNull().isEqualTo(ACCOUNT_ID);
-  }
-
-  @Test
-  void createAccountWithOptionalsReturnsAccountId() {
-
-    final EcJwkRequest deviceKeyRequest = defaultKeyRequest().build();
-    final Jwk deviceKeyDto = toPublicKeyDto(deviceKeyRequest);
-
-    var accountDto = se.digg.wallet.gateway.domain.model.account.AccountBuilder.builder()
-        .id(ACCOUNT_ID)
-        .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
-        .email(EMAIL)
-        .phoneNumber(PHONE_NUMBER)
-        .deviceKey(deviceKeyDto)
-        .build();
-    when(accountService.createAccount(any())).thenReturn(accountDto);
-
-    var accountResponse = client.post()
-        .uri("/v0/accounts")
-        .body(CreateAccountRequest.builder()
-            .personalIdentityNumber(PERSONAL_IDENTITY_NUMBER)
-            .email(EMAIL)
-            .telephoneNumber(PHONE_NUMBER)
             .deviceKey(deviceKeyRequest)
             .build())
         .exchange()

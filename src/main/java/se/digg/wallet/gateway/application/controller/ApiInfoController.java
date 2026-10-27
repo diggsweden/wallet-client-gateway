@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -17,8 +17,8 @@ public class ApiInfoController implements ApiInfoApi {
 
   private static final String NAME = "Wallet Client Gateway API";
   private static final String STATUS = "alpha";
-  private static final String VERSION = "0.0.7";
-  private static final LocalDate RELEASE_DATE = LocalDate.of(2026, 9, 21);
+  private static final String VERSION = "0.0.10";
+  private static final LocalDate RELEASE_DATE = LocalDate.of(2026, 10, 26);
   private static final List<String> LINKS = Collections.emptyList();
 
   @Override

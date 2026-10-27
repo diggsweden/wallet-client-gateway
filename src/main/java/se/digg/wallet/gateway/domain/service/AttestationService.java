@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
 import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestation;
-import se.digg.wallet.gateway.domain.model.attestation.Wua;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
-import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 import se.digg.wallet.gateway.domain.ports.outbound.AttestationIssuerPort;
 
 @Service
@@ -22,18 +20,7 @@ public class AttestationService {
   private final Logger logger = LoggerFactory.getLogger(AttestationService.class);
 
   @Autowired
-  private AccountPort accountPort;
-
-  @Autowired
   private AttestationIssuerPort attestationIssuerPort;
-
-  public Wua createWua(String accountId, @Nullable String nonce) {
-
-    logger.info("Create WUA for accountId: {}, nonce: {}", accountId, nonce);
-    var walletKey = accountPort.getWalletKey(accountId);
-
-    return attestationIssuerPort.createWalletUnitAttestation(walletKey, nonce);
-  }
 
   public KeyAttestation createKeyAttestation(List<Jwk> keys, @Nullable String nonce) {
 

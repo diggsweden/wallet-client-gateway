@@ -12,17 +12,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import se.digg.wallet.gateway.client.provider.v0.api.KeyAttestationApi;
 import se.digg.wallet.gateway.client.provider.v0.api.WalletInstanceAttestationApi;
-import se.digg.wallet.gateway.client.provider.v0.api.WalletUnitAttestationApi;
 import se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationItem;
 import se.digg.wallet.gateway.client.provider.v0.model.KeyAttestationRequest;
 import se.digg.wallet.gateway.client.provider.v0.model.WalletInstanceAttestationRequest;
-import se.digg.wallet.gateway.client.provider.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestation;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestation;
 import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestationBuilder;
-import se.digg.wallet.gateway.domain.model.attestation.Wua;
-import se.digg.wallet.gateway.domain.model.attestation.WuaBuilder;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.ports.outbound.AttestationIssuerPort;
 
@@ -33,31 +29,10 @@ public class AttestationIssuerAdapter implements AttestationIssuerPort {
   private AttestationIssuerClientMapper mapper;
 
   @Autowired
-  private WalletUnitAttestationApi walletUnitAttestationApi;
-
-  @Autowired
   private KeyAttestationApi keyAttestationApi;
 
   @Autowired
   private WalletInstanceAttestationApi walletInstanceAttestationApi;
-
-  @Override
-  public Wua createWalletUnitAttestation(Jwk walletKey, @Nullable String nonce) {
-
-    Assert.notNull(walletKey, "WalletKey must not be null");
-
-    var jwkString = mapper.jwkToJsonString(walletKey);
-    var request = WalletUnitAttestationRequest.builder()
-        .jwk(jwkString)
-        .nonce(nonce)
-        .build();
-
-    var createdWua = walletUnitAttestationApi.postWalletUnitAttestation(request);
-
-    return WuaBuilder.builder()
-        .jwt(createdWua)
-        .build();
-  }
 
   @Override
   public KeyAttestation createKeyAttestation(List<Jwk> keys, @Nullable String nonce) {
