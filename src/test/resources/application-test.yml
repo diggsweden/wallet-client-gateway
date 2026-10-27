@@ -61,7 +61,7 @@ properties:
       allowed-headers: >
         accept, accept-encoding, accept-language, content-type, content-length, host, user-agent, wallet-app-version, wallet-device-os, wallet-device-os-version, wallet-device-model
       allowed-body-json-fields: >
-        accountid, id, status, title, type, detail, instance, reason, property, resulturl, name, version, releasedate, cachegeneration, startsat, endsat, active, url, kty, kid, alg, use, crv, x, y, serverjwspublickey, opaqueserverid, ttl
+        accountid, id, status, title, type, instance, property, resulturl, name, version, releasedate, cachegeneration, startsat, endsat, active, url, kty, kid, alg, use, crv, x, y, serverjwspublickey, opaqueserverid, ttl
   resilience:
     retry-policy:
       max-retries: 2
