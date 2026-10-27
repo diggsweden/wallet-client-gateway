@@ -145,14 +145,38 @@ public class SensitiveDataMaskerTest {
   }
 
   @Test
-  void allowedContainerShouldBeLoggedWithEverythingBelowIt() throws Exception {
+  void allowedContainersShouldStillMaskUnallowedDescendants() throws Exception {
 
     var masked = mask("""
-        {"allowedObject": {"anyName": "value", "list": [1, 2]}}
+        {
+          "allowedObject": {
+            "status": "COMPLETE",
+            "token": "secret-token",
+            "password": "secret-password",
+            "allowedObject": [1, {"status": "ACTIVE", "secret": "nested-secret"}]
+          },
+          "status": {"password": "another-secret"}
+        }
         """);
 
-    assertThat(masked.at("/allowedObject/anyName").asText()).isEqualTo("value");
-    assertThat(masked.at("/allowedObject/list/1").asInt()).isEqualTo(2);
+    assertThat(masked.at("/allowedObject/status").asText()).isEqualTo("COMPLETE");
+    assertThat(masked.at("/allowedObject/token").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/allowedObject/password").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/allowedObject/allowedObject/0").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/allowedObject/allowedObject/1/status").asText()).isEqualTo("ACTIVE");
+    assertThat(masked.at("/allowedObject/allowedObject/1/secret").asText()).isEqualTo(MASKED);
+    assertThat(masked.at("/status/password").asText()).isEqualTo(MASKED);
+  }
+
+  @Test
+  void allowedContainerNameWithScalarValueShouldReturnOriginValue() throws Exception {
+
+    var masked = mask("""
+        {"allowedObject": "visible", "nested": {"allowedObject": 7}}
+        """);
+
+    assertThat(masked.get("allowedObject").asText()).isEqualTo("visible");
+    assertThat(masked.at("/nested/allowedObject").asInt()).isEqualTo(7);
   }
 
   @Test

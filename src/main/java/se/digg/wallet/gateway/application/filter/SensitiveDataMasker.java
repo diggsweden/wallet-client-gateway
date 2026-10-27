@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
@@ -109,10 +108,13 @@ public class SensitiveDataMasker {
       objectNode.fieldNames().forEachRemaining(fieldName -> {
         JsonNode childNode = objectNode.get(fieldName);
 
-        if (normalizedAllowedFields.contains(fieldName.toLowerCase(Locale.ROOT))) {
-          objectNode.set(fieldName, maskPatterns(childNode));
-        } else if (childNode.isContainerNode()) {
+        if (childNode.isContainerNode()) {
           maskJsonNode(childNode);
+        } else if (normalizedAllowedFields.contains(fieldName.toLowerCase(Locale.ROOT))) {
+          // Allowed values are logged in clear, but e-mail addresses inside them are still masked
+          if (childNode.isTextual()) {
+            objectNode.put(fieldName, maskPatterns(childNode.asText()));
+          }
         } else if (!childNode.isNull()) {
           objectNode.put(fieldName, mask);
         }
@@ -128,25 +130,6 @@ public class SensitiveDataMasker {
         }
       }
     }
-  }
-
-  /*
-   * Values of allowed fields are logged in clear, but any e-mail address found inside their text is
-   * still masked, e.g. a problem detail like "invalid value test@test.xx".
-   */
-  private JsonNode maskPatterns(JsonNode node) {
-    if (node.isTextual()) {
-      return TextNode.valueOf(maskPatterns(node.asText()));
-    }
-    if (node.isObject()) {
-      node.properties().forEach(field -> field.setValue(maskPatterns(field.getValue())));
-    } else if (node.isArray()) {
-      ArrayNode arrayNode = (ArrayNode) node;
-      for (int i = 0; i < arrayNode.size(); i++) {
-        arrayNode.set(i, maskPatterns(arrayNode.get(i)));
-      }
-    }
-    return node;
   }
 
   /**
