@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.16] - 2026-10-27
+
+### Changed
+
+- Drop support for wallet-key and wua (#233)
+- Update java non-major (#231)
+- Update actions/setup-java action to v6.1.0 (#230)
+- Attestation issuer api client update (#228)
+- Restore openapi-diff (#227)
+- Renew client apispec auto update profile (#224)
+- Update org.apache.tomcat.embed:tomcat-embed-core to v11.0.27 (#226)
+- Update dependency prettier to v3.9.10 (#225)
+- Update docker.io/library/eclipse-temurin docker tag to v27 (#219)
+- Update java major (#220)
+
+### Removed
+
+- Remove the optional datatype for generated models (#223)
+- Remove webuild from lote providers config (#222)
+
 ## [0.6.15] - 2026-10-15
 
 ### Added
@@ -14,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Bump openapi-generator-maven-plugin to 7.26.0 (#216)
+
 
 ## [0.6.14] - 2026-10-13
 
@@ -798,6 +819,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.16]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.15..v0.6.16
 [0.6.15]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.14..v0.6.15
 [0.6.14]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.13..v0.6.14
 [0.6.13]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.12..v0.6.13
