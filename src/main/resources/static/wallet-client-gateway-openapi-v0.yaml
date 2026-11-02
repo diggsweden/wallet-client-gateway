@@ -39,8 +39,6 @@ tags:
     description: Account operations
   - name: Authentication
     description: Authentication operations
-  - name: Wallet Unit Attestation
-    description: Wallet Unit Attestation operations
   - name: Wallet Attestation
     description: Wallet Attestation operations
   - name: HSM
@@ -417,7 +415,7 @@ paths:
   /trust/v0/lote-providers:
     get:
       tags:
-        - trust
+        - Trust
       summary: Get list of LoTE providers
       description: |
         Get the list of LoTE (List of Trusted Entities) providers to be used with the wallet.
