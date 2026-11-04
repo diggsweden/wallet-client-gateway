@@ -4,7 +4,7 @@
 openapi: 3.0.3
 info:
   title: Wallet Client Gateway API
-  version: 0.0.10
+  version: 0.0.11
   description: |
     Detta API tillhandahåller serveroperationer som i huvudsak används av klienter till den svenska
     statliga digitala identitetsplånboken.
@@ -76,6 +76,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
         - name: If-None-Match
           in: header
           description: ETag from a previous response.
@@ -113,6 +114,12 @@ paths:
       operationId: getMaintenanceWindow
       security:
         - ApiKeyScheme: []
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       responses:
         '200':
           description: Upcoming or active maintenance window
@@ -137,6 +144,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       requestBody:
         content:
           application/json:
@@ -175,6 +183,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
         - name: accountId
           in: query
           required: true
@@ -211,6 +220,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       requestBody:
         description: Challenge response
         content:
@@ -253,6 +263,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       requestBody:
         content:
           application/json:
@@ -286,6 +297,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       requestBody:
         content:
           application/json:
@@ -316,6 +328,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
         - name: type
           in: query
           description: Optional. Apply the intended HSM operation type. Only used for traceability.
@@ -357,6 +370,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
         - name: id
           in: path
           required: true
@@ -396,6 +410,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       requestBody:
         content:
           application/json:
@@ -425,6 +440,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       responses:
         '200':
           description: LoTE providers.
@@ -469,8 +485,17 @@ components:
     Wallet-App-Version:
       name: Wallet-App-Version
       in: header
-      description: Optional. Wallet app version.
-      example: '0.0.12 Build 129'
+      description: Optional. Wallet app semantic version.
+      example: '0.0.12'
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+    Wallet-App-Build:
+      name: Wallet-App-Build
+      in: header
+      description: Optional. Wallet app build number.
+      example: '129'
       required: false
       schema:
         type: string
