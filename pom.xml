@@ -459,7 +459,9 @@
                 <generateBuilders>true</generateBuilders>
                 <useOptional>false</useOptional>
                 <includeHttpRequestContext>false</includeHttpRequestContext>
-                <implicitHeadersRegex>^(Wallet-Device-OS|Wallet-Device-OS-Version|Wallet-Device-Model|Wallet-App-Version|If-None-Match)$</implicitHeadersRegex>
+                <implicitHeadersRegex>
+                  ^(Wallet-Device-OS|Wallet-Device-OS-Version|Wallet-Device-Model|Wallet-App-Version|Wallet-App-Build|If-None-Match)$
+                </implicitHeadersRegex>§§
               </configOptions>
             </configuration>
           </execution>
