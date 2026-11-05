@@ -137,7 +137,7 @@ paths:
       tags:
         - Client Utils
       summary: Create client log
-      description: Create a client log entry with
+      description: Create a client log entry.
       operationId: createClientLog
       security:
         - ApiKeyScheme: []
@@ -146,6 +146,7 @@ paths:
         - $ref: '#/components/parameters/Wallet-Device-OS-Version'
         - $ref: '#/components/parameters/Wallet-Device-Model'
         - $ref: '#/components/parameters/Wallet-App-Version'
+        - $ref: '#/components/parameters/Wallet-App-Build'
       requestBody:
         content:
           application/json:
