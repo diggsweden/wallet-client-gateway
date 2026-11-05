@@ -132,6 +132,32 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
+  /util/v0/client-logs:
+    post:
+      tags:
+        - Client Utils
+      summary: Create client log
+      description: Create a client log entry with
+      operationId: createClientLog
+      security:
+        - ApiKeyScheme: []
+      parameters:
+        - $ref: '#/components/parameters/Wallet-Device-OS'
+        - $ref: '#/components/parameters/Wallet-Device-OS-Version'
+        - $ref: '#/components/parameters/Wallet-Device-Model'
+        - $ref: '#/components/parameters/Wallet-App-Version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientLogRequest'
+        required: true
+      responses:
+        '204':
+          description: Log entry created
+        'default':
+          $ref: '#/components/responses/default'
+
   /v0/accounts:
     post:
       tags:
@@ -544,6 +570,27 @@ components:
         - version
         - releaseDate
         - status
+
+    ClientLogRequest:
+      description: Client log entry request.
+      type: object
+      properties:
+        level:
+          type: string
+          default: INFO
+          enum:
+            - ERROR
+            - WARN
+            - INFO
+            - DEBUG
+            - TRACE
+        message:
+          description: The log message text chunk.
+          type: string
+          minLength: 1
+          maxLength: 10000
+      required:
+        - message
 
     ClientConfigResponse:
       type: object
