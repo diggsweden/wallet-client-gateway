@@ -14,12 +14,14 @@ public final class ClientContextMapper {
   public static final String DEVICE_OS_VERSION = "Wallet-Device-OS-Version";
   public static final String DEVICE_MODEL = "Wallet-Device-Model";
   public static final String APP_VERSION = "Wallet-App-Version";
+  public static final String APP_BUILD = "Wallet-App-Build";
 
   public static final List<String> VARY_HEADERS = List.of(
       DEVICE_OS,
       DEVICE_OS_VERSION,
       DEVICE_MODEL,
-      APP_VERSION);
+      APP_VERSION,
+      APP_BUILD);
 
   private ClientContextMapper() {}
 
@@ -28,6 +30,7 @@ public final class ClientContextMapper {
         request.getHeader(DEVICE_OS),
         request.getHeader(DEVICE_OS_VERSION),
         request.getHeader(DEVICE_MODEL),
-        request.getHeader(APP_VERSION));
+        request.getHeader(APP_VERSION),
+        request.getHeader(APP_BUILD));
   }
 }

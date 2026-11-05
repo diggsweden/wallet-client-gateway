@@ -13,14 +13,16 @@ public record ClientContext(
     @Nullable String os,
     @Nullable String osVersion,
     @Nullable String deviceModel,
-    @Nullable String appVersion) {
+    @Nullable String appVersion,
+    @Nullable String appBuild) {
 
   public static final String OS_ATTRIBUTE = "os";
   public static final String OS_VERSION_ATTRIBUTE = "osVersion";
   public static final String DEVICE_MODEL_ATTRIBUTE = "deviceModel";
   public static final String APP_VERSION_ATTRIBUTE = "appVersion";
+  public static final String APP_BUILD_ATTRIBUTE = "appBuild";
 
   public static ClientContext empty() {
-    return new ClientContext(null, null, null, null);
+    return new ClientContext(null, null, null, null, null);
   }
 }
