@@ -19,8 +19,9 @@ class ClientContextMapperTest {
     request.addHeader(ClientContextMapper.DEVICE_OS_VERSION, "15");
     request.addHeader(ClientContextMapper.DEVICE_MODEL, "Pixel 9");
     request.addHeader(ClientContextMapper.APP_VERSION, "2.1.0");
+    request.addHeader(ClientContextMapper.APP_BUILD, "40");
 
     assertThat(ClientContextMapper.from(request))
-        .isEqualTo(new ClientContext("Android", "15", "Pixel 9", "2.1.0"));
+        .isEqualTo(new ClientContext("Android", "15", "Pixel 9", "2.1.0", "40"));
   }
 }

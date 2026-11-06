@@ -37,6 +37,8 @@ SPDX-License-Identifier: EUPL-1.2
   <logger name="se.digg.wallet.gateway" level="INFO" additivity="false">
     <appender-ref ref="CONSOLE" />
   </logger>
+  <logger name="WalletClientApp" level="ALL" />
+
   <!-- To hide logging api-key at debug level for appliaction-->
   <logger name="se.digg.wallet.gateway.config.SecurityConfig" level="info" />
   <root level="INFO">

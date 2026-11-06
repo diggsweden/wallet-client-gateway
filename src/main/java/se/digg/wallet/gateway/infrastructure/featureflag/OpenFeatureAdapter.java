@@ -44,6 +44,7 @@ public class OpenFeatureAdapter implements FeatureFlagPort {
     putIfPresent(result, ClientContext.OS_VERSION_ATTRIBUTE, context.osVersion());
     putIfPresent(result, ClientContext.DEVICE_MODEL_ATTRIBUTE, context.deviceModel());
     putIfPresent(result, ClientContext.APP_VERSION_ATTRIBUTE, context.appVersion());
+    putIfPresent(result, ClientContext.APP_BUILD_ATTRIBUTE, context.appBuild());
     return result;
   }
 

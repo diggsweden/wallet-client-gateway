@@ -39,9 +39,9 @@ class OpenFeatureAdapterTest {
 
   @Test
   void targetsOnClientContext() {
-    var matching = new ClientContext("Android", "15", "Pixel 9", "2.1.0");
-    var tooOld = new ClientContext("Android", "15", "Pixel 9", "1.9.0");
-    var otherOs = new ClientContext("iOS", "18", "iPhone", "2.1.0");
+    var matching = new ClientContext("Android", "15", "Pixel 9", "2.1.0", "40");
+    var tooOld = new ClientContext("Android", "15", "Pixel 9", "1.9.0", "200");
+    var otherOs = new ClientContext("iOS", "18", "iPhone", "2.1.0", "673");
 
     assertThat(adapter.getBoolean("client.feature.example", false, matching)).isTrue();
     assertThat(adapter.getBoolean("client.feature.example", false, tooOld)).isFalse();
