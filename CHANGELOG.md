@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.18] - 2026-11-06
+
+### Changed
+
+- Migrate workflows to reusable-ci v3 (#242)
+- Update valkey/valkey docker tag to v9.1.3 (#240)
+
+## [0.6.17] - 2026-11-06
+
+### Added
+
+- Add client logging (#241)
+- Add wallet-app-build request header (#235)
+
+### Changed
+
+- Update java non-major (#239)
+- Update diggsweden/wallet-ecosystem digest to f017a14 (#237)
+- Update diggsweden/wallet-ecosystem digest to b5e03a2 (#209)
+- Update diggsweden/reusable-ci action to v3 (#218)
+- Apispec cleanup (#234)
+- Fix/sensitive log masking (#229)
+
 ## [0.6.16] - 2026-10-27
 
 ### Changed
@@ -24,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove the optional datatype for generated models (#223)
 - Remove webuild from lote providers config (#222)
+
 
 ## [0.6.15] - 2026-10-15
 
@@ -819,6 +843,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.18]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.17..v0.6.18
+[0.6.17]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.16..v0.6.17
 [0.6.16]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.15..v0.6.16
 [0.6.15]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.14..v0.6.15
 [0.6.14]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.13..v0.6.14
