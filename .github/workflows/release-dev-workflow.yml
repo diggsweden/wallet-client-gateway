@@ -26,6 +26,5 @@ jobs:
       packages: write # Push dev images to ghcr.io
     uses: diggsweden/reusable-ci/.github/workflows/release-dev-orchestrator.yml@1a76b0c1a69952742ea663c8cfe77d8fe1d168ad # v3.1.0
     with:
-      reusable-ci-ref: d31c989acd139c3e8754e116496c826af8dbbca0
+      reusable-ci-ref: 1a76b0c1a69952742ea663c8cfe77d8fe1d168ad # v3.1.0
       project-type: maven
-    secrets: inherit
