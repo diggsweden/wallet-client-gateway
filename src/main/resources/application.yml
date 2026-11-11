@@ -46,12 +46,6 @@ properties:
   lote-providers:
     - id: DIGG Sandbox
       url: https://wallet.sandbox.digg.se/trust-source/signed/trusted-entities.json
-    - id: Launchpad Wallet Providers
-      url: https://development.trust.tech.ec.europa.eu/lists/eudiw/wallet-providers.json
-    - id: Launchpad PID Providers
-      url: https://development.trust.tech.ec.europa.eu/lists/eudiw/pid-providers.json
-    - id: Launchpad wrpac Providers
-      url: https://development.trust.tech.ec.europa.eu/lists/eudiw/wrpac-providers.json
   logging-filter:
     enabled: true
     max-payload-length: 10000
