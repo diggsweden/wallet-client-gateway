@@ -21,6 +21,9 @@ info:
     availability: Test
     responseTime: 24
     support: Kontorstid
+  x-limitations:
+    - SAK.01
+    - SAK.10
   termsOfService: https://to.be.decided.xx
 externalDocs:
   description: TBD. Text som ex. innehåller service level agreement, kända problem eller begränsningar.
@@ -191,6 +194,53 @@ paths:
           description: |
             Duplicate account. Indicates a save conflict with an existing account having the same unique
             account identifier. The deviceKey.kid value for new accounts must be unique.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
+  /v0/wallets:
+    put:
+      tags:
+        - Account
+      summary: Put the wallet of the signed-in account
+      description: |
+        Stores the wallet for the device key under the account in the access token. Requires a
+        DPoP-bound access token from the authorization server; deviceKey must be the key the token
+        is bound to. Idempotent: putting the same device key again returns the stored wallet.
+      operationId: putWallet
+      security:
+        - ApiKeyScheme: []
+          DPoPScheme: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+        required: true
+      responses:
+        '200':
+          description: The wallet was already stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountResponse'
+        '201':
+          description: Wallet stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountResponse'
+        '400':
+          description: deviceKey is invalid or is not the key the access token is bound to.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: The device key belongs to another wallet, or the account has a wallet with another device key.
           content:
             application/problem+json:
               schema:
@@ -936,3 +986,10 @@ components:
       type: apiKey
       name: SESSION
       in: header
+    DPoPScheme:
+      type: http
+      scheme: DPoP
+      description: |
+        DPoP-bound access token from the authorization server, with a DPoP proof header.
+        Deviates from SAK.10 (Bearer) on purpose: RFC 9449 requires the DPoP scheme for a
+        DPoP-bound token, and accepting it as a bearer token would remove the key binding.

@@ -10,23 +10,26 @@ import java.security.MessageDigest;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.authorization.AuthorizationResult;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
+import se.digg.wallet.gateway.application.auth.DpopTokenAuthentication;
 
 @Configuration
 @EnableWebSecurity
@@ -59,7 +62,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) {
+  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity,
+      ObjectProvider<JwtDecoder> jwtDecoder) {
     httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
         // Unused by this stateless API (no redirect-based login flow); disabling it avoids
@@ -69,13 +73,23 @@ public class SecurityConfig {
             .anyRequest()
             .access(gatewayAuthorizationMgr()));
 
+    // Enabled when the authorization server's JWKS is configured
+    // (spring.security.oauth2.resourceserver.jwt.jwk-set-uri)
+    if (jwtDecoder.getIfAvailable() != null) {
+      DpopTokenAuthentication.configure(httpSecurity);
+    }
+
     return httpSecurity.build();
   }
 
-  // Disables auto config of user repository
+  // Disables auto config of user repository. Authenticates nothing: it is the parent the token
+  // authentication falls back to, and ProviderManager ignores a parent's ProviderNotFoundException.
+  // (Returning AuthenticationConfiguration's manager here made that fallback call itself.)
   @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) {
-    return cfg.getAuthenticationManager();
+  AuthenticationManager authenticationManager() {
+    return authentication -> {
+      throw new ProviderNotFoundException("No global authentication provider");
+    };
   }
 
   /**
@@ -102,7 +116,8 @@ public class SecurityConfig {
         return new AuthorizationDecision(apiKeyGranted);
       }
 
-      boolean authGranted = checkIfGranted(challengeResponseMgr.authorize(authentication, context));
+      boolean authGranted = checkIfGranted(challengeResponseMgr.authorize(authentication, context))
+          || DpopTokenAuthentication.isTokenAuthentication(authentication.get());
       return new AuthorizationDecision(apiKeyGranted && authGranted);
     };
   }

@@ -9,12 +9,16 @@ import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
+import se.digg.wallet.gateway.domain.model.account.WalletPut;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 
 public interface AccountPort {
 
   Account getAccount(UUID accountId);
 
   Account createAccount(NewAccount account);
+
+  WalletPut putWallet(UUID accountId, Jwk deviceKey);
 
   void addSecurityEnvelope(SecurityEnvelope securityEnvelope, String accountId);
 
