@@ -102,6 +102,46 @@ paths:
         'default':
           $ref: '#/components/responses/default'
 
+  /v0/accounts/{id}/wallets:
+    put:
+      tags:
+        - Account
+      summary: Put the wallet of an account
+      description: |
+        Stores the wallet for a device key under an account id assigned by the authorization server,
+        creating the account on first use. Idempotent: putting the same device key again returns the
+        stored wallet. An account has one wallet for now.
+      operationId: putAccountWallet
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+        required: true
+      responses:
+        '200':
+          description: The wallet was already stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '201':
+          description: Wallet stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '409':
+          description: The device key belongs to another wallet, or the account has a wallet with another device key.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        'default':
+          $ref: '#/components/responses/default'
+
   /v0/accounts/{id}/wallet-keys:
     post:
       tags:
