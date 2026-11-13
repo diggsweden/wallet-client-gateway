@@ -4,11 +4,13 @@
 
 package se.digg.wallet.gateway.infrastructure.account;
 
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import se.digg.wallet.gateway.client.account.v0.api.AccountApi;
+import se.digg.wallet.gateway.client.account.v0.model.AccountRequest;
 import se.digg.wallet.gateway.client.account.v0.model.AccountResponse;
 import se.digg.wallet.gateway.client.account.v0.model.HsmClientIdRequest;
 import se.digg.wallet.gateway.client.account.v0.model.SecurityEnvelopeRequest;
@@ -17,6 +19,8 @@ import se.digg.wallet.gateway.domain.model.account.Account;
 import se.digg.wallet.gateway.domain.model.account.NewAccount;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelope;
 import se.digg.wallet.gateway.domain.model.account.SecurityEnvelopes;
+import se.digg.wallet.gateway.domain.model.account.WalletPut;
+import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.ports.outbound.AccountPort;
 
 @Component
@@ -51,6 +55,24 @@ public class WalletAccountAdapter implements AccountPort {
       } else {
         throw e;
       }
+    }
+  }
+
+  @Override
+  public WalletPut putWallet(UUID accountId, Jwk deviceKey) {
+    var request = AccountRequest.builder()
+        .deviceKey(accountClientMapper.toClientRequest(deviceKey))
+        .build();
+    try {
+      var response = accountApi.putAccountWalletWithHttpInfo(accountId, request);
+      return new WalletPut(
+          accountClientMapper.toDomain(Objects.requireNonNull(response.getBody())),
+          response.getStatusCode().value() == HttpStatus.CREATED.value());
+    } catch (RestClientResponseException e) {
+      if (HttpStatus.CONFLICT.value() == e.getStatusCode().value()) {
+        throw new AccountAlreadyExistsException("The wallet conflicts with an existing one");
+      }
+      throw e;
     }
   }
 
