@@ -82,9 +82,11 @@ public class SecurityConfig {
     return httpSecurity.build();
   }
 
-  // Disables auto config of user repository. Authenticates nothing: it is the parent the token
-  // authentication falls back to, and ProviderManager ignores a parent's ProviderNotFoundException.
-  // (Returning AuthenticationConfiguration's manager here made that fallback call itself.)
+  // Disables auto config of user repository. Also the parent that the token chain's ProviderManager
+  // calls when its providers fail (e.g. an expired token). It authenticates nothing; a parent's
+  // ProviderNotFoundException is ignored, so the token error is kept. Returning
+  // AuthenticationConfiguration's manager here made the parent call itself.
+  // https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html#servlet-authentication-providermanager
   @Bean
   AuthenticationManager authenticationManager() {
     return authentication -> {
