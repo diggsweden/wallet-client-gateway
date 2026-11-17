@@ -45,7 +45,7 @@ import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 @WalletAccountMock
 @Testcontainers
 @ActiveProfiles("test")
-class DpopTokenAuthenticationIntegrationTest {
+class DpopTokenAuthenticationComponentTest {
 
   private static final String PATH = "/private/user/session/test";
   private static final String API_KEY = "my_secret_key";
@@ -164,7 +164,7 @@ class DpopTokenAuthenticationIntegrationTest {
   }
 
   @Test
-  void the_challenge_response_session_still_authenticates() throws Exception {
+  void a_challenge_response_session_authenticates_the_account_alongside_tokens() throws Exception {
     AuthUtil.login(accountServer, port, client).get().uri(PATH)
         .exchange()
         .expectStatus().isOk()
@@ -173,7 +173,7 @@ class DpopTokenAuthenticationIntegrationTest {
   }
 
   @Test
-  void a_request_without_session_or_token_is_still_forbidden() {
+  void a_request_without_session_or_token_is_forbidden() {
     client.get().uri(PATH)
         .header(SecurityConfig.API_KEY_HEADER, API_KEY)
         .exchange()
@@ -181,7 +181,7 @@ class DpopTokenAuthenticationIntegrationTest {
   }
 
   @Test
-  void a_valid_token_still_needs_the_api_key() {
+  void a_valid_token_without_the_api_key_is_forbidden() {
     String token = accessToken(SIGNING_KEY, ACCOUNT_ID, DEVICE_KEY);
 
     client.get().uri(PATH)

@@ -52,7 +52,7 @@ import se.digg.wallet.gateway.application.controller.util.WalletAccountMock;
 @WalletAccountMock
 @Testcontainers
 @ActiveProfiles("test")
-class PutWalletIntegrationTest {
+class PutWalletComponentTest {
 
   private static final String PATH = "/v0/wallets";
   private static final String API_KEY = "my_secret_key";
