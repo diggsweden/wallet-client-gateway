@@ -15,6 +15,19 @@ The client config `features` object only contains client-visible boolean switche
 feature-flag values are evaluated by the backend and exposed through explicit response fields when
 needed, such as `cacheGeneration` or `maintenance`.
 
+## DPoP Access Tokens
+
+Enabled by setting `jwk-set-uri`. Also set `issuer-uri` and `audiences`; without them `iss` and
+`aud` are not checked.
+
+```yaml
+spring.security.oauth2.resourceserver.jwt:
+  jwk-set-uri: https://<authorization-server>/<jwks-path>
+  issuer-uri: <iss in the access tokens>
+  audiences: <aud in the access tokens>
+  jws-algorithms: ES256
+```
+
 ## Development
 
 To run the application locally, see docker-compose/README.md
