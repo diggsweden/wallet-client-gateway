@@ -16,6 +16,7 @@ import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
 import se.digg.wallet.gateway.api.v0.model.SessionResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
+import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthenticationMetrics;
 import se.digg.wallet.gateway.domain.model.auth.ValidateAuthChallengeRequestDto;
 import se.digg.wallet.gateway.domain.service.AuthService;
 
@@ -23,9 +24,12 @@ import se.digg.wallet.gateway.domain.service.AuthService;
 public class AuthenticationController implements AuthenticationApi {
 
   private final AuthService authService;
+  private final ChallengeResponseAuthenticationMetrics metrics;
 
-  public AuthenticationController(AuthService authService) {
+  public AuthenticationController(AuthService authService,
+      ChallengeResponseAuthenticationMetrics metrics) {
     this.authService = authService;
+    this.metrics = metrics;
   }
 
   @Override
@@ -46,12 +50,14 @@ public class AuthenticationController implements AuthenticationApi {
       HttpServletRequest req =
           ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
       createAndSaveSession(req, validationResult.orElseThrow());
+      metrics.recordSuccess();
       String sessionId = req.getSession(false).getId();
       var response = SessionResponse.builder()
           .sessionId(sessionId)
           .build();
       return ResponseEntity.ok(response);
     }
+    metrics.recordFailure();
     return ResponseEntity.status(401).build();
   }
 
