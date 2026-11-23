@@ -67,6 +67,10 @@ properties:
       max-retries: 2
       delay-millis: 1000
       multiplier: 1.5
+  # Timeouts for calls to wallet-account, wallet-r2ps and the wallet provider
+  downstream-http:
+    connect-timeout: 2s
+    read-timeout: 5s
 # Wallet Client Gateway Configuration
 server:
   port: 8080
