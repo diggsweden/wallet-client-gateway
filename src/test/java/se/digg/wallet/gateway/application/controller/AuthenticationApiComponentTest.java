@@ -4,6 +4,7 @@
 
 package se.digg.wallet.gateway.application.controller;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -54,6 +55,9 @@ public class AuthenticationApiComponentTest {
 
   @Autowired
   private WebApplicationContext context;
+
+  @Autowired
+  private MeterRegistry meterRegistry;
 
   private RestTestClient client;
 
@@ -234,5 +238,47 @@ public class AuthenticationApiComponentTest {
 
     assertThat(sessionResponse).isNotNull();
     assertThat(sessionResponse.getSessionId()).isNotEmpty().isEqualTo(SESSION_ID);
+  }
+
+  @Test
+  void a_rejected_challenge_response_is_counted_as_failure() {
+
+    when(authService.validateChallenge(any())).thenReturn(Optional.empty());
+    double before = challengeResponseCount("failure");
+
+    client
+        .post()
+        .uri("/public/auth/session/response")
+        .body(AuthChallengeRequest.builder().signedJwt("signed.jwt.test").build())
+        .exchange()
+        .expectStatus()
+        .isUnauthorized();
+
+    assertThat(challengeResponseCount("failure")).isEqualTo(before + 1);
+  }
+
+  @Test
+  void a_validated_challenge_response_is_counted_as_success() {
+
+    var validationResult = new AuthService.ValidationResult(ACCOUNT_ID.toString());
+    when(authService.validateChallenge(any())).thenReturn(Optional.of(validationResult));
+    double before = challengeResponseCount("success");
+
+    client
+        .post()
+        .uri("/public/auth/session/response")
+        .body(AuthChallengeRequest.builder().signedJwt("signed.jwt.test").build())
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    assertThat(challengeResponseCount("success")).isEqualTo(before + 1);
+  }
+
+  private double challengeResponseCount(String outcome) {
+    return meterRegistry.get("gateway.auth.challenge_response")
+        .tag("outcome", outcome)
+        .counter()
+        .count();
   }
 }
