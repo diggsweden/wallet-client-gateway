@@ -30,12 +30,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+@Deprecated
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
   public static final String MDC_TRANSACTION_ID = "transactionId";
   public static final String MDC_CORRELATION_ID = "id";
+  public static final List<String> TRACKED_KEYS = List.of(MDC_TRANSACTION_ID, MDC_CORRELATION_ID);
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -106,7 +108,7 @@ public class LoggingFilter extends OncePerRequestFilter {
       }
     } finally {
       // Ensure MDC is always cleared
-      MDC.clear();
+      TRACKED_KEYS.forEach(MDC::remove);
     }
   }
 
