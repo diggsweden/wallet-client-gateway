@@ -10,15 +10,25 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import se.digg.wallet.gateway.api.v0.ClientUtilsApi;
+import se.digg.wallet.gateway.application.filter.ClientContextMdcFilter;
 import se.digg.wallet.gateway.application.filter.LoggingFilter;
 import se.digg.wallet.gateway.application.filter.MaintenanceFilter;
 
 @Configuration
 public class FilterConfig {
 
-  private static final int LOGGING_ORDER = Ordered.HIGHEST_PRECEDENCE;
+  private static final int CLIENT_CONTEXT_MDC_ORDER = Ordered.HIGHEST_PRECEDENCE;
+  private static final int LOGGING_ORDER = CLIENT_CONTEXT_MDC_ORDER + 10;
   private static final int MAINTENANCE_ORDER = LOGGING_ORDER + 10;
   private static final int CLIENT_CONFIG_ETAG_ORDER = Ordered.LOWEST_PRECEDENCE;
+
+  @Bean
+  public FilterRegistrationBean<ClientContextMdcFilter> clientContextMdcFilterRegistration(
+      ClientContextMdcFilter filter) {
+    var registration = new FilterRegistrationBean<>(filter);
+    registration.setOrder(CLIENT_CONTEXT_MDC_ORDER);
+    return registration;
+  }
 
   @Bean
   public FilterRegistrationBean<LoggingFilter> loggingFilterRegistration(LoggingFilter filter) {
