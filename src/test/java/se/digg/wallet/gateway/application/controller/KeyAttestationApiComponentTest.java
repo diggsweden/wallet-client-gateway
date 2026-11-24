@@ -24,7 +24,6 @@ import org.springframework.web.context.WebApplicationContext;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationResponse;
-import se.digg.wallet.gateway.api.v0.model.ProblemParameterResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
@@ -40,7 +39,7 @@ import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAs
 public class KeyAttestationApiComponentTest {
 
   private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
-  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
+  private static final String TRACE_ID = "50a41978bfc3c5530ba1676f4be03216";
   private static final String NONCE = "f0c0d595-827e-4f23-921a-f5e6a40fc491";
   private static final String JWT = "the.result.jwt";
 
@@ -52,7 +51,7 @@ public class KeyAttestationApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("transactionId", TRANSACTION_ID);
+    MDC.put("trace_id", TRACE_ID);
   }
 
   static List<List<EcJwkRequest>> invalidSetOfEcJwkRequests() {
@@ -111,7 +110,7 @@ public class KeyAttestationApiComponentTest {
         .getResponseBody();
 
     assertThat(problemResponse).isNotNull();
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
     assertThat(problemResponse.getDetail()).isNotEmpty().contains("Remote service failure");
   }
 
@@ -135,7 +134,7 @@ public class KeyAttestationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
   }
 
   @ParameterizedTest
@@ -155,8 +154,8 @@ public class KeyAttestationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
-        VALIDATION_FAILURE, "keys");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRACE_ID, VALIDATION_FAILURE,
+        "keys");
   }
 
   @ParameterizedTest

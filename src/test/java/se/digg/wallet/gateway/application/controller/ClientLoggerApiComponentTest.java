@@ -39,7 +39,8 @@ import se.digg.wallet.gateway.domain.service.ClientLoggerService;
 @ActiveProfiles("test")
 class ClientLoggerApiComponentTest {
 
-  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
+  private static final String VALIDATION_FAILURE = "/problem-details/field-validation-failure";
+  private static final String TRACE_ID = "50a41978bfc3c5530ba1676f4be03216";
   private static final String MESSAGE = "Client log message";
 
   @MockitoBean
@@ -53,7 +54,7 @@ class ClientLoggerApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) {
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("transactionId", TRANSACTION_ID);
+    MDC.put("trace_id", TRACE_ID);
   }
 
   @AfterEach
@@ -105,8 +106,7 @@ class ClientLoggerApiComponentTest {
         .expectBody(ProblemResponse.class)
         .returnResult().getResponseBody();
 
-    assertProblemDetails(problem, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
-        "/problem-details/field-validation-failure", "message");
+    assertProblemDetails(problem, HttpStatus.BAD_REQUEST, TRACE_ID, VALIDATION_FAILURE, "message");
     verifyNoInteractions(clientLoggerService);
   }
 

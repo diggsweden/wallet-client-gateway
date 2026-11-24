@@ -48,7 +48,7 @@ public class AuthenticationApiComponentTest {
   private static final String SESSION_ID = "f753681e-0cb1-4a79-8f4a-b0cddaf1561f";
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
   private static final String KEY_ID = "26862913-ecd0-4d4d-a3d0-9271665d577e";
-  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
+  private static final String TRACE_ID = "50a41978bfc3c5530ba1676f4be03216";
 
   @MockitoBean
   private AuthService authService;
@@ -64,7 +64,7 @@ public class AuthenticationApiComponentTest {
   @BeforeEach
   void setUp() { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("transactionId", TRANSACTION_ID);
+    MDC.put("trace_id", TRACE_ID);
   }
 
   @AfterEach
@@ -97,7 +97,7 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRACE_ID,
         REQUEST_ARGUMENT_NOT_VALID, null);
   }
 
@@ -121,7 +121,7 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
   }
 
   @Test
@@ -140,7 +140,7 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
     assertThat(problemResponse).isNotNull();
     assertThat(problemResponse.getDetail()).isEqualTo(message);
   }
@@ -182,8 +182,8 @@ public class AuthenticationApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
-        VALIDATION_FAILURE, "signedJwt");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRACE_ID, VALIDATION_FAILURE,
+        "signedJwt");
   }
 
   @Test

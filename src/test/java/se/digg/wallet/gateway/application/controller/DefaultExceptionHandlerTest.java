@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
 //
 // SPDX-License-Identifier: EUPL-1.2
 
@@ -20,6 +20,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAssertion.assertProblemDetails;
 
 public class DefaultExceptionHandlerTest {
 
@@ -51,18 +52,17 @@ public class DefaultExceptionHandlerTest {
 
     assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
     var problemResponse = (ProblemResponse) responseEntity.getBody();
-    assertProblemDetails(problemResponse, httpStatus);
+    assertProblemDetails(problemResponse, httpStatus, null);
   }
 
   @Test
-  void nonExistingMdcTransactionIdReturnsEmptyTransactionId() {
+  void nonExistingMdcTraceIdReturnsEmptyTransactionId() {
 
     MDC.clear();
     var problemDetail = ProblemDetail.forStatus(400);
 
-    var responseEntity = assertDoesNotThrow(() -> exceptionHandler
-        .createResponseEntity(problemDetail, HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST,
-            webRequest));
+    var responseEntity = exceptionHandler
+        .createResponseEntity(problemDetail, HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST, webRequest);
 
     assertThat(responseEntity).isNotNull();
     assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
@@ -72,33 +72,21 @@ public class DefaultExceptionHandlerTest {
   }
 
   @Test
-  void existingMdcTransactionIdReturnsTransactionId() {
+  void existingMdcTraceIdReturnsTransactionId() {
 
-    var transactionId = "the-transaction-id";
+    final var traceId = "50a41978bfc3c5530ba1676f4be03216";
     MDC.clear();
-    MDC.put("transactionId", transactionId);
+    MDC.put("trace_id", traceId);
     var problemDetail = ProblemDetail.forStatus(400);
 
-    var responseEntity = assertDoesNotThrow(() -> exceptionHandler
-        .createResponseEntity(problemDetail, HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST,
-            webRequest));
+    var responseEntity = exceptionHandler
+        .createResponseEntity(problemDetail, HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST, webRequest);
 
     assertThat(responseEntity).isNotNull();
     assertThat(responseEntity.getBody()).isInstanceOf(ProblemResponse.class);
     var problemResponse = (ProblemResponse) responseEntity.getBody();
 
     assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getTransactionId()).isNotEmpty().isEqualTo(transactionId);
-  }
-
-  private static void assertProblemDetails(ProblemResponse problemResponse,
-      HttpStatus expectedHttpStatus) {
-
-    assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getStatus()).isEqualTo(expectedHttpStatus.value());
-    assertThat(problemResponse.getTitle()).isNotEmpty();
-    assertThat(problemResponse.getDetail()).isNotEmpty();
-    assertThat(problemResponse.getInstance()).isNotNull();
-    assertThat(problemResponse.getType()).isNotEmpty();
+    assertThat(problemResponse.getTransactionId()).isNotEmpty().isEqualTo(traceId);
   }
 }
