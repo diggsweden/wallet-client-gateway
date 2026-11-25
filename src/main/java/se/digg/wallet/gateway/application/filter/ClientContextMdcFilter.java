@@ -8,10 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import se.digg.wallet.gateway.application.mapper.clientconfig.ClientContextMapper;
@@ -19,10 +16,7 @@ import se.digg.wallet.gateway.application.mapper.clientconfig.ClientContextMappe
 import java.io.IOException;
 import java.util.List;
 
-@Component
 public class ClientContextMdcFilter extends OncePerRequestFilter {
-
-  private static final Logger logger = LoggerFactory.getLogger(ClientContextMdcFilter.class);
 
   public static final String MDC_DEVICE_OS_NAME = "client.os.name";
   public static final String MDC_DEVICE_OS_VERSION = "client.os.version";

@@ -21,9 +21,8 @@ public class FilterConfig {
   private static final int CLIENT_CONFIG_ETAG_ORDER = Ordered.LOWEST_PRECEDENCE;
 
   @Bean
-  public FilterRegistrationBean<ClientContextMdcFilter> clientContextMdcFilterRegistration(
-      ClientContextMdcFilter filter) {
-    var registration = new FilterRegistrationBean<>(filter);
+  public FilterRegistrationBean<ClientContextMdcFilter> clientContextMdcFilterRegistration() {
+    var registration = new FilterRegistrationBean<>(new ClientContextMdcFilter());
     registration.setOrder(CLIENT_CONTEXT_MDC_ORDER);
     return registration;
   }
