@@ -32,7 +32,13 @@ public class ProblemDetailAssertion {
     assertThat(problemResponse.getDetail()).isNotNull();
     assertThat(problemResponse.getInstance()).isNotNull();
     assertThat(problemResponse.getType()).isNotNull();
-    assertThat(problemResponse.getTransactionId()).isNotEmpty().isEqualTo(transactionId);
+
+    if (transactionId != null) {
+      assertThat(problemResponse.getTransactionId()).isNotEmpty().isEqualTo(transactionId);
+    } else {
+      assertThat(problemResponse.getTransactionId()).isNull();
+    }
+
     if (expectedType != null) {
       assertThat(problemResponse.getType()).isEqualTo(expectedType);
     }

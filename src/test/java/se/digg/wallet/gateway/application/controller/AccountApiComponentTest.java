@@ -41,7 +41,7 @@ public class AccountApiComponentTest {
   private static final String RESOURCE_EXISTS = "/problem-details/resource-already-exists";
   private static final UUID ACCOUNT_ID = UUID.fromString("61128b3c-ef55-4410-8dff-d8e8bf0cb9a7");
   private static final String KEY_ID = "26862913-ecd0-4d4d-a3d0-9271665d577e";
-  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
+  private static final String TRACE_ID = "50a41978bfc3c5530ba1676f4be03216";
 
   @MockitoBean
   private AccountService accountService;
@@ -51,7 +51,7 @@ public class AccountApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("transactionId", TRANSACTION_ID);
+    MDC.put("trace_id", TRACE_ID);
   }
 
   @AfterEach
@@ -74,8 +74,8 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
-        VALIDATION_FAILURE, "deviceKey");
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRACE_ID, VALIDATION_FAILURE,
+        "deviceKey");
   }
 
   @ParameterizedTest
@@ -100,8 +100,8 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRANSACTION_ID,
-        VALIDATION_FAILURE, invalidProperty);
+    assertProblemDetails(problemResponse, HttpStatus.BAD_REQUEST, TRACE_ID, VALIDATION_FAILURE,
+        invalidProperty);
   }
 
   @Test
@@ -123,8 +123,7 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.CONFLICT, TRANSACTION_ID,
-        RESOURCE_EXISTS, null);
+    assertProblemDetails(problemResponse, HttpStatus.CONFLICT, TRACE_ID, RESOURCE_EXISTS, null);
   }
 
   @ParameterizedTest
@@ -151,7 +150,7 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
   }
 
   @Test
@@ -173,7 +172,7 @@ public class AccountApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
   }
 
   @Test

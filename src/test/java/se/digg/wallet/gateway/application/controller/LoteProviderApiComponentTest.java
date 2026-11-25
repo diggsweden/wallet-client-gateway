@@ -30,7 +30,7 @@ import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAs
 @ActiveProfiles("test")
 class LoteProviderApiComponentTest {
 
-  private static final String TRANSACTION_ID = "a7240655-a568-41c8-8059-7b18859d5d88";
+  private static final String TRACE_ID = "50a41978bfc3c5530ba1676f4be03216";
 
   @MockitoBean
   private LoteProviderService loteProviderService;
@@ -40,7 +40,7 @@ class LoteProviderApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) {
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("transactionId", TRANSACTION_ID);
+    MDC.put("trace_id", TRACE_ID);
   }
 
   @Test
@@ -88,7 +88,7 @@ class LoteProviderApiComponentTest {
         .returnResult()
         .getResponseBody();
 
-    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRANSACTION_ID);
+    assertProblemDetails(problemResponse, HttpStatus.INTERNAL_SERVER_ERROR, TRACE_ID);
   }
 
   private RestTestClient.ResponseSpec performRequest() {
