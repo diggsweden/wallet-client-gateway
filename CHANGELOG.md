@@ -5,12 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.19] - 2026-11-25
+
+### Added
+
+- Add client context mdc filter (#249)
+
+### Changed
+
+- Drop request response logging (#250)
+- Count challenge-response authentication outcomes (#247)
+- Accept dpop-bound access tokens and put the wallet with them (#244)
+- Bump wallet-ecosystem to latest main (#245)
+- Update docker.io/library/eclipse-temurin:27-jdk-alpine docker digest to 63c4f00 (#238)
+
+### Removed
+
+- Remove unused brave tracing bridge (#248)
+- Remove obsolete launchpad lote-providers (#243)
+
 ## [0.6.18] - 2026-11-06
 
 ### Changed
 
 - Migrate workflows to reusable-ci v3 (#242)
 - Update valkey/valkey docker tag to v9.1.3 (#240)
+
 
 ## [0.6.17] - 2026-11-06
 
@@ -843,6 +863,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.19]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.18..v0.6.19
 [0.6.18]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.17..v0.6.18
 [0.6.17]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.16..v0.6.17
 [0.6.16]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.15..v0.6.16
