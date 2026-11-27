@@ -8,7 +8,6 @@ import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +18,7 @@ import se.digg.wallet.gateway.api.v0.TrustApi;
 import se.digg.wallet.gateway.api.v0.model.LoteProviderItemResponse;
 import se.digg.wallet.gateway.api.v0.model.LoteProvidersResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.domain.model.lote.LoteProvider;
 import se.digg.wallet.gateway.domain.service.LoteProviderService;
 
@@ -40,7 +40,6 @@ class LoteProviderApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) {
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
   }
 
   @Test
@@ -79,6 +78,7 @@ class LoteProviderApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_unexpected_server_error_problem() {
     when(loteProviderService.getLoteProviders()).thenThrow(new RuntimeException("failure"));
 

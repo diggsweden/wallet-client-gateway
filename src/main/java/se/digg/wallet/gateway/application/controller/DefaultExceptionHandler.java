@@ -10,6 +10,7 @@ import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_
 import static se.digg.wallet.gateway.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
 import static se.digg.wallet.gateway.application.controller.ProblemType.RESOURCE_ALREADY_EXISTS;
 
+import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.text.MessageFormat;
@@ -20,7 +21,6 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -333,11 +333,10 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
   private ResponseEntity<Object> createResponseEntity(ProblemResponse problemResponse) {
 
-    try {
-      problemResponse.setTransactionId(MDC.get(MDC_OTEL_TRACE_ID));
-    } catch (Exception e) {
-      LOGGER.info("The MDC property {} is not present", MDC_OTEL_TRACE_ID);
-    }
+    var spanContext = Span.current().getSpanContext();
+    final var traceId = spanContext.isValid() ? spanContext.getTraceId() : null;
+    problemResponse.setTransactionId(traceId);
+
     return ResponseEntity.status(problemResponse.getStatus())
         .contentType(MediaType.APPLICATION_PROBLEM_JSON)
         .body(problemResponse);

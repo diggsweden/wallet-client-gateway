@@ -7,7 +7,6 @@ package se.digg.wallet.gateway.application.controller;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +14,6 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -30,6 +28,7 @@ import se.digg.wallet.gateway.api.v0.model.AuthChallengeRequest;
 import se.digg.wallet.gateway.api.v0.model.AuthChallengeResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.SessionResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.domain.model.auth.AuthChallengeDto;
 import se.digg.wallet.gateway.domain.service.AuthService;
 
@@ -64,12 +63,6 @@ public class AuthenticationApiComponentTest {
   @BeforeEach
   void setUp() { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
-  }
-
-  @AfterEach
-  void cleanUp() {
-    MDC.clear();
   }
 
   @ParameterizedTest
@@ -83,6 +76,7 @@ public class AuthenticationApiComponentTest {
       "accountId=abc123&keyId=",
       "accountId=&keyId=def456"
   })
+  @WithSpanContext(traceId = TRACE_ID)
   void informsClientOfChallengeRequestArgumentProblem(String queryString) {
 
     var problemResponse = client.get()
@@ -103,6 +97,7 @@ public class AuthenticationApiComponentTest {
 
   @ParameterizedTest
   @EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "INTERNAL_SERVER_ERROR"})
+  @WithSpanContext(traceId = TRACE_ID)
   void initChallengeFailingWithRemoteServiceReturnsGenericServerProblem(HttpStatus httpStatus) {
 
     var restClientResponseException = new RestClientResponseException(
@@ -125,6 +120,7 @@ public class AuthenticationApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void initChallengeFailingWithUnexpectedServerErrorReturnsGenericServerProblem() {
 
     final var message = "The cause error message";
@@ -167,6 +163,7 @@ public class AuthenticationApiComponentTest {
 
   @ParameterizedTest
   @NullAndEmptySource
+  @WithSpanContext(traceId = TRACE_ID)
   void informsClientOfMissingSignedJwtProblem(String emptySignedJwt) {
 
     var sessionRequest = AuthChallengeRequest.builder()

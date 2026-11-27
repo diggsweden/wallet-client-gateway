@@ -5,13 +5,12 @@
 package se.digg.wallet.gateway.application.controller;
 
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +22,7 @@ import se.digg.wallet.gateway.api.v0.model.CreateAccountRequest;
 import se.digg.wallet.gateway.api.v0.model.CreateAccountResponse;
 import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.domain.exception.AccountAlreadyExistsException;
 import se.digg.wallet.gateway.domain.model.common.Jwk;
 import se.digg.wallet.gateway.domain.model.common.JwkBuilder;
@@ -51,15 +51,10 @@ public class AccountApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
-  }
-
-  @AfterEach
-  void cleanUp() {
-    MDC.clear();
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void createAccountWithoutDeviceKeyReturnsDeviceKeyProblem() {
 
     var problemResponse = client.post()
@@ -86,6 +81,7 @@ public class AccountApiComponentTest {
       "deviceKey.x",
       "deviceKey.y"
   })
+  @WithSpanContext(traceId = TRACE_ID)
   void informsClientOfDeviceKeyParameterProblem(String invalidProperty) {
 
     var problemResponse = client.post()
@@ -105,6 +101,7 @@ public class AccountApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void creatingDuplicateAccountReturnsConflictProblem() {
 
     var accountAlreadyExistsException = new AccountAlreadyExistsException("The message");
@@ -128,6 +125,7 @@ public class AccountApiComponentTest {
 
   @ParameterizedTest
   @EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "INTERNAL_SERVER_ERROR"})
+  @WithSpanContext(traceId = TRACE_ID)
   void creatingAccountWhenRemoteServiceFailsWithBadRequestReturnsGenericServerProblem(
       HttpStatus httpStatus) {
 
@@ -154,6 +152,7 @@ public class AccountApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void createAccountFailsWithUnexpectedServerErrorReturnsGenericServerProblem() {
 
     final var message = "The cause error message";

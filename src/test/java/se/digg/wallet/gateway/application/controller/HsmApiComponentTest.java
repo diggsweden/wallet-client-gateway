@@ -5,7 +5,6 @@
 package se.digg.wallet.gateway.application.controller;
 
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,7 +13,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +29,7 @@ import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateRequest;
 import se.digg.wallet.gateway.api.v0.model.RegisterStateResponse;
 import se.digg.wallet.gateway.application.auth.ChallengeResponseAuthentication;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.domain.model.hsm.DeviceStateRegistrationResultBuilder;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwk;
 import se.digg.wallet.gateway.domain.model.hsm.EcPublicJwkBuilder;
@@ -61,16 +60,11 @@ public class HsmApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
-  }
-
-  @AfterEach
-  void cleanUp() {
-    MDC.clear();
   }
 
   @ParameterizedTest
   @NullAndEmptySource
+  @WithSpanContext(traceId = TRACE_ID)
   void informsClientOfOuterRequestJwsProblem(String emptyOuterRequestJws) {
 
     var problemResponse = client.post()
@@ -91,6 +85,7 @@ public class HsmApiComponentTest {
 
   @ParameterizedTest
   @EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "INTERNAL_SERVER_ERROR"})
+  @WithSpanContext(traceId = TRACE_ID)
   void requestingHsmWhenRemoteServiceFailsReturnsGenericServerProblem(
       HttpStatus httpStatus) {
 
@@ -117,6 +112,7 @@ public class HsmApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void requestingHsmFailsWithUnexpectedServerErrorReturnsGenericServerProblem() {
 
     final var message = "The cause error message";
@@ -333,6 +329,7 @@ public class HsmApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void saveDeviceStateWithoutDeviceKeyReturnsDeviceKeyProblem() {
 
     var problemResponse = client.post()
@@ -359,6 +356,7 @@ public class HsmApiComponentTest {
       "deviceKey.x",
       "deviceKey.y"
   })
+  @WithSpanContext(traceId = TRACE_ID)
   void informsClientOfDeviceKeyParameterProblem(String invalidProperty) {
 
     var problemResponse = client.post()
@@ -386,6 +384,7 @@ public class HsmApiComponentTest {
       "one year",
       "P30"
   })
+  @WithSpanContext(traceId = TRACE_ID)
   void informsClientOfTtlParameterProblem(String invalidTtl) {
 
     var problemResponse = client.post()
@@ -407,6 +406,7 @@ public class HsmApiComponentTest {
 
   @ParameterizedTest
   @EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "INTERNAL_SERVER_ERROR"})
+  @WithSpanContext(traceId = TRACE_ID)
   void saveDeviceStateWhenRemoteServiceFailingReturnsGenericServerProblem(
       HttpStatus httpStatus) {
 
@@ -433,6 +433,7 @@ public class HsmApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void saveDeviceStateFailingWithUnexpectedServerErrorReturnsGenericServerProblem() {
 
     final var message = "The cause error message";
