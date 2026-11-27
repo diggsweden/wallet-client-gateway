@@ -7,13 +7,11 @@ package se.digg.wallet.gateway.application.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,6 +23,7 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.gateway.api.v0.model.KeyAttestationResponse;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.KeyAttestationBuilder;
 import se.digg.wallet.gateway.domain.service.AttestationService;
@@ -51,7 +50,6 @@ public class KeyAttestationApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
   }
 
   static List<List<EcJwkRequest>> invalidSetOfEcJwkRequests() {
@@ -79,13 +77,9 @@ public class KeyAttestationApiComponentTest {
     return validSetOfEcJwks;
   }
 
-  @AfterEach
-  void cleanUp() {
-    MDC.clear();
-  }
-
   @ParameterizedTest
   @EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "INTERNAL_SERVER_ERROR"})
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_remote_service_problem(HttpStatus httpStatus) {
 
     var restClientResponseException = new RestClientResponseException(
@@ -115,6 +109,7 @@ public class KeyAttestationApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_unexpected_server_error_problem() {
 
     final var message = "The cause error message";
@@ -139,6 +134,7 @@ public class KeyAttestationApiComponentTest {
 
   @ParameterizedTest
   @MethodSource("invalidSetOfEcJwkRequests")
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_missing_keys_problem(List<EcJwkRequest> invalidKeys) {
 
     var problemResponse = client.post()

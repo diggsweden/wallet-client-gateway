@@ -17,6 +17,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -72,11 +73,9 @@ public class DefaultExceptionHandlerTest {
   }
 
   @Test
+  @WithSpanContext(traceId = "50a41978bfc3c5530ba1676f4be03216")
   void existingMdcTraceIdReturnsTransactionId() {
 
-    final var traceId = "50a41978bfc3c5530ba1676f4be03216";
-    MDC.clear();
-    MDC.put("trace_id", traceId);
     var problemDetail = ProblemDetail.forStatus(400);
 
     var responseEntity = exceptionHandler
@@ -87,6 +86,8 @@ public class DefaultExceptionHandlerTest {
     var problemResponse = (ProblemResponse) responseEntity.getBody();
 
     assertThat(problemResponse).isNotNull();
-    assertThat(problemResponse.getTransactionId()).isNotEmpty().isEqualTo(traceId);
+    assertThat(problemResponse.getTransactionId()).isNotEmpty()
+        .isEqualTo("50a41978bfc3c5530ba1676f4be03216");
+
   }
 }

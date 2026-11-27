@@ -12,14 +12,12 @@ import static se.digg.wallet.gateway.application.controller.util.ProblemDetailAs
 
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import se.digg.wallet.gateway.api.v0.ClientUtilsApi;
 import se.digg.wallet.gateway.api.v0.model.ClientLogRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.application.mapper.clientconfig.ClientContextMapper;
 import se.digg.wallet.gateway.domain.model.clientlogger.ClientLogEntry;
 import se.digg.wallet.gateway.domain.service.ClientConfigService;
@@ -54,12 +53,6 @@ class ClientLoggerApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) {
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
-  }
-
-  @AfterEach
-  void cleanUp() {
-    MDC.clear();
   }
 
   @ParameterizedTest
@@ -97,6 +90,7 @@ class ClientLoggerApiComponentTest {
 
   @ParameterizedTest
   @NullAndEmptySource
+  @WithSpanContext(traceId = TRACE_ID)
   void rejects_a_missing_or_empty_log_message(String message) {
     var problem = client.post()
         .uri(ClientUtilsApi.PATH_CREATE_CLIENT_LOG)
@@ -111,6 +105,7 @@ class ClientLoggerApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void rejects_a_log_message_longer_than_the_maximum_length() {
     client.post()
         .uri(ClientUtilsApi.PATH_CREATE_CLIENT_LOG)

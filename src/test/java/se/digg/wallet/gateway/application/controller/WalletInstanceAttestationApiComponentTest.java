@@ -4,13 +4,11 @@
 
 package se.digg.wallet.gateway.application.controller;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +20,7 @@ import se.digg.wallet.gateway.api.v0.model.EcJwkRequest;
 import se.digg.wallet.gateway.api.v0.model.ProblemResponse;
 import se.digg.wallet.gateway.api.v0.model.WalletInstanceAttestationRequest;
 import se.digg.wallet.gateway.api.v0.model.WalletInstanceAttestationResponse;
+import se.digg.wallet.gateway.application.controller.util.WithSpanContext;
 import se.digg.wallet.gateway.application.model.EcJwkRequestTestBuilder;
 import se.digg.wallet.gateway.domain.model.attestation.WalletInstanceAttestationBuilder;
 import se.digg.wallet.gateway.domain.service.AttestationService;
@@ -47,16 +46,11 @@ public class WalletInstanceAttestationApiComponentTest {
   @BeforeEach
   void setUp(WebApplicationContext context) { // Inject the configuration
     client = RestTestClient.bindToApplicationContext(context).build();
-    MDC.put("trace_id", TRACE_ID);
-  }
-
-  @AfterEach
-  void cleanUp() {
-    MDC.clear();
   }
 
   @ParameterizedTest
   @EnumSource(value = HttpStatus.class, names = {"BAD_REQUEST", "INTERNAL_SERVER_ERROR"})
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_remote_service_problem(HttpStatus httpStatus) {
 
     var restClientResponseException = new RestClientResponseException(
@@ -85,6 +79,7 @@ public class WalletInstanceAttestationApiComponentTest {
   }
 
   @Test
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_unexpected_server_error_problem() {
 
     final var message = "The cause error message";
@@ -114,6 +109,7 @@ public class WalletInstanceAttestationApiComponentTest {
       "key.x",
       "key.y"
   })
+  @WithSpanContext(traceId = TRACE_ID)
   void informs_client_of_missing_key_property_problem(String invalidProperty) {
 
     var problemResponse =
