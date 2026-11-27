@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.19] - 2026-11-25
+## [0.6.20] - 2026-11-27
+
+### Fixed
+
+- Use otel span context for traceid (#251)
+
+## [0.6.19] - 2026-11-26
 
 ### Added
 
@@ -23,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove unused brave tracing bridge (#248)
 - Remove obsolete launchpad lote-providers (#243)
+
 
 ## [0.6.18] - 2026-11-06
 
@@ -863,6 +870,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit
 
 
+[0.6.20]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.19..v0.6.20
 [0.6.19]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.18..v0.6.19
 [0.6.18]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.17..v0.6.18
 [0.6.17]: https://github.com/diggsweden/wallet-client-gateway/compare/v0.6.16..v0.6.17
